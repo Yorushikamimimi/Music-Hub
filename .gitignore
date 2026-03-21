@@ -1,0 +1,35 @@
+# ===== 敏感配置 =====
+.env
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ===== 虚拟环境 =====
+venv/
+.venv/
+env/
+
+# ===== 数据库 & 持久化 =====
+*.db
+*.sqlite3
+current_avatar.txt
+
+# ===== 上传文件 =====
+static/uploads/*
+!static/uploads/.gitkeep
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,8 @@
+Flask
+Flask-SQLAlchemy
+pymysql
+requests
+beautifulsoup4
+gunicorn
+python-dotenv
+cryptography

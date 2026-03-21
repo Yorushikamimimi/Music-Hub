@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Music Hub Pro</title>
+    <!-- Bootstrap 5.3 -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="{{ url_for('static', filename='css/fonts.css') }}" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.css') }}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top navbar-glass">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="/" style="color: var(--accent-color);">
+                <i class="bi bi-music-note-beamed me-2"></i>
+                <span>MusicHub <span class="badge bg-dark rounded-pill" style="font-size: 0.6rem;">PRO</span></span>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <ul class="navbar-nav d-none d-md-flex flex-row gap-4">
+                    <li class="nav-item"><a class="nav-link" href="/">榜单首页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/search">歌曲搜索</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">关于作者</a></li>
+                </ul>
+                <div class="theme-toggle" id="theme-toggle" title="切换深色模式">
+                    <i class="bi bi-moon-stars-fill"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div style="height: 100px;"></div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.setAttribute('data-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                icon.classList.replace('bi-moon-stars-fill', 'bi-sun-fill');
+            } else {
+                icon.classList.replace('bi-sun-fill', 'bi-moon-stars-fill');
+            }
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

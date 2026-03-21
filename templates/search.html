@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="glass-card p-4 mb-4">
+        <form action="{{ url_for('main.search') }}" method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="q" class="form-label">搜索歌曲</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control border-start-0" id="q" name="q"
+                        value="{{ request.args.get('q', '') }}" placeholder="输入歌名或专辑...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="year" class="form-label">发行年份</label>
+                <select class="form-select" id="year" name="year">
+                    <option value="">全部年份</option>
+                    {% for y in years %}
+                    <option value="{{ y }}" {% if request.args.get('year')|int==y %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="sort" class="form-label">排序方式</label>
+                <select class="form-select" id="sort" name="sort">
+                    <option value="hot_desc" {% if request.args.get('sort')=='hot_desc' %}selected{% endif %}>热度 (高→低)
+                    </option>
+                    <option value="hot_asc" {% if request.args.get('sort')=='hot_asc' %}selected{% endif %}>热度 (低→高)
+                    </option>
+                    <option value="date_desc" {% if request.args.get('sort')=='date_desc' %}selected{% endif %}>年份 (新→旧)
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel-fill me-1"></i> 筛选
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Area -->
+    <div class="row g-4">
+        {% if songs %}
+        {% for song in songs %}
+        <div class="col-md-6 col-lg-4">
+            <div class="glass-card h-100 p-3 position-relative song-card">
+                <div class="d-flex">
+                    <!-- Placeholder Image Area -->
+                    <!-- ⚠️ Add your JPG images to static/images/ and update DB to use real paths -->
+                    <div class="album-art me-3"
+                        style="width: 80px; height: 80px; background-color: #eee; border-radius: 12px; overflow: hidden;">
+                        <img src="{{ url_for('static', filename='images/' + (song.cover_path if song.cover_path else 'placeholder.jpg')) }}"
+                            class="w-100 h-100 object-fit-cover" alt="{{ song.title }}"
+                            onerror="this.src='https://placehold.co/80x80?text=No+Img'">
+                    </div>
+
+                    <div class="flex-grow-1">
+                        <h5 class="card-title fw-bold mb-1 text-truncate" style="max-width: 200px;"
+                            title="{{ song.title }}">
+                            <a href="{{ song.link }}" target="_blank"
+                                class="text-decoration-none text-reset stretched-link">
+                                {{ song.title }}
+                            </a>
+                        </h5>
+                        <p class="card-text small text-muted mb-1">
+                            <i class="bi bi-music-note-beamed"></i> {{ song.album }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                {{ song.release_year }}
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-danger bg-opacity-10 text-danger">
+                                    <i class="bi bi-fire"></i> {{ song.rating }}
+                                </span>
+                                <button class="fav-btn fav-btn-sm" data-song-id="{{ song.id }}"
+                                    data-song-title="{{ song.title }}" data-song-album="{{ song.album }}"
+                                    data-song-link="{{ song.link }}" data-song-year="{{ song.release_year }}"
+                                    data-song-rating="{{ song.rating }}" title="收藏"
+                                    style="position: relative; z-index: 2;">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <div class="display-1 text-muted opacity-25 mb-3">
+                <i class="bi bi-music-note-list"></i>
+            </div>
+            <h3>没有找到相关歌曲</h3>
+            <p class="text-muted">试着换个关键词，或者减少筛选条件</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='favorites.js') }}"></script>
+{% endblock %}
