@@ -1,49 +1,41 @@
-﻿# 项目进度跟踪（Progress）
+# Project Progress
 
-> 更新时间：2026-03-21（Asia/Shanghai）
+> Updated: 2026-03-21 (Asia/Shanghai)
 
-## 里程碑状态
-- 当前阶段：`MVP Stabilization`（MVP 稳定化阶段）
-  - 中文解释：核心能力可用，正在做上线前收口和运维标准化。
+## Current Stage
+- Stage: `Online Stabilization`
+- Meaning: Core pages are online and accessible. Focus is now on stability and operations.
 
-## 已完成
-1. 项目清理
-- 删除 `venv`、缓存目录、历史日志、空目录等非必要内容。
+## Completed in This Round
+1. Availability fixes
+- Fixed `/search` 500 by importing `request`.
+- Restored `/lyrics` and `/radio` routes.
 
-2. 合规与功能下线
-- 删除评论/留言全链路（后端路由 + 前端页面）。
-- 删除头像悬停音乐功能，并移除本地 MP3 文件。
-- 关闭头像上传（前端入口 + 后端处理均已关闭）。
+2. Homepage UX fixes
+- Fixed daily pick rendering issues.
+- Removed distracting right-side music decoration.
+- Fixed duplicated rating text (such as `HOT HOT`).
 
-3. 安全配置加固
-- `config.py` 改为强制读取环境变量。
-- `SECRET_KEY` 增加强度校验。
-- `netease_spider.py` 去除硬编码数据库密码，改为环境变量。
-- `app.py` 新增安全响应头（CSP/HSTS 等）。
+3. Encoding risk mitigation
+- Switched key templates to safe fallback text to avoid `????` in production.
 
-4. 运维标准化
-- 新增一键部署脚本：`scripts/deploy_music_hub.sh`。
-- 文档补充“证书有效但仍不安全”的排查与修复流程。
+4. Ops workflow
+- Verified deploy/restart/check flow with `systemctl` + `curl`.
+- Added hotfix flow for uploading only changed files.
 
-5. 可运行性验证
-- 执行 `python -m compileall -q .` 可通过（本地代码语法层面）。
+## Current Deliverables
+- Home page with daily recommendation.
+- Search page (`/search`).
+- Song stories page (`/lyrics`).
+- Radio page (`/radio`, optional `RADIO_STREAM_URL`).
+- About page and local favorites.
 
-## 当前可交付能力
-- 首页歌曲展示 + 每日推荐。
-- 搜索筛选与排序。
-- 收藏心愿单（浏览器本地持久化）。
-- 关于页展示（不含上传与评论）。
-- 服务器统一更新（脚本化部署）。
+## Next Steps
+1. i18n cleanup
+- Re-introduce Chinese copy with a strict UTF-8 content pipeline.
 
-## 未完成 / 可继续探索
-1. 文案与编码治理
-- 修复模板中的乱码文本，统一 UTF-8 文案。
+2. Release path hardening
+- Use `local package + scp` as default deployment path on weak networks.
 
-2. 观测与告警
-- 增加基础监控（服务状态、5xx、证书到期提醒）。
-
-3. 测试补强
-- 增加路由可用性测试与配置加载测试。
-
-## 当前风险
-- 若线上页面仍提示“不安全”，优先按 `docs/operations.md` 的 mixed content 与 Nginx 冲突路径继续排查。
+3. Monitoring
+- Add minimal checks: service status, 5xx trend, certificate expiry reminder.

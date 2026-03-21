@@ -5,12 +5,12 @@
     <div class="glass-card p-4 mb-4">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div>
-                <h2 class="fw-bold mb-1">??????</h2>
-                <p class="text-muted mb-0">????????????????????</p>
+                <h2 class="fw-bold mb-1">Song Stories</h2>
+                <p class="text-muted mb-0">Context and interpretation notes for tracks</p>
             </div>
             <form action="{{ url_for('main.lyrics') }}" method="GET" class="d-flex gap-2">
-                <input type="text" class="form-control" name="q" placeholder="????/??" value="{{ keyword }}">
-                <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i>??</button>
+                <input type="text" class="form-control" name="q" placeholder="Song / Album" value="{{ keyword }}">
+                <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i>Search</button>
             </form>
         </div>
     </div>
@@ -23,16 +23,16 @@
                     <h5 class="fw-bold mb-0">{{ item.title }}</h5>
                     <span class="badge bg-primary bg-opacity-10 text-primary">{{ item.release_year or '-' }}</span>
                 </div>
-                <p class="small text-muted mb-2"><i class="bi bi-disc me-1"></i>{{ item.album or '????' }}</p>
+                <p class="small text-muted mb-2"><i class="bi bi-disc me-1"></i>{{ item.album or 'Unknown album' }}</p>
                 <p class="mb-3">{{ item.story }}</p>
                 <a class="btn btn-sm btn-outline-light" href="{{ item.link }}" target="_blank">
-                    <i class="bi bi-box-arrow-up-right me-1"></i>????
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Open Track
                 </a>
             </div>
         </div>
         {% else %}
         <div class="col-12">
-            <div class="glass-card p-4 text-center text-muted">???????????</div>
+            <div class="glass-card p-4 text-center text-muted">No songs matched your query.</div>
         </div>
         {% endfor %}
     </div>

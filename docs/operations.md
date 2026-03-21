@@ -1,74 +1,96 @@
-﻿# 运行与合规手册（Operations）
+# Operations Guide
 
-## 1. 线上运行基线
-- 站点域名：`music.yoruming.cn`
-- 反向代理：`Nginx`（反向代理，负责 HTTPS 与转发）
-- 应用服务：`Gunicorn + Flask`
-- 服务名：`yorushika-web`
-- 应用目录：`/var/www/My_Homepage`
+## Runtime Baseline
+- Domain: `music.yoruming.cn`
+- Reverse proxy: `Nginx`
+- App server: `Gunicorn + Flask`
+- Service name: `yorushika-web`
+- App path: `/var/www/My_Homepage`
 
-## 2. 为什么会出现“不安全”（证书有效但仍警告）
-最常见根因不是证书本身，而是 `mixed content`（混合内容：HTTPS 页面里加载了 HTTP 资源）或入口路由冲突。
-
-高概率原因：
-1. `mixed content`：页面中某些资源被 `http://` 加载（图片、脚本、字体、接口）。
-2. Nginx 多份 `server_name` 冲突：同一域名命中到旧站点或错误 upstream。
-3. 证书命中错误（`SNI`）：域名正确但命中默认站点证书或历史配置。
-4. 浏览器缓存/HSTS 历史状态未刷新。
-
-## 3. 一次性排查命令（服务器）
-```bash
-# 1) 证书链和域名是否匹配
-openssl s_client -connect music.yoruming.cn:443 -servername music.yoruming.cn < /dev/null 2>/dev/null | openssl x509 -noout -subject -issuer -dates
-
-# 2) Nginx 是否有重复 server_name
-sudo nginx -T 2>/dev/null | grep -nE "server_name\s+music\.yoruming\.cn|listen\s+443|proxy_pass"
-
-# 3) 线上首页是否含 http:// 资源
-curl -s https://music.yoruming.cn | grep -oE "http://[^\" )]+"
-
-# 4) 本机回环验证（绕过 DNS）
-curl -I -H "Host: music.yoruming.cn" http://127.0.0.1
-curl -Ik https://music.yoruming.cn
+## Deployment (Recommended)
+### A) Default path (stable on weak network): local package + SCP
+```powershell
+# Local Windows
+cd D:\Workspace\My_Homepage
+git archive --format=tar.gz -o Music-Hub-main.tar.gz HEAD
+scp .\Music-Hub-main.tar.gz root@<SERVER_IP>:/tmp/
 ```
 
-如果第 3 条有输出，就属于 `mixed content`，需要把对应资源改成 `https://` 或相对路径。
+```bash
+# Server Linux
+rm -rf /tmp/music-hub-release && mkdir -p /tmp/music-hub-release
+tar --warning=no-unknown-keyword -xzf /tmp/Music-Hub-main.tar.gz -C /tmp/music-hub-release
+sudo rsync -a --delete \
+  --exclude ".env" \
+  --exclude "venv/" \
+  --exclude "static/uploads/" \
+  --exclude "current_avatar.txt" \
+  /tmp/music-hub-release/ /var/www/My_Homepage/
+sudo systemctl restart yorushika-web
+```
 
-## 4. 统一更新方式（一键脚本）
-脚本位置：`scripts/deploy_music_hub.sh`
-
-能力说明：
-1. 从 GitHub 拉取指定分支。
-2. 通过 `rsync` 同步到 `/var/www/My_Homepage`。
-3. 保留 `.env`、`venv/`、`static/uploads/`、`current_avatar.txt`。
-4. 安装依赖、执行 `compile check`（编译检查）。
-5. 重启 `yorushika-web` 并做健康检查。
-6. 生成增量备份目录：`/var/backups/music-hub/<timestamp>`。
-
-使用方法：
+### B) One-click script (when server can access GitHub smoothly)
 ```bash
 cd /var/www/My_Homepage
 chmod +x scripts/deploy_music_hub.sh
 ./scripts/deploy_music_hub.sh
 ```
 
-可选参数：
+## Ops Command Cheat Sheet
 ```bash
-BRANCH=main \
-DOMAIN=music.yoruming.cn \
-SERVICE_NAME=yorushika-web \
-REPO_URL=https://github.com/Yorushikamimimi/Music-Hub.git \
-./scripts/deploy_music_hub.sh
+# Service status
+sudo systemctl status yorushika-web --no-pager
+
+# Start / Stop / Restart
+sudo systemctl start yorushika-web
+sudo systemctl stop yorushika-web
+sudo systemctl restart yorushika-web
+
+# Enable / Disable on boot
+sudo systemctl enable yorushika-web
+sudo systemctl disable yorushika-web
+
+# Logs
+sudo journalctl -u yorushika-web -f
+sudo journalctl -u yorushika-web -n 120 --no-pager
+
+# Nginx check and reload
+sudo nginx -t
+sudo systemctl reload nginx
+
+# Health checks
+curl -Ik https://music.yoruming.cn
+curl -I -H "Host: music.yoruming.cn" http://127.0.0.1
 ```
 
-## 5. 本轮已加安全响应头（应用层）
-在 `app.py` 新增了安全响应头：
-- `Content-Security-Policy`（内容安全策略）：包含 `upgrade-insecure-requests` 与 `block-all-mixed-content`。
-- `Strict-Transport-Security`（HSTS，强制 HTTPS）。
-- `X-Content-Type-Options`、`X-Frame-Options`、`Referrer-Policy`、`Permissions-Policy`。
+## Maintenance / Stop Site
+### Temporary maintenance
+```bash
+sudo systemctl stop yorushika-web
+# Optional full stop (including gateway):
+# sudo systemctl stop nginx
+```
 
-## 6. 变更后验收清单
-1. `https://music.yoruming.cn` 打开后浏览器地址栏不再提示“不安全”。
-2. `curl -Ik https://music.yoruming.cn` 返回 `HTTP/2 200`。
-3. `sudo systemctl status yorushika-web` 为 `active (running)`。
-4. `/`、`/search`、`/about` 页面可正常打开。
+### Resume service
+```bash
+sudo systemctl start yorushika-web
+sudo systemctl status yorushika-web --no-pager
+curl -Ik https://music.yoruming.cn
+```
+
+## Hotfix (single file)
+```powershell
+# Local: upload one changed file
+scp .\templates\radio.html root@<SERVER_IP>:/var/www/My_Homepage/templates/radio.html
+```
+
+```bash
+# Server: restart and verify
+sudo systemctl restart yorushika-web
+curl -I https://music.yoruming.cn/radio
+```
+
+## Post-change Validation
+1. `/` `/search` `/lyrics` `/radio` `/about` all return `200`.
+2. `yorushika-web` is `active (running)`.
+3. Browser hard refresh shows latest page content.
