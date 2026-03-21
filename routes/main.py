@@ -1,4 +1,4 @@
-﻿from flask import Blueprint, render_template, url_for
+﻿from flask import Blueprint, render_template, request, url_for
 import random
 import datetime
 
@@ -97,3 +97,4 @@ def about():
     ]
 
     return render_template('about.html', skills=skills, avatar_url=avatar_url)
+
