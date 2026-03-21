@@ -179,7 +179,6 @@ body {
     color: white;
     transform: rotate(20deg);
 }
-`r`n`r`n`r`n`r`n`r`n`r`n`r`n
 .song-card {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -267,7 +266,6 @@ body {
 .wishlist-link:hover {
     color: var(--accent-color);
 }
-`r`n`r`n`r`n
 .daily-card {
     position: relative;
     background: linear-gradient(135deg, var(--accent-color) 0%, #a78bfa 100%);
@@ -346,3 +344,40 @@ body {
     user-select: none;
 }
 
+/* --- overrides: daily card + restored pages --- */
+.daily-card {
+    position: relative;
+    background: linear-gradient(120deg, #fb7299 0%, #a78bfa 52%, #7c8cff 100%);
+    border-radius: 20px;
+    padding: 2rem 2rem 2rem 2.5rem;
+    overflow: hidden;
+    min-height: 170px;
+    box-shadow: 0 8px 32px rgba(251, 114, 153, 0.28);
+}
+
+[data-theme="light"] .daily-card {
+    background: linear-gradient(120deg, #ff7daf 0%, #b487ff 55%, #8aa0ff 100%);
+}
+
+.daily-year,
+.daily-album {
+    color: rgba(255, 255, 255, 0.88);
+    font-weight: 600;
+}
+
+.daily-hot {
+    white-space: nowrap;
+}
+
+.daily-decoration {
+    display: none !important;
+}
+
+.story-card p {
+    color: var(--text-color);
+    line-height: 1.75;
+}
+
+.radio-hero {
+    border-left: 4px solid var(--accent-color);
+}

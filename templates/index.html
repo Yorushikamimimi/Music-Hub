@@ -4,37 +4,32 @@
 <div class="container py-4">
 
     {% if daily_song %}
-    <!-- ── Feature D: 每日推荐 ────────────────────────────── -->
     <div class="daily-card mb-5" id="daily-pick">
         <div class="daily-card-inner">
             <div class="d-flex align-items-center gap-2 mb-2">
                 <span class="daily-tag">
-                    <i class="bi bi-calendar-heart-fill me-1"></i>今日推荐
+                    <i class="bi bi-calendar-heart-fill me-1"></i>????
                 </span>
-                <span class="small text-white opacity-75">{{ daily_song.release_year }}</span>
+                <span class="daily-year">{{ daily_song.release_year }}</span>
             </div>
             <a href="{{ daily_song.link }}" target="_blank" class="daily-title">
                 {{ daily_song.title }}
                 <i class="bi bi-box-arrow-up-right ms-2" style="font-size:0.8em;"></i>
             </a>
-            <p class="daily-lyric">「{{ daily_lyric }}」</p>
+            <p class="daily-lyric">?{{ daily_lyric }}?</p>
             <div class="d-flex align-items-center gap-3 mt-3">
-                <span class="small text-white opacity-75">
+                <span class="daily-album">
                     <i class="bi bi-disc me-1"></i>{{ daily_song.album }}
                 </span>
                 <span class="daily-hot">
-                    <i class="bi bi-fire me-1"></i>{{ daily_song.rating }}
+                    <i class="bi bi-fire me-1"></i>HOT {{ daily_song.rating }}
                 </span>
             </div>
-        </div>
-        <div class="daily-decoration">
-            <i class="bi bi-music-note-beamed"></i>
         </div>
     </div>
     {% endif %}
 
     <div class="row g-5">
-        <!-- Yorushika Section -->
         <div class="col-lg-6">
             <div class="glass-card h-100 p-4">
                 <div class="d-flex align-items-center mb-4">
@@ -42,16 +37,15 @@
                         <i class="bi bi-moon-stars text-primary fs-4"></i>
                     </div>
                     <div>
-                        <h3 class="mb-0 fw-bold">Yorushika 严选</h3>
-                        <p class="text-muted small mb-0">ヨルシカ Selection • Editorial Pick</p>
+                        <h3 class="mb-0 fw-bold">Yorushika ??</h3>
+                        <p class="text-muted small mb-0">Yorushika Selection ? Editorial Pick</p>
                     </div>
                 </div>
 
                 <div class="music-list">
                     {% for song in yorushika %}
                     <div class="music-item d-flex align-items-center">
-                        <div
-                            class="rank-num {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% else %}rank-other{% endif %}">
+                        <div class="rank-num {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% else %}rank-other{% endif %}">
                             {{ "%02d"|format(loop.index) }}
                         </div>
 
@@ -60,20 +54,19 @@
                                 {{ song.title }}
                                 <i class="bi bi-play-circle-fill ms-2 opacity-50" style="font-size: 0.9rem;"></i>
                             </a>
-                            <div class="sub-text d-flex align-items-center"
-                                style="color: var(--accent-color); font-style: italic;">
+                            <div class="sub-text d-flex align-items-center" style="color: var(--accent-color); font-style: italic;">
                                 <i class="bi bi-music-note-beamed me-1"></i> {{ song.album }}
                             </div>
                         </div>
 
                         <div class="text-end d-flex align-items-center gap-2">
                             <div class="hot-badge mb-1">
-                                <i class="bi bi-fire me-1"></i> {{ song.rating }}
+                                <i class="bi bi-fire me-1"></i> HOT {{ song.rating }}
                             </div>
                             <button class="fav-btn" data-song-id="{{ song.id }}" data-song-title="{{ song.title }}"
                                 data-song-album="{{ song.album }}" data-song-link="{{ song.link }}"
                                 data-song-year="{{ song.release_year }}" data-song-rating="{{ song.rating }}"
-                                title="收藏">
+                                title="??">
                                 <i class="bi bi-heart"></i>
                             </button>
                         </div>
@@ -83,16 +76,14 @@
             </div>
         </div>
 
-        <!-- Yorushika Part 2 Section -->
         <div class="col-lg-6">
             <div class="glass-card h-100 p-4">
                 <div class="d-flex align-items-center mb-4">
-                    <div class="icon-box me-3 bg-purple bg-opacity-10 p-3 rounded-4"
-                        style="background: rgba(111, 66, 193, 0.1);">
+                    <div class="icon-box me-3 bg-purple bg-opacity-10 p-3 rounded-4" style="background: rgba(111, 66, 193, 0.1);">
                         <i class="bi bi-music-note-list text-purple fs-4" style="color: #6f42c1;"></i>
                     </div>
                     <div>
-                        <h3 class="mb-0 fw-bold">Yorushika 更多推荐</h3>
+                        <h3 class="mb-0 fw-bold">Yorushika ????</h3>
                         <p class="text-muted small mb-0">More from n-buna & suis</p>
                     </div>
                 </div>
@@ -108,19 +99,18 @@
                                 {{ song.title }}
                                 <i class="bi bi-play-circle-fill ms-2 opacity-50" style="font-size: 0.9rem;"></i>
                             </a>
-                            <div class="sub-text d-flex align-items-center"
-                                style="color: var(--accent-color); font-style: italic;">
+                            <div class="sub-text d-flex align-items-center" style="color: var(--accent-color); font-style: italic;">
                                 <i class="bi bi-music-note-beamed me-1"></i> {{ song.album }}
                             </div>
                         </div>
                         <div class="text-end d-flex align-items-center gap-2">
                             <div class="hot-badge mb-1" style="background: #8b5cf6;">
-                                <i class="bi bi-fire me-1"></i> {{ song.rating }}
+                                <i class="bi bi-fire me-1"></i> HOT {{ song.rating }}
                             </div>
                             <button class="fav-btn" data-song-id="{{ song.id }}" data-song-title="{{ song.title }}"
                                 data-song-album="{{ song.album }}" data-song-link="{{ song.link }}"
                                 data-song-year="{{ song.release_year }}" data-song-rating="{{ song.rating }}"
-                                title="收藏">
+                                title="??">
                                 <i class="bi bi-heart"></i>
                             </button>
                         </div>
