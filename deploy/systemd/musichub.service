@@ -8,6 +8,7 @@ Wants=network-online.target
 Type=simple
 User=musichub
 Group=www-data
+SupplementaryGroups=musichub
 WorkingDirectory=/var/www/My_Homepage
 EnvironmentFile=/var/www/My_Homepage/.env
 Environment="PATH=/var/www/My_Homepage/venv/bin"
