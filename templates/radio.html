@@ -6,7 +6,7 @@
         <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3">
             <div>
                 <p class="radio-kicker mb-2">MUSIC HUB LIVE</p>
-                <h2 class="fw-bold mb-2">Radio</h2>
+                <h1 class="fw-bold mb-2">Radio</h1>
                 <p class="text-muted mb-0">A continuous mix from the local Yorushika collection. Playback always starts manually.</p>
             </div>
             <div class="radio-station-chip">
@@ -19,6 +19,7 @@
     <section
         class="glass-card p-4 p-lg-5 radio-player-card"
         data-radio-schedule="/hls/radio-schedule.json"
+        data-station-name="{{ station_name }}"
         aria-labelledby="radio-now-playing-title"
     >
         {% if stream_url %}
@@ -75,7 +76,7 @@
         </div>
 
         <div class="radio-native-player">
-            <audio id="radio-audio" controls preload="none">
+            <audio id="radio-audio" controls controlslist="nodownload noplaybackrate" preload="none">
                 <source src="{{ stream_url }}">
                 Your browser does not support audio playback.
             </audio>
@@ -89,6 +90,12 @@
             <i class="bi bi-info-circle" aria-hidden="true"></i>
             Track details follow the live broadcast timeline and may lead the buffered audio by a few seconds.
         </p>
+        {% if private_mode %}
+        <p class="radio-private-note mb-0">
+            <i class="bi bi-shield-lock" aria-hidden="true"></i>
+            私人聆听入口：仅向服务器白名单内的本人网络开放，不作为公开音乐分发或下载服务。
+        </p>
+        {% endif %}
         {% else %}
         <div class="alert alert-warning mb-0" role="alert">
             The radio stream is not configured. Playback is currently unavailable.
@@ -100,125 +107,6 @@
 
 {% block scripts %}
 {% if stream_url %}
-<script>
-    (() => {
-        const page = document.querySelector('.radio-player-card');
-        const audio = document.getElementById('radio-audio');
-        const equalizer = document.getElementById('radio-equalizer');
-        const title = document.getElementById('radio-track-title');
-        const artist = document.getElementById('radio-track-artist');
-        const nextTitle = document.getElementById('radio-next-title');
-        const elapsed = document.getElementById('radio-elapsed');
-        const duration = document.getElementById('radio-duration');
-        const progressTrack = document.getElementById('radio-progress-track');
-        const progressFill = document.getElementById('radio-progress-fill');
-        const playbackStatus = document.getElementById('radio-playback-status');
-
-        let schedule = null;
-        let serverClockOffset = 0;
-
-        const formatTime = (seconds) => {
-            const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
-            const minutes = Math.floor(safeSeconds / 60);
-            return `${minutes}:${String(safeSeconds % 60).padStart(2, '0')}`;
-        };
-
-        const setPlaybackState = (isPlaying, message) => {
-            equalizer.classList.toggle('is-playing', isPlaying);
-            playbackStatus.textContent = message;
-        };
-
-        const renderSchedule = () => {
-            if (!schedule || !Array.isArray(schedule.tracks) || schedule.tracks.length === 0) {
-                return;
-            }
-
-            const totalDuration = schedule.tracks.reduce((total, track) => total + track.duration, 0);
-            if (totalDuration <= 0) {
-                return;
-            }
-
-            const serverNow = (Date.now() / 1000) + serverClockOffset;
-            const liveSeconds = Math.max(
-                0,
-                serverNow - schedule.startedAt - (schedule.bufferDelaySeconds || 0)
-            );
-            let position = liveSeconds % totalDuration;
-            let currentIndex = 0;
-
-            for (let index = 0; index < schedule.tracks.length; index += 1) {
-                const trackDuration = schedule.tracks[index].duration;
-                if (position < trackDuration) {
-                    currentIndex = index;
-                    break;
-                }
-                position -= trackDuration;
-            }
-
-            const currentTrack = schedule.tracks[currentIndex];
-            const upcomingTrack = schedule.tracks[(currentIndex + 1) % schedule.tracks.length];
-            const percentage = Math.min(100, Math.max(0, (position / currentTrack.duration) * 100));
-
-            title.textContent = currentTrack.title;
-            artist.textContent = currentTrack.artist;
-            nextTitle.textContent = `${upcomingTrack.title} · ${upcomingTrack.artist}`;
-            elapsed.textContent = formatTime(position);
-            duration.textContent = formatTime(currentTrack.duration);
-            progressFill.style.width = `${percentage}%`;
-            progressTrack.setAttribute('aria-valuenow', String(Math.round(percentage)));
-            progressTrack.setAttribute(
-                'aria-valuetext',
-                `${currentTrack.title}, ${formatTime(position)} of ${formatTime(currentTrack.duration)}`
-            );
-        };
-
-        const loadSchedule = async () => {
-            try {
-                const response = await fetch(`${page.dataset.radioSchedule}?v=${Date.now()}`, {
-                    cache: 'no-store'
-                });
-                if (!response.ok) {
-                    throw new Error(`Schedule request failed with ${response.status}`);
-                }
-
-                const serverDate = response.headers.get('Date');
-                if (serverDate) {
-                    serverClockOffset = (new Date(serverDate).getTime() - Date.now()) / 1000;
-                }
-
-                schedule = await response.json();
-                renderSchedule();
-                window.setInterval(renderSchedule, 1000);
-            } catch (error) {
-                title.textContent = '{{ station_name }}';
-                artist.textContent = 'Live stream';
-                nextTitle.textContent = 'Track details temporarily unavailable';
-                console.warn('Radio schedule unavailable:', error);
-            }
-        };
-
-        audio.volume = 0.25;
-        audio.addEventListener('loadedmetadata', () => {
-            audio.volume = 0.25;
-        });
-        audio.addEventListener('play', () => {
-            setPlaybackState(true, 'Live stream playing');
-        });
-        audio.addEventListener('pause', () => {
-            setPlaybackState(false, audio.currentTime > 0 ? 'Playback paused' : 'Click Play when you are ready.');
-        });
-        audio.addEventListener('waiting', () => {
-            setPlaybackState(false, 'Buffering live stream…');
-        });
-        audio.addEventListener('playing', () => {
-            setPlaybackState(true, 'Live stream playing');
-        });
-        audio.addEventListener('error', () => {
-            setPlaybackState(false, 'Playback is temporarily unavailable');
-        });
-
-        loadSchedule();
-    })();
-</script>
+<script src="{{ url_for('static', filename='radio.js') }}" defer></script>
 {% endif %}
 {% endblock %}

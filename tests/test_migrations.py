@@ -1,0 +1,86 @@
+import sqlalchemy as sa
+from flask_migrate import upgrade
+
+from app import create_app
+from catalog_service import sync_catalog
+from models import MusicYorushika, db
+
+
+def _migration_app(database_path):
+    return create_app(
+        {
+            "TESTING": True,
+            "SECRET_KEY": "migration-test-secret",
+            "SQLALCHEMY_DATABASE_URI": f"sqlite:///{database_path}",
+            "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+        }
+    )
+
+
+def test_migration_creates_fresh_catalog_schema(tmp_path):
+    application = _migration_app(tmp_path / "fresh.sqlite3")
+
+    with application.app_context():
+        upgrade(directory="migrations")
+        columns = {
+            column["name"]
+            for column in sa.inspect(db.engine).get_columns("music_yorushika")
+        }
+        assert {
+            "slug",
+            "album_title",
+            "story_summary",
+            "display_order",
+            "is_featured",
+        }.issubset(columns)
+
+        result = sync_catalog()
+        assert result["created"] == 20
+        assert MusicYorushika.query.count() == 20
+
+
+def test_migration_preserves_legacy_row_and_columns(tmp_path):
+    application = _migration_app(tmp_path / "legacy.sqlite3")
+
+    with application.app_context():
+        with db.engine.begin() as connection:
+            connection.exec_driver_sql(
+                """
+                CREATE TABLE music_yorushika (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title VARCHAR(255) NOT NULL,
+                    album VARCHAR(255),
+                    rating INTEGER,
+                    release_year INTEGER,
+                    cover_path VARCHAR(255),
+                    link VARCHAR(255)
+                )
+                """
+            )
+            connection.exec_driver_sql(
+                """
+                INSERT INTO music_yorushika
+                    (title, album, rating, release_year, cover_path, link)
+                VALUES
+                    ('Sunny', 'legacy', 99, 2024, 'sunny.jpg', 'https://example.com'),
+                    ('Legacy extra', 'legacy', 88, 2016, 'extra.jpg', 'https://example.com')
+                """
+            )
+
+        upgrade(directory="migrations")
+        columns = {
+            column["name"]
+            for column in sa.inspect(db.engine).get_columns("music_yorushika")
+        }
+        assert "album" in columns
+        assert "rating" in columns
+        assert "album_title" in columns
+
+        result = sync_catalog()
+        assert result["created"] == 19
+        assert MusicYorushika.query.count() == 21
+        sunny = MusicYorushika.query.filter_by(slug="haru").one()
+        assert sunny.id == 1
+        assert sunny.album_title == "晴る"
+        extra = MusicYorushika.query.filter_by(title="Legacy extra").one()
+        assert extra.is_featured is False

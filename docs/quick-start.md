@@ -1,15 +1,14 @@
 ﻿# 快速开始（Quick Start）
 
 ## 1. 环境要求
-- Python 3.11+
+- Python 3.10+
 - MySQL 8+
-- Windows PowerShell（当前项目环境）
 
 ## 2. 安装依赖
-```powershell
+```bash
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+. .venv/bin/activate
+pip install --require-hashes -r requirements.txt
 ```
 
 ## 3. 配置环境变量
@@ -21,6 +20,8 @@ DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=<你的数据库密码>
 DB_NAME=python_study
+RADIO_STATION_NAME=Yorushika Radio
+RADIO_STREAM_URL=/hls/yorushika.m3u8
 ```
 
 说明：
@@ -28,25 +29,33 @@ DB_NAME=python_study
 - `DB_*` 为必填，缺失任一项会启动失败（Fail Fast，快速失败）。
   - 中文解释：配置不完整时立即报错，避免带着隐患运行。
 
-## 4. 启动应用
-```powershell
-python app.py
+## 4. 升级数据库并同步作品目录
+
+```bash
+flask --app wsgi:app db upgrade
+flask --app wsgi:app catalog-sync
 ```
 
-默认访问：
-- [http://127.0.0.1:5000](http://127.0.0.1:5000)
+目录同步是可重复执行的 upsert，不删除未知记录，也不再抓取第三方排行榜。
+首轮迁移会保留旧 `album` / `rating` 列作为回滚余地，但运行时不再使用它们。
 
-## 5. 数据准备
-### 方案A：直接使用现有库数据
-保证 `DB_NAME` 中已有 `music_yorushika` 表和数据。
+## 5. 启动应用
 
-### 方案B：使用爬虫脚本重建数据（谨慎）
-```powershell
-python netease_spider.py
+```bash
+flask --app wsgi:app run --host 127.0.0.1 --port 5000
 ```
-注意：该脚本包含 `DROP TABLE` 逻辑，会重建相关表。
 
-## 6. 常见问题
+默认访问：[http://127.0.0.1:5000](http://127.0.0.1:5000)。
+
+## 6. 测试
+
+```bash
+pip install --require-hashes -r requirements-dev.txt
+python -m pytest -q
+```
+
+## 7. 常见问题
 - 启动时报 `Missing required environment variable`：补全 `.env`。
 - 启动时报 `SECRET_KEY is too weak`：换成高强度随机值。
-- 页面中文乱码：当前为历史遗留，建议后续统一修复模板文案编码。
+- Radio 页面无声：确认 `RADIO_STREAM_URL` 已设置，并检查 HLS 服务与白名单。
+- 不要将 `.env`、数据库密码或本地音频提交到 Git。

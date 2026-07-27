@@ -8,7 +8,7 @@ import subprocess
 import time
 
 
-DEFAULT_MUSIC_DIR = "/root/projects/archived/Yorushika-24h-Radio/assets/music"
+DEFAULT_MUSIC_DIR = "/srv/media/yorushika-radio/music"
 DEFAULT_RUNTIME_DIR = "/run/yorushika-radio"
 
 PLAYLIST_ORDER = [
@@ -23,10 +23,6 @@ PLAYLIST_ORDER = [
     "Thoughtcrime",
     "yinci_bayue_mou",
     "Zuoyoumang",
-    "【あたらよ ⧸ 可惜夜】10月無口な君を忘れる ⧸ 10月忘记沉默寡言的你【官方MV】",
-    "【あたらよ ⧸ 可惜夜】また夏を追う ⧸ 再度追逐夏天【官方MV】",
-    "【あたらよ ⧸ 可惜夜】僕は… ⧸ 我是…【官方MV】",
-    "【あたらよ ⧸ 可惜夜】夏霞【官方MV】",
     "ヨルシカ-ただ君に晴れ 现场版",
     "ヨルシカ -ノーチラス 现场版",
     "ヨルシカ-ヒッチコック 现场版 中日字幕",
@@ -54,32 +50,27 @@ TITLE_OVERRIDES = {
     "Thoughtcrime": "思想犯",
     "yinci_bayue_mou": "八月、某、月明かり",
     "Zuoyoumang": "左右盲",
-    PLAYLIST_ORDER[11]: "10月無口な君を忘れる",
-    PLAYLIST_ORDER[12]: "また夏を追う",
-    PLAYLIST_ORDER[13]: "僕は…",
-    PLAYLIST_ORDER[14]: "夏霞",
-    PLAYLIST_ORDER[15]: "ただ君に晴れ (Live)",
-    PLAYLIST_ORDER[16]: "ノーチラス (Live)",
-    PLAYLIST_ORDER[17]: "ヒッチコック (Live)",
-    PLAYLIST_ORDER[18]: "ブレーメン (Live)",
-    PLAYLIST_ORDER[19]: "嘘月 (Live)",
-    PLAYLIST_ORDER[20]: "春ひさぎ (Live)",
-    PLAYLIST_ORDER[21]: "神様のダンス (Live)",
-    PLAYLIST_ORDER[22]: "花に亡霊 (Live)",
-    PLAYLIST_ORDER[23]: "花人局 (Live)",
-    PLAYLIST_ORDER[24]: "藍二乗 (Live)",
-    PLAYLIST_ORDER[25]: "言って。 (Live)",
-    PLAYLIST_ORDER[26]: "雨とカプチーノ (Live)",
-    PLAYLIST_ORDER[27]: "雨晴るる (Live)",
+    PLAYLIST_ORDER[11]: "ただ君に晴れ (Live)",
+    PLAYLIST_ORDER[12]: "ノーチラス (Live)",
+    PLAYLIST_ORDER[13]: "ヒッチコック (Live)",
+    PLAYLIST_ORDER[14]: "ブレーメン (Live)",
+    PLAYLIST_ORDER[15]: "嘘月 (Live)",
+    PLAYLIST_ORDER[16]: "春ひさぎ (Live)",
+    PLAYLIST_ORDER[17]: "神様のダンス (Live)",
+    PLAYLIST_ORDER[18]: "花に亡霊 (Live)",
+    PLAYLIST_ORDER[19]: "花人局 (Live)",
+    PLAYLIST_ORDER[20]: "藍二乗 (Live)",
+    PLAYLIST_ORDER[21]: "言って。 (Live)",
+    PLAYLIST_ORDER[22]: "雨とカプチーノ (Live)",
+    PLAYLIST_ORDER[23]: "雨晴るる (Live)",
 }
 
 
 def ordered_music_files(music_dir):
     discovered = {path.stem: path for path in music_dir.glob("*.mp3") if path.is_file()}
-    ordered = [discovered.pop(stem) for stem in PLAYLIST_ORDER if stem in discovered]
-    ordered.extend(sorted(discovered.values(), key=lambda path: path.name.casefold()))
+    ordered = [discovered[stem] for stem in PLAYLIST_ORDER if stem in discovered]
     if not ordered:
-        raise RuntimeError(f"No MP3 files found in {music_dir}")
+        raise RuntimeError(f"No curated Yorushika MP3 files found in {music_dir}")
     return ordered
 
 
@@ -139,7 +130,7 @@ def main():
     tracks = [
         {
             "title": TITLE_OVERRIDES.get(path.stem, path.stem.replace("_", " ")),
-            "artist": "Atarayo" if "あたらよ" in path.stem else "Yorushika",
+            "artist": "Yorushika",
             "duration": duration_for(path),
         }
         for path in files
@@ -151,6 +142,7 @@ def main():
         "startedAt": round(now, 3),
         "generatedAt": round(now, 3),
         "bufferDelaySeconds": int(os.environ.get("RADIO_BUFFER_DELAY_SECONDS", "16")),
+        "private": True,
         "tracks": tracks,
     }
     write_atomic(

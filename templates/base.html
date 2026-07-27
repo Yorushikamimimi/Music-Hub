@@ -1,38 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Music Hub Pro</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="{{ url_for('static', filename='images/avatar-placeholder.svg') }}" type="image/svg+xml">
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/fonts.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='site.js') }}" defer></script>
 </head>
 
 <body>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
     <nav class="navbar navbar-expand-lg fixed-top navbar-glass">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="/" style="color: var(--accent-color);">
+        <div class="container site-nav-shell">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('main.index') }}">
                 <i class="bi bi-music-note-beamed me-2"></i>
                 <span>MusicHub <span class="badge bg-dark rounded-pill" style="font-size: 0.6rem;">PRO</span></span>
             </a>
-            <div class="ms-auto d-flex align-items-center gap-3">
-                <ul class="navbar-nav d-none d-md-flex flex-row gap-4">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/search">Search</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/lyrics">Stories</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/radio">Radio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+
+            <div class="site-nav-actions">
+                <button
+                    class="mobile-nav-toggle"
+                    id="mobile-nav-toggle"
+                    type="button"
+                    aria-controls="site-nav"
+                    aria-expanded="false"
+                    aria-label="打开导航菜单"
+                >
+                    <i class="bi bi-list" aria-hidden="true"></i>
+                </button>
+                <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换为浅色主题">
+                    <i class="bi bi-sun-fill" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="site-nav-panel" id="site-nav">
+                <ul class="navbar-nav site-nav-list">
+                    <li class="nav-item">
+                        <a class="nav-link{% if request.endpoint == 'main.index' %} active{% endif %}"
+                            {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}
+                            href="{{ url_for('main.index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link{% if request.endpoint == 'main.search' %} active{% endif %}"
+                            {% if request.endpoint == 'main.search' %}aria-current="page"{% endif %}
+                            href="{{ url_for('main.search') }}">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link{% if request.endpoint == 'main.lyrics' %} active{% endif %}"
+                            {% if request.endpoint == 'main.lyrics' %}aria-current="page"{% endif %}
+                            href="{{ url_for('main.lyrics') }}">Stories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link{% if request.endpoint == 'main.radio' %} active{% endif %}"
+                            {% if request.endpoint == 'main.radio' %}aria-current="page"{% endif %}
+                            href="{{ url_for('main.radio') }}">Radio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link{% if request.endpoint == 'main.about' %} active{% endif %}"
+                            {% if request.endpoint == 'main.about' %}aria-current="page"{% endif %}
+                            href="{{ url_for('main.about') }}">About</a>
+                    </li>
                 </ul>
-                <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
-                    <i class="bi bi-moon-stars-fill"></i>
-                </div>
             </div>
         </div>
     </nav>
-    <div style="height: 100px;"></div>
+    <div class="navbar-spacer" aria-hidden="true"></div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -47,34 +85,10 @@
     {% endif %}
     {% endwith %}
 
-    {% block content %}{% endblock %}
+    <main id="main-content" tabindex="-1">
+        {% block content %}{% endblock %}
+    </main>
 
-    <script>
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.documentElement;
-        const icon = themeToggle.querySelector('i');
-
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        body.setAttribute('data-theme', savedTheme);
-        updateIcon(savedTheme);
-
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-
-            body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateIcon(newTheme);
-        });
-
-        function updateIcon(theme) {
-            if (theme === 'dark') {
-                icon.classList.replace('bi-moon-stars-fill', 'bi-sun-fill');
-            } else {
-                icon.classList.replace('bi-sun-fill', 'bi-moon-stars-fill');
-            }
-        }
-    </script>
     {% block scripts %}{% endblock %}
 </body>
 

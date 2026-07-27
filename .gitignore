@@ -10,6 +10,9 @@ __pycache__/
 dist/
 build/
 *.egg
+.pytest_cache/
+.coverage
+htmlcov/
 
 # ===== 虚拟环境 =====
 venv/
@@ -20,6 +23,7 @@ env/
 *.db
 *.sqlite3
 current_avatar.txt
+instance/
 
 # ===== 上传文件 =====
 static/uploads/*
@@ -33,6 +37,8 @@ Thumbs.db
 gunicorn.ctl
 *.pre-now-playing-*
 .playwright-cli/
+playwright-report/
+test-results/
 
 # ===== IDE =====
 .vscode/

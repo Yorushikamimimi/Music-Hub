@@ -2,6 +2,7 @@
 
 {% block content %}
 <div class="container py-4">
+    <h1 class="visually-hidden">Yorushika 私人选曲与作品索引</h1>
 
     {% if daily_song %}
     <div class="daily-card mb-5" id="daily-pick">
@@ -12,24 +13,21 @@
                 </span>
                 <span class="daily-year">{{ daily_song.release_year }}</span>
             </div>
-            <a href="{{ daily_song.link }}" target="_blank" class="daily-title">
+            <a href="{{ daily_song.source_url }}" target="_blank" rel="noopener noreferrer" class="daily-title">
                 {{ daily_song.title }}
                 <i class="bi bi-box-arrow-up-right ms-2" style="font-size:0.8em;"></i>
             </a>
-            <p class="daily-lyric">"{{ daily_lyric }}"</p>
+            <p class="daily-lyric">{{ daily_note }}</p>
             <div class="d-flex align-items-center gap-3 mt-3">
                 <span class="daily-album">
-                    <i class="bi bi-disc me-1"></i>{{ daily_song.album }}
-                </span>
-                <span class="daily-hot">
-                    <i class="bi bi-fire me-1"></i>{{ daily_song.rating }}
+                    <i class="bi bi-disc me-1"></i>{{ daily_song.album_title }}
                 </span>
             </div>
         </div>
     </div>
     {% endif %}
 
-    <div class="row g-5">
+    <div class="row g-5 home-columns">
         <div class="col-lg-6">
             <div class="glass-card h-100 p-4">
                 <div class="d-flex align-items-center mb-4">
@@ -50,23 +48,20 @@
                         </div>
 
                         <div class="flex-grow-1">
-                            <a href="{{ song.link }}" target="_blank" class="song-link">
+                            <a href="{{ song.source_url }}" target="_blank" rel="noopener noreferrer" class="song-link">
                                 {{ song.title }}
                                 <i class="bi bi-play-circle-fill ms-2 opacity-50" style="font-size: 0.9rem;"></i>
                             </a>
                             <div class="sub-text d-flex align-items-center" style="color: var(--accent-color); font-style: italic;">
-                                <i class="bi bi-music-note-beamed me-1"></i> {{ song.album }}
+                                <i class="bi bi-music-note-beamed me-1"></i> {{ song.album_title }}
                             </div>
                         </div>
 
-                        <div class="text-end d-flex align-items-center gap-2">
-                            <div class="hot-badge mb-1">
-                                <i class="bi bi-fire me-1"></i> {{ song.rating }}
-                            </div>
+                        <div class="text-end d-flex align-items-center">
                             <button class="fav-btn" data-song-id="{{ song.id }}" data-song-title="{{ song.title }}"
-                                data-song-album="{{ song.album }}" data-song-link="{{ song.link }}"
-                                data-song-year="{{ song.release_year }}" data-song-rating="{{ song.rating }}"
-                                title="Favorite">
+                                data-song-album="{{ song.album_title }}" data-song-link="{{ song.source_url }}"
+                                data-song-year="{{ song.release_year }}"
+                                title="收藏 {{ song.title }}" aria-label="收藏 {{ song.title }}">
                                 <i class="bi bi-heart"></i>
                             </button>
                         </div>
@@ -95,22 +90,19 @@
                             {{ "%02d"|format(loop.index + 10) }}
                         </div>
                         <div class="flex-grow-1">
-                            <a href="{{ song.link }}" target="_blank" class="song-link">
+                            <a href="{{ song.source_url }}" target="_blank" rel="noopener noreferrer" class="song-link">
                                 {{ song.title }}
                                 <i class="bi bi-play-circle-fill ms-2 opacity-50" style="font-size: 0.9rem;"></i>
                             </a>
                             <div class="sub-text d-flex align-items-center" style="color: var(--accent-color); font-style: italic;">
-                                <i class="bi bi-music-note-beamed me-1"></i> {{ song.album }}
+                                <i class="bi bi-music-note-beamed me-1"></i> {{ song.album_title }}
                             </div>
                         </div>
-                        <div class="text-end d-flex align-items-center gap-2">
-                            <div class="hot-badge mb-1" style="background: #8b5cf6;">
-                                <i class="bi bi-fire me-1"></i> {{ song.rating }}
-                            </div>
+                        <div class="text-end d-flex align-items-center">
                             <button class="fav-btn" data-song-id="{{ song.id }}" data-song-title="{{ song.title }}"
-                                data-song-album="{{ song.album }}" data-song-link="{{ song.link }}"
-                                data-song-year="{{ song.release_year }}" data-song-rating="{{ song.rating }}"
-                                title="Favorite">
+                                data-song-album="{{ song.album_title }}" data-song-link="{{ song.source_url }}"
+                                data-song-year="{{ song.release_year }}"
+                                title="收藏 {{ song.title }}" aria-label="收藏 {{ song.title }}">
                                 <i class="bi bi-heart"></i>
                             </button>
                         </div>

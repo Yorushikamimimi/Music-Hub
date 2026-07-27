@@ -2,35 +2,22 @@ import os
 import random
 import datetime
 
-from flask import Blueprint, render_template, request, url_for
+from flask import Blueprint, Response, current_app, render_template, request, url_for
+from sqlalchemy import or_
 
 from models import db, MusicYorushika
-from utils import get_current_avatar
 
 main_bp = Blueprint('main', __name__)
-
-LYRIC_SNIPPETS = {
-    'Sunny': 'Even if dawn comes, stay by my side.',
-    'Spring Thief': 'Spring, come soon.',
-    'Just a Sunny Day for You': 'If only the sky clears for you.',
-    'Night Journey': 'I walk through the night thinking of you.',
-    'Nautilus': 'Did you already forget?',
-}
-
-SONG_STORIES = {
-    'Elma': 'A key song in the album narrative, centered on memory and pursuit.',
-    'Sunny': 'Bright arrangement with restrained emotions under the surface.',
-    'Spring Thief': 'A spring metaphor about beauty and inevitable loss.',
-    'Ghost in a Flower': 'A song often interpreted as memory shaping the present.',
-    'Hitchcock': 'Questions about growth and how to keep seeing the world.',
-    'Say It.': 'Tension between wanting to speak and not being able to.',
-    'Nautilus': 'A retrospective perspective on farewell and missing someone.',
-}
 
 
 @main_bp.route('/')
 def index():
-    songs = MusicYorushika.query.all()
+    songs = (
+        MusicYorushika.query
+        .filter_by(is_featured=True)
+        .order_by(MusicYorushika.display_order.asc(), MusicYorushika.id.asc())
+        .all()
+    )
 
     if len(songs) > 10:
         yorushika_left = songs[:10]
@@ -40,19 +27,19 @@ def index():
         yorushika_right = []
 
     daily_song = None
-    daily_lyric = ''
+    daily_note = ''
     if songs:
         seed = datetime.date.today().isoformat()
         rng = random.Random(seed)
         daily_song = rng.choice(songs)
-        daily_lyric = LYRIC_SNIPPETS.get(daily_song.title, 'Music for tonight.')
+        daily_note = f"收录于《{daily_song.album_title}》"
 
     return render_template(
         'index.html',
         yorushika=yorushika_left,
         yorushika_right=yorushika_right,
         daily_song=daily_song,
-        daily_lyric=daily_lyric,
+        daily_note=daily_note,
     )
 
 
@@ -60,25 +47,35 @@ def index():
 def search():
     query = request.args.get('q', '')
     year = request.args.get('year')
-    sort_by = request.args.get('sort', 'hot_desc')
+    sort_by = request.args.get('sort', 'editorial')
 
-    sql_query = MusicYorushika.query
+    sql_query = MusicYorushika.query.filter_by(is_featured=True)
 
     if query:
         sql_query = sql_query.filter(
-            (MusicYorushika.title.contains(query))
-            | (MusicYorushika.album.contains(query))
+            or_(
+                MusicYorushika.title.contains(query),
+                MusicYorushika.title_ja.contains(query),
+                MusicYorushika.title_en.contains(query),
+                MusicYorushika.album_title.contains(query),
+            )
         )
 
     if year and year.isdigit():
         sql_query = sql_query.filter_by(release_year=int(year))
 
-    if sort_by == 'hot_desc':
-        sql_query = sql_query.order_by(MusicYorushika.rating.desc())
-    elif sort_by == 'hot_asc':
-        sql_query = sql_query.order_by(MusicYorushika.rating.asc())
-    elif sort_by == 'date_desc':
-        sql_query = sql_query.order_by(MusicYorushika.release_year.desc())
+    if sort_by == 'date_desc':
+        sql_query = sql_query.order_by(
+            MusicYorushika.release_year.desc(),
+            MusicYorushika.display_order.asc(),
+        )
+    elif sort_by == 'title_asc':
+        sql_query = sql_query.order_by(MusicYorushika.title_ja.asc())
+    else:
+        sql_query = sql_query.order_by(
+            MusicYorushika.display_order.asc(),
+            MusicYorushika.id.asc(),
+        )
 
     songs = sql_query.all()
     all_dates = (
@@ -94,12 +91,7 @@ def search():
 
 @main_bp.route('/about')
 def about():
-    current_avatar = get_current_avatar()
-    avatar_url = (
-        current_avatar
-        if current_avatar.startswith('http')
-        else url_for('static', filename='uploads/' + current_avatar)
-    )
+    avatar_url = url_for('static', filename='images/avatar-placeholder.svg')
 
     skills = [
         {'name': 'Python / Flask', 'progress': 90, 'color': 'success'},
@@ -114,23 +106,32 @@ def about():
 @main_bp.route('/lyrics')
 def lyrics():
     keyword = request.args.get('q', '').strip()
-    sql_query = MusicYorushika.query
+    sql_query = MusicYorushika.query.filter_by(is_featured=True)
 
     if keyword:
         sql_query = sql_query.filter(
-            (MusicYorushika.title.contains(keyword))
-            | (MusicYorushika.album.contains(keyword))
+            or_(
+                MusicYorushika.title.contains(keyword),
+                MusicYorushika.title_ja.contains(keyword),
+                MusicYorushika.title_en.contains(keyword),
+                MusicYorushika.album_title.contains(keyword),
+            )
         )
 
-    songs = sql_query.order_by(MusicYorushika.release_year.desc()).all()
+    songs = sql_query.order_by(
+        MusicYorushika.release_year.desc(),
+        MusicYorushika.display_order.asc(),
+    ).all()
     stories = []
     for song in songs:
         stories.append({
             'title': song.title,
-            'album': song.album,
+            'album_title': song.album_title,
+            'release_type': song.release_type,
             'release_year': song.release_year,
             'link': song.link,
-            'story': SONG_STORIES.get(song.title, 'Background notes for this song are being prepared.'),
+            'story': song.story_summary,
+            'source_url': song.source_url,
         })
 
     return render_template('lyrics.html', stories=stories, keyword=keyword)
@@ -140,4 +141,22 @@ def lyrics():
 def radio():
     station_name = os.getenv('RADIO_STATION_NAME', 'Yorushika Radio')
     stream_url = os.getenv('RADIO_STREAM_URL', '').strip()
-    return render_template('radio.html', station_name=station_name, stream_url=stream_url)
+    return render_template(
+        'radio.html',
+        station_name=station_name,
+        stream_url=stream_url,
+        private_mode=True,
+    )
+
+
+@main_bp.route('/robots.txt')
+def robots():
+    return Response(
+        "User-agent: *\nDisallow: /\n",
+        mimetype="text/plain",
+    )
+
+
+@main_bp.route('/favicon.ico')
+def favicon():
+    return current_app.send_static_file('images/avatar-placeholder.svg')

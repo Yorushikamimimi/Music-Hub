@@ -4,15 +4,16 @@ After=local-fs.target
 
 [Service]
 Type=simple
-User=root
+User=musichub-radio
 Group=www-data
-WorkingDirectory=/root/projects/archived/Yorushika-24h-Radio
-Environment="RADIO_MUSIC_DIR=/root/projects/archived/Yorushika-24h-Radio/assets/music"
+SupplementaryGroups=musichub-radio
+WorkingDirectory=/var/www/My_Homepage
+Environment="RADIO_MUSIC_DIR=/srv/media/yorushika-radio/music"
 Environment="RADIO_RUNTIME_DIR=/run/yorushika-radio"
 Environment="RADIO_STATION_NAME=Yorushika Radio"
 Environment="RADIO_BUFFER_DELAY_SECONDS=16"
 RuntimeDirectory=yorushika-radio
-RuntimeDirectoryMode=0755
+RuntimeDirectoryMode=0750
 ExecStartPre=/usr/bin/python3 /var/www/My_Homepage/scripts/generate_radio_schedule.py
 ExecStart=/usr/bin/ffmpeg -hide_banner -loglevel warning -re -stream_loop -1 -f concat -safe 0 -i /run/yorushika-radio/playlist.txt -vn -c:a aac -b:a 128k -ar 44100 -ac 2 -f hls -hls_time 4 -hls_list_size 10 -hls_flags delete_segments+independent_segments+omit_endlist+program_date_time -hls_segment_filename /run/yorushika-radio/hls/yorushika-%%08d.ts /run/yorushika-radio/hls/yorushika.m3u8
 Restart=on-failure
@@ -22,7 +23,24 @@ Nice=10
 CPUWeight=20
 MemoryMax=512M
 NoNewPrivileges=true
-UMask=0022
+UMask=0027
+
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+ReadOnlyPaths=/srv/media/yorushika-radio/music
+ReadWritePaths=/run/yorushika-radio
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+SystemCallArchitectures=native
 
 [Install]
 WantedBy=multi-user.target

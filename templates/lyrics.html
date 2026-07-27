@@ -5,11 +5,12 @@
     <div class="glass-card p-4 mb-4">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div>
-                <h2 class="fw-bold mb-1">Song Stories</h2>
-                <p class="text-muted mb-0">Context and interpretation notes for tracks</p>
+                <h1 class="fw-bold mb-1">Song Stories</h1>
+                <p class="text-muted mb-0">有来源的作品资料与个人整理，不转载完整歌词</p>
             </div>
             <form action="{{ url_for('main.lyrics') }}" method="GET" class="d-flex gap-2">
-                <input type="text" class="form-control" name="q" placeholder="Song / Album" value="{{ keyword }}">
+                <label class="visually-hidden" for="story-query">搜索歌曲或专辑</label>
+                <input id="story-query" type="text" class="form-control" name="q" placeholder="Song / Album" value="{{ keyword }}">
                 <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i>Search</button>
             </form>
         </div>
@@ -23,10 +24,13 @@
                     <h5 class="fw-bold mb-0">{{ item.title }}</h5>
                     <span class="badge bg-primary bg-opacity-10 text-primary">{{ item.release_year or '-' }}</span>
                 </div>
-                <p class="small text-muted mb-2"><i class="bi bi-disc me-1"></i>{{ item.album or 'Unknown album' }}</p>
+                <p class="small text-muted mb-2">
+                    <i class="bi bi-disc me-1"></i>{{ item.album_title or '未整理' }}
+                    {% if item.release_type %} · {{ item.release_type }}{% endif %}
+                </p>
                 <p class="mb-3">{{ item.story }}</p>
-                <a class="btn btn-sm btn-outline-light" href="{{ item.link }}" target="_blank">
-                    <i class="bi bi-box-arrow-up-right me-1"></i>Open Track
+                <a class="btn btn-sm btn-outline-light" href="{{ item.source_url }}" target="_blank" rel="noopener noreferrer">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>官方收录信息
                 </a>
             </div>
         </div>

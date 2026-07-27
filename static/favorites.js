@@ -8,7 +8,8 @@ const FAV_KEY = 'yorushika_favorites';
 /** 读取所有收藏（返回对象数组） */
 function getFavorites() {
     try {
-        return JSON.parse(localStorage.getItem(FAV_KEY)) || [];
+        const value = JSON.parse(localStorage.getItem(FAV_KEY));
+        return Array.isArray(value) ? value : [];
     } catch {
         return [];
     }
@@ -40,6 +41,8 @@ function toggleFavorite(song) {
 /** 为页面上所有 .fav-btn 绑定事件，并同步初始状态 */
 function initFavButtons() {
     document.querySelectorAll('.fav-btn').forEach(btn => {
+        if (btn.dataset.favoriteBound === 'true') return;
+        btn.dataset.favoriteBound = 'true';
         const id    = btn.dataset.songId;
         const icon  = btn.querySelector('i');
         // 初始状态
@@ -57,7 +60,6 @@ function initFavButtons() {
                 album:  btn.dataset.songAlbum,
                 link:   btn.dataset.songLink,
                 year:   btn.dataset.songYear,
-                rating: btn.dataset.songRating,
             };
             const added = toggleFavorite(song);
             if (added) {
@@ -70,7 +72,7 @@ function initFavButtons() {
                 showToast(`🩶 已取消收藏《${song.title}》`);
             }
             // 如果当前在 about 页面，实时刷新心愿单
-            if (typeof renderWishlist === 'function') renderWishlist();
+            if (typeof window.renderWishlist === 'function') window.renderWishlist();
         });
     });
 }
@@ -82,6 +84,8 @@ function showToast(msg) {
         toast = document.createElement('div');
         toast.id = 'fav-toast';
         toast.className = 'fav-toast';
+        toast.setAttribute('role', 'status');
+        toast.setAttribute('aria-live', 'polite');
         document.body.appendChild(toast);
     }
     toast.textContent = msg;

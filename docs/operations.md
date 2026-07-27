@@ -1,6 +1,9 @@
 # Operations Guide
 
-## Runtime Baseline
+## Target Runtime
+
+> This is the versioned target for the next controlled deployment. The live
+> server continues to use the previous root services until that deployment is accepted.
 
 - Entry: `http://81.68.72.245/`
 - Access boundary: localhost and Tian's current public IPv4 only
@@ -9,7 +12,10 @@
 - App service: `musichub.service`
 - Radio service: `yorushika-radio.service`
 - App path: `/var/www/My_Homepage`
+- App socket: `/run/musichub/musichub.sock`
 - HLS runtime path: `/run/yorushika-radio/hls`
+- Radio library: `/srv/media/yorushika-radio/music`
+- Service identities: `musichub` and `musichub-radio` (no login shells)
 
 The retired `music.yoruming.cn` DNS and HTTPS entry are not part of the current runtime.
 
@@ -19,30 +25,37 @@ The retired `music.yoruming.cn` DNS and HTTPS entry are not part of the current 
 
 1. Creates `/run/yorushika-radio/` through systemd `RuntimeDirectory`.
 2. Runs `scripts/generate_radio_schedule.py`.
-3. Builds a deterministic FFmpeg concat playlist from the server's local MP3 collection.
+3. Builds a deterministic FFmpeg concat playlist from 24 reviewed Yorushika files.
 4. Probes the real duration of each track and writes `radio-schedule.json`.
 5. Starts an audio-only FFmpeg HLS stream.
 6. Regenerates runtime files after service restart or server reboot.
 
-The repository intentionally excludes the MP3 collection, generated HLS segments, `.env`, databases, uploads, and virtual environments.
+The repository intentionally excludes the MP3 collection, generated HLS segments,
+`.env`, databases and virtual environments. Unknown MP3 files are ignored.
 
-## Install Versioned Runtime Configuration
+The stream is a private, IP-restricted personal listening tool. It does not
+autoplay, expose a download feature, provide public indexing, or reproduce full lyrics.
+
+## One-time Non-root Preparation
 
 ```bash
 cd /var/www/My_Homepage
+sudo bash scripts/prepare_server_runtime.sh
+```
 
-sudo install -m 0644 deploy/systemd/musichub.service \
-  /etc/systemd/system/musichub.service
-sudo install -m 0644 deploy/systemd/yorushika-radio.service \
-  /etc/systemd/system/yorushika-radio.service
-sudo install -m 0644 deploy/nginx/musichub-ip.conf \
-  /etc/nginx/conf.d/musichub-ip.conf
+This creates locked service users, copies (without deleting) legacy audio into
+`/srv/media/yorushika-radio/music`, limits `.env` to `root:musichub` with mode
+`0640` without reading it, installs the target unit/Nginx files, runs `nginx -t`,
+and stops before restarting anything.
 
-sudo systemctl daemon-reload
-sudo nginx -t
-sudo systemctl enable --now yorushika-radio.service
-sudo systemctl enable --now musichub.service
-sudo systemctl reload nginx
+Before activation, verify:
+
+```bash
+id musichub
+id musichub-radio
+sudo -u musichub-radio test -r /srv/media/yorushika-radio/music
+systemd-analyze verify deploy/systemd/musichub.service
+systemd-analyze verify deploy/systemd/yorushika-radio.service
 ```
 
 When Tian's public IPv4 changes, update the `allow` line in the Nginx configuration before expecting remote access.
@@ -77,6 +90,26 @@ Browser acceptance should additionally prove:
 
 ## Deployment
 
-The existing `scripts/deploy_music_hub.sh` keeps `.env`, `venv/`, uploads, and local avatar state. It now restarts both persistent Music Hub services and checks the local IP-based Nginx route.
+`scripts/deploy_music_hub.sh` keeps `.env` and `venv/`, installs hash-locked
+dependencies, compiles the app, applies the additive migration, synchronizes
+the catalog, restarts both services, and checks the local Nginx route.
 
-Before deploying, keep an external rollback point or a known-good Git commit. The Git repository covers source and deployment configuration, not the MP3 collection, databases, uploads, or complete server state.
+Because the script writes the database and restarts services, it requires an
+explicit maintenance confirmation. Do not run it as a routine read-only check.
+
+Before deploying, keep a known-good Git commit and the existing cloud snapshot.
+Do not delete the legacy audio directory until live Radio playback is accepted.
+The Git repository covers source and deployment configuration, not the MP3
+collection, database or complete server state.
+
+## MySQL Network Boundary
+
+The current Docker port publication must not be described as localhost-only
+until live inspection proves it. The preferred end state is a container
+published as `127.0.0.1:3306:3306` plus no cloud firewall rule for 3306.
+
+Changing the port binding requires a controlled container recreation with the
+existing named volume and a user-supplied protected environment file. Do not
+extract or print the running container's environment to reconstruct it. The
+sequence must include a volume check, downtime notice, rollback container name,
+local application query, and external port probe.

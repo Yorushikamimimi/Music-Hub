@@ -1,0 +1,9 @@
+Single-database migration configuration for Music Hub.
+
+Apply migrations with:
+
+    flask --app wsgi:app db upgrade
+
+The first migration upgrades the legacy `music_yorushika` table in place. It
+intentionally keeps the unused legacy `album` and `rating` columns for the
+first production release so rollback does not depend on reconstructing data.

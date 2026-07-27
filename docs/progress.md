@@ -3,32 +3,30 @@
 > Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Online Stabilization`
-- Meaning: Core pages are online and accessible. Focus is now on stability and operations.
+- Stage: `Hardening release candidate`
+- Meaning: Selected content, privacy, migration, performance and runtime work is
+  implemented locally. Production activation is pending a controlled maintenance step.
 
 ## Completed in This Round
-1. Persistent Radio delivery
-- Replaced the transient FFmpeg unit with a versioned `yorushika-radio.service`.
-- Added deterministic playlist and schedule generation for 28 local tracks.
-- Added current track, approximate progress, next track, LIVE state, and 25% initial volume.
-- Added versioned systemd and IP-restricted Nginx configuration.
-- Kept audio files and generated HLS segments outside Git.
+1. Performance
+- Re-encoded 20 covers as WebP and removed roughly 20 MB of redundant CJK font files.
+- Added one-day caching for versioned static assets and reduced Gunicorn target workers from 3 to 2.
 
-2. Availability fixes
-- Fixed `/search` 500 by importing `request`.
-- Restored `/lyrics` and `/radio` routes.
+2. Content and data
+- Replaced fabricated ranking/HOT data with a 20-track curated catalog.
+- Added real album/release metadata, original summaries and official source links.
+- Replaced the destructive crawler with an idempotent catalog sync.
 
-3. Homepage UX fixes
-- Fixed daily pick rendering issues.
-- Removed distracting right-side music decoration.
-- Fixed duplicated rating text (such as `HOT HOT`).
+3. Privacy and accessibility
+- Radio is explicitly private, manual-play only and excluded from search indexing.
+- Added a functional mobile navigation toggle, keyboard Escape support, focus states,
+  landmarks and touch-size controls without changing the overall visual direction.
 
-4. Encoding risk mitigation
-- Switched key templates to safe fallback text to avoid `????` in production.
-
-5. Ops workflow
-- Verified deploy/restart/check flow with `systemctl` + `curl`.
-- Added hotfix flow for uploading only changed files.
+4. Operations and reliability
+- Added additive Flask/Alembic migrations that preserve legacy columns for rollback.
+- Added hash-locked runtime and development dependency sets.
+- Added non-root target units for Web and Radio plus a no-restart preparation script.
+- Added 21 automated tests covering routes, catalog, CSP, migrations and Radio schedule.
 
 ## Current Deliverables
 - Home page with daily recommendation.
@@ -37,15 +35,11 @@
 - Radio page (`/radio`, optional `RADIO_STREAM_URL`).
 - About page and local favorites.
 
-## Next Steps
-1. Repository-backed deployment
-- Use the tracked systemd and Nginx files as the runtime source of truth.
+## Pending Production Proof
+1. Create the two system users and copy the Radio library to `/srv/media`.
+2. Apply the additive database migration and catalog sync.
+3. Install target systemd/Nginx configuration and restart both services.
+4. Complete real desktop/mobile browser regression and live audio progression checks.
+5. Recreate or otherwise firewall the MySQL container so port 3306 is not externally bound.
 
-2. i18n cleanup
-- Re-introduce Chinese copy with a strict UTF-8 content pipeline.
-
-3. Release path hardening
-- Use `local package + scp` as default deployment path on weak networks.
-
-4. Monitoring
-- Add minimal checks: service status, 5xx trend, certificate expiry reminder.
+The visual redesign remains intentionally deferred until a separate design version can be reviewed.

@@ -11,9 +11,6 @@ TMP_DIR="${TMP_DIR:-/tmp/music-hub-release}"
 BACKUP_ROOT="${BACKUP_ROOT:-/var/backups/music-hub}"
 
 KEEP_ENV_FILE="${KEEP_ENV_FILE:-.env}"
-KEEP_UPLOADS_DIR="${KEEP_UPLOADS_DIR:-static/uploads}"
-KEEP_AVATAR_FILE="${KEEP_AVATAR_FILE:-current_avatar.txt}"
-
 if [[ "$(id -u)" -eq 0 ]]; then
   SUDO=""
 else
@@ -56,8 +53,6 @@ ${SUDO} rsync -a --delete \
   --exclude "venv/" \
   --exclude "__pycache__/" \
   --exclude "${KEEP_ENV_FILE}" \
-  --exclude "${KEEP_UPLOADS_DIR}/" \
-  --exclude "${KEEP_AVATAR_FILE}" \
   --backup --backup-dir="${backup_dir}" \
   "${TMP_DIR}/" "${APP_DIR}/"
 
@@ -67,10 +62,24 @@ if [[ ! -x "${APP_DIR}/venv/bin/pip" ]]; then
 fi
 
 log "Install dependencies"
-${SUDO} "${APP_DIR}/venv/bin/pip" install -r "${APP_DIR}/requirements.txt"
+${SUDO} "${APP_DIR}/venv/bin/pip" install \
+  --require-hashes \
+  -r "${APP_DIR}/requirements.txt"
 
 log "Run compile check"
 ${SUDO} "${APP_DIR}/venv/bin/python" -m compileall -q "${APP_DIR}"
+
+log "Apply additive database migrations"
+(
+  cd "${APP_DIR}"
+  ${SUDO} "${APP_DIR}/venv/bin/flask" --app wsgi:app db upgrade
+)
+
+log "Synchronize the curated catalog"
+(
+  cd "${APP_DIR}"
+  ${SUDO} "${APP_DIR}/venv/bin/flask" --app wsgi:app catalog-sync
+)
 
 log "Restart service ${SERVICE_NAME}"
 ${SUDO} systemctl restart "${SERVICE_NAME}"

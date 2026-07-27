@@ -1,8 +1,7 @@
 ﻿import os
 import urllib.parse
-from dotenv import load_dotenv
 
-load_dotenv()
+from dotenv import load_dotenv
 
 
 def _require_env(name: str) -> str:
@@ -23,25 +22,33 @@ def _require_strong_secret() -> str:
     return secret
 
 
-DB_HOST = _require_env('DB_HOST')
-DB_USER = _require_env('DB_USER')
-DB_PASSWORD = _require_env('DB_PASSWORD')
-DB_NAME = _require_env('DB_NAME')
-
-encoded_password = urllib.parse.quote_plus(DB_PASSWORD)
-
-SQLALCHEMY_DATABASE_URI = (
-    f'mysql+pymysql://{DB_USER}:{encoded_password}'
-    f'@{DB_HOST}/{DB_NAME}?charset=utf8mb4'
-)
-SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-SECRET_KEY = _require_strong_secret()
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 MAX_CONTENT_LENGTH = 2 * 1024 * 1024
-AVATAR_PERSISTENCE_FILE = os.path.join(BASE_DIR, 'current_avatar.txt')
 
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def load_runtime_config() -> dict:
+    """Load production configuration without exposing secret values."""
+    load_dotenv()
+
+    db_host = _require_env('DB_HOST')
+    db_user = _require_env('DB_USER')
+    db_password = urllib.parse.quote_plus(_require_env('DB_PASSWORD'))
+    db_name = _require_env('DB_NAME')
+
+    return {
+        'SECRET_KEY': _require_strong_secret(),
+        'SQLALCHEMY_DATABASE_URI': (
+            f'mysql+pymysql://{db_user}:{db_password}'
+            f'@{db_host}/{db_name}?charset=utf8mb4'
+        ),
+        'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+        'SQLALCHEMY_ENGINE_OPTIONS': {
+            'pool_pre_ping': True,
+            'pool_recycle': 280,
+        },
+        'MAX_CONTENT_LENGTH': MAX_CONTENT_LENGTH,
+        'SEND_FILE_MAX_AGE_DEFAULT': 86400,
+        'SESSION_COOKIE_HTTPONLY': True,
+        'SESSION_COOKIE_SAMESITE': 'Lax',
+        'TRUSTED_HOSTS': ['81.68.72.245', 'localhost', '127.0.0.1'],
+    }

@@ -3,7 +3,7 @@
     --card-bg: rgba(255, 255, 255, 0.7);
     --text-color: #212529;
     --navbar-bg: rgba(255, 255, 255, 0.8);
-    --accent-color: #fb7299;
+    --accent-color: #c92a5b;
     --glass-border: rgba(255, 255, 255, 0.4);
     --glass-shadow: rgba(0, 0, 0, 0.08);
     --rank-other: #dee2e6;
@@ -17,6 +17,7 @@
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: rgba(0, 0, 0, 0.3);
     --rank-other: #cbd5e1;
+    --accent-color: #fb85a7;
 }
 
 [data-theme="dark"] .text-muted {
@@ -34,9 +35,97 @@
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Outfit', 'Noto Sans SC', sans-serif;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+        'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
     transition: background-color 0.3s ease, color 0.3s ease;
     min-height: 100vh;
+}
+
+.skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 1100;
+    padding: 0.65rem 0.9rem;
+    border-radius: 0.6rem;
+    background: var(--text-color);
+    color: var(--bg-color);
+    transform: translateY(-150%);
+}
+
+.skip-link:focus {
+    color: var(--bg-color);
+    transform: translateY(0);
+}
+
+.navbar-spacer {
+    height: 100px;
+}
+
+.navbar-brand {
+    color: var(--accent-color);
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus-visible {
+    color: var(--accent-color);
+}
+
+.site-nav-shell {
+    position: relative;
+}
+
+.site-nav-panel {
+    margin-left: auto;
+}
+
+.site-nav-list {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+.site-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-left: 1rem;
+    order: 3;
+}
+
+.mobile-nav-toggle,
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    background: var(--glass-border);
+    color: var(--text-color);
+}
+
+.mobile-nav-toggle {
+    display: none;
+}
+
+.nav-link {
+    min-height: 44px;
+    border-radius: 999px;
+}
+
+.nav-link.active {
+    color: var(--accent-color) !important;
+    background: rgba(201, 42, 91, 0.1);
+}
+
+.nav-link:focus-visible,
+.mobile-nav-toggle:focus-visible,
+.theme-toggle:focus-visible,
+.fav-btn:focus-visible {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 2px;
 }
 
 .glass-card {
@@ -151,26 +240,8 @@ body {
     text-overflow: ellipsis;
 }
 
-.hot-badge {
-    background: var(--accent-color);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
 .theme-toggle {
     cursor: pointer;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--glass-border);
     transition: all 0.3s ease;
 }
 
@@ -192,7 +263,9 @@ body {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 6px 8px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px;
     border-radius: 50%;
     color: #cbd5e1;
     font-size: 1.1rem;
@@ -212,8 +285,8 @@ body {
 }
 
 .fav-btn-sm {
-    font-size: 0.9rem;
-    padding: 4px 6px;
+    font-size: 0.95rem;
+    padding: 8px;
 }
 
 .fav-toast {
@@ -322,15 +395,6 @@ body {
     letter-spacing: 0.03em;
 }
 
-.daily-hot {
-    background: rgba(255, 255, 255, 0.22);
-    color: #fff;
-    border-radius: 20px;
-    padding: 3px 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
 .daily-decoration {
     position: absolute;
     right: -10px;
@@ -365,10 +429,6 @@ body {
     font-weight: 600;
 }
 
-.daily-hot {
-    white-space: nowrap;
-}
-
 .daily-decoration {
     display: none !important;
 }
@@ -376,6 +436,15 @@ body {
 .story-card p {
     color: var(--text-color);
     line-height: 1.75;
+}
+
+.album-art-placeholder {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    color: #64748b;
+    font-size: 1.5rem;
 }
 
 .radio-hero {
@@ -631,9 +700,85 @@ body {
     line-height: 1.55;
 }
 
-.radio-sync-note i {
+.radio-private-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid rgba(201, 42, 91, 0.2);
+    border-radius: 12px;
+    background: rgba(201, 42, 91, 0.06);
+    color: var(--text-color);
+    font-size: 0.78rem;
+    line-height: 1.55;
+}
+
+.radio-sync-note i,
+.radio-private-note i {
     margin-top: 0.12rem;
     color: var(--accent-color);
+}
+
+@media (max-width: 767.98px) {
+    .navbar-spacer {
+        height: 84px;
+    }
+
+    .site-nav-shell {
+        flex-wrap: wrap;
+    }
+
+    .site-nav-actions {
+        margin-left: auto;
+    }
+
+    .mobile-nav-toggle {
+        display: inline-flex;
+    }
+
+    .site-nav-panel {
+        display: none;
+        width: 100%;
+        margin: 0.6rem 0 0;
+        padding: 0.5rem;
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        background: var(--navbar-bg);
+        box-shadow: 0 12px 24px var(--glass-shadow);
+    }
+
+    .site-nav-panel.is-open {
+        display: block;
+    }
+
+    .site-nav-list {
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .site-nav-list .nav-link {
+        display: flex;
+        align-items: center;
+        padding-inline: 1rem;
+    }
+
+    .glass-card:hover,
+    .music-item:hover,
+    .song-card:hover {
+        transform: none;
+    }
+
+    .form-control,
+    .form-select,
+    .btn {
+        min-height: 44px;
+    }
+
+    .home-columns {
+        margin-right: 0;
+        margin-left: 0;
+    }
 }
 
 @keyframes radio-live-pulse {
@@ -676,6 +821,15 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+
     .radio-live-dot,
     .radio-equalizer.is-playing span {
         animation: none;
