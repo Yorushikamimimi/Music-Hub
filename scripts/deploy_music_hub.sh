@@ -2,8 +2,9 @@
 set -Eeuo pipefail
 
 APP_DIR="${APP_DIR:-/var/www/My_Homepage}"
-SERVICE_NAME="${SERVICE_NAME:-yorushika-web}"
-DOMAIN="${DOMAIN:-music.yoruming.cn}"
+SERVICE_NAME="${SERVICE_NAME:-musichub.service}"
+RADIO_SERVICE_NAME="${RADIO_SERVICE_NAME:-yorushika-radio.service}"
+HOST_HEADER="${HOST_HEADER:-81.68.72.245}"
 BRANCH="${BRANCH:-main}"
 REPO_URL="${REPO_URL:-https://github.com/Yorushikamimimi/Music-Hub.git}"
 TMP_DIR="${TMP_DIR:-/tmp/music-hub-release}"
@@ -75,14 +76,16 @@ log "Restart service ${SERVICE_NAME}"
 ${SUDO} systemctl restart "${SERVICE_NAME}"
 ${SUDO} systemctl is-active --quiet "${SERVICE_NAME}"
 
-log "Run local health check (Nginx -> Gunicorn)"
-curl -fsS -I -H "Host: ${DOMAIN}" http://127.0.0.1 >/dev/null
-
-if curl -fsS -Ik "https://${DOMAIN}/" >/dev/null; then
-  log "External HTTPS check passed: https://${DOMAIN}/"
-else
-  log "Warning: external HTTPS check failed. Please verify DNS/certificate/firewall manually."
+if ${SUDO} systemctl cat "${RADIO_SERVICE_NAME}" >/dev/null 2>&1; then
+  log "Restart radio service ${RADIO_SERVICE_NAME}"
+  ${SUDO} systemctl restart "${RADIO_SERVICE_NAME}"
+  ${SUDO} systemctl is-active --quiet "${RADIO_SERVICE_NAME}"
 fi
+
+log "Run local health check (Nginx -> Gunicorn)"
+curl -fsS -I -H "Host: ${HOST_HEADER}" http://127.0.0.1 >/dev/null
+curl -fsS -I -H "Host: ${HOST_HEADER}" http://127.0.0.1/radio >/dev/null
+curl -fsS -I -H "Host: ${HOST_HEADER}" http://127.0.0.1/hls/yorushika.m3u8 >/dev/null
 
 log "Deploy finished"
 log "Incremental backup path: ${backup_dir}"

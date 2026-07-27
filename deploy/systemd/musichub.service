@@ -1,0 +1,20 @@
+[Unit]
+Description=Gunicorn instance to serve Music Hub
+After=network.target yorushika-radio.service
+Wants=yorushika-radio.service
+
+[Service]
+Type=simple
+User=root
+Group=www-data
+WorkingDirectory=/var/www/My_Homepage
+Environment="PATH=/var/www/My_Homepage/venv/bin"
+Environment="RADIO_STATION_NAME=Yorushika Radio"
+Environment="RADIO_STREAM_URL=/hls/yorushika.m3u8"
+ExecStart=/var/www/My_Homepage/venv/bin/gunicorn --workers 3 --bind unix:musichub.sock -m 007 app:app
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

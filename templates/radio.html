@@ -1,30 +1,224 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 radio-page">
     <div class="glass-card p-4 radio-hero mb-4">
-        <h2 class="fw-bold mb-2">Radio</h2>
-        <p class="text-muted mb-0">Personal radio page. Playback is manual and never auto-starts.</p>
+        <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3">
+            <div>
+                <p class="radio-kicker mb-2">MUSIC HUB LIVE</p>
+                <h2 class="fw-bold mb-2">Radio</h2>
+                <p class="text-muted mb-0">A continuous mix from the local Yorushika collection. Playback always starts manually.</p>
+            </div>
+            <div class="radio-station-chip">
+                <i class="bi bi-broadcast-pin" aria-hidden="true"></i>
+                <span>{{ station_name }}</span>
+            </div>
+        </div>
     </div>
 
-    <div class="glass-card p-4">
-        <div class="d-flex align-items-center gap-2 mb-3">
-            <i class="bi bi-broadcast-pin fs-5 text-primary"></i>
-            <h5 class="mb-0">{{ station_name }}</h5>
+    <section
+        class="glass-card p-4 p-lg-5 radio-player-card"
+        data-radio-schedule="/hls/radio-schedule.json"
+        aria-labelledby="radio-now-playing-title"
+    >
+        {% if stream_url %}
+        <div class="radio-player-heading">
+            <div>
+                <p class="radio-kicker mb-1">ON AIR NOW</p>
+                <h3 id="radio-now-playing-title" class="mb-0">Now playing</h3>
+            </div>
+            <span class="radio-live-badge" id="radio-live-badge">
+                <span class="radio-live-dot" aria-hidden="true"></span>
+                LIVE
+            </span>
         </div>
 
-        {% if stream_url %}
-        <p class="small text-muted mb-3">Detected `RADIO_STREAM_URL` configuration.</p>
-        <audio controls preload="none" style="width:100%; max-width:680px;">
-            <source src="{{ stream_url }}">
-            Your browser does not support audio playback.
-        </audio>
-        <p class="small text-muted mt-3 mb-0">Playback only starts when the user clicks Play.</p>
+        <div class="radio-now-playing">
+            <div class="radio-cover" aria-hidden="true">
+                <div class="radio-disc">
+                    <i class="bi bi-music-note-beamed"></i>
+                </div>
+                <div class="radio-equalizer" id="radio-equalizer">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <div class="radio-track-panel" aria-live="polite">
+                <p class="radio-track-label mb-2">CURRENT TRACK</p>
+                <h4 class="radio-track-title mb-1" id="radio-track-title">Synchronizing live playlist…</h4>
+                <p class="radio-track-artist mb-4" id="radio-track-artist">{{ station_name }}</p>
+
+                <div
+                    class="radio-progress-track"
+                    id="radio-progress-track"
+                    role="progressbar"
+                    aria-label="Approximate broadcast track progress"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                >
+                    <span class="radio-progress-fill" id="radio-progress-fill"></span>
+                </div>
+                <div class="radio-progress-time">
+                    <span id="radio-elapsed">0:00</span>
+                    <span id="radio-duration">0:00</span>
+                </div>
+
+                <div class="radio-next-track">
+                    <span class="radio-next-label">UP NEXT</span>
+                    <span class="radio-next-title" id="radio-next-title">Loading playlist…</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="radio-native-player">
+            <audio id="radio-audio" controls preload="none">
+                <source src="{{ stream_url }}">
+                Your browser does not support audio playback.
+            </audio>
+            <div class="radio-player-note">
+                <span id="radio-playback-status">Click Play when you are ready.</span>
+                <span>Initial volume 25%</span>
+            </div>
+        </div>
+
+        <p class="radio-sync-note mb-0">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            Track details follow the live broadcast timeline and may lead the buffered audio by a few seconds.
+        </p>
         {% else %}
         <div class="alert alert-warning mb-0" role="alert">
-            `RADIO_STREAM_URL` is not configured. Add it to `.env` and restart the service.
+            The radio stream is not configured. Playback is currently unavailable.
         </div>
         {% endif %}
-    </div>
+    </section>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if stream_url %}
+<script>
+    (() => {
+        const page = document.querySelector('.radio-player-card');
+        const audio = document.getElementById('radio-audio');
+        const equalizer = document.getElementById('radio-equalizer');
+        const title = document.getElementById('radio-track-title');
+        const artist = document.getElementById('radio-track-artist');
+        const nextTitle = document.getElementById('radio-next-title');
+        const elapsed = document.getElementById('radio-elapsed');
+        const duration = document.getElementById('radio-duration');
+        const progressTrack = document.getElementById('radio-progress-track');
+        const progressFill = document.getElementById('radio-progress-fill');
+        const playbackStatus = document.getElementById('radio-playback-status');
+
+        let schedule = null;
+        let serverClockOffset = 0;
+
+        const formatTime = (seconds) => {
+            const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+            const minutes = Math.floor(safeSeconds / 60);
+            return `${minutes}:${String(safeSeconds % 60).padStart(2, '0')}`;
+        };
+
+        const setPlaybackState = (isPlaying, message) => {
+            equalizer.classList.toggle('is-playing', isPlaying);
+            playbackStatus.textContent = message;
+        };
+
+        const renderSchedule = () => {
+            if (!schedule || !Array.isArray(schedule.tracks) || schedule.tracks.length === 0) {
+                return;
+            }
+
+            const totalDuration = schedule.tracks.reduce((total, track) => total + track.duration, 0);
+            if (totalDuration <= 0) {
+                return;
+            }
+
+            const serverNow = (Date.now() / 1000) + serverClockOffset;
+            const liveSeconds = Math.max(
+                0,
+                serverNow - schedule.startedAt - (schedule.bufferDelaySeconds || 0)
+            );
+            let position = liveSeconds % totalDuration;
+            let currentIndex = 0;
+
+            for (let index = 0; index < schedule.tracks.length; index += 1) {
+                const trackDuration = schedule.tracks[index].duration;
+                if (position < trackDuration) {
+                    currentIndex = index;
+                    break;
+                }
+                position -= trackDuration;
+            }
+
+            const currentTrack = schedule.tracks[currentIndex];
+            const upcomingTrack = schedule.tracks[(currentIndex + 1) % schedule.tracks.length];
+            const percentage = Math.min(100, Math.max(0, (position / currentTrack.duration) * 100));
+
+            title.textContent = currentTrack.title;
+            artist.textContent = currentTrack.artist;
+            nextTitle.textContent = `${upcomingTrack.title} · ${upcomingTrack.artist}`;
+            elapsed.textContent = formatTime(position);
+            duration.textContent = formatTime(currentTrack.duration);
+            progressFill.style.width = `${percentage}%`;
+            progressTrack.setAttribute('aria-valuenow', String(Math.round(percentage)));
+            progressTrack.setAttribute(
+                'aria-valuetext',
+                `${currentTrack.title}, ${formatTime(position)} of ${formatTime(currentTrack.duration)}`
+            );
+        };
+
+        const loadSchedule = async () => {
+            try {
+                const response = await fetch(`${page.dataset.radioSchedule}?v=${Date.now()}`, {
+                    cache: 'no-store'
+                });
+                if (!response.ok) {
+                    throw new Error(`Schedule request failed with ${response.status}`);
+                }
+
+                const serverDate = response.headers.get('Date');
+                if (serverDate) {
+                    serverClockOffset = (new Date(serverDate).getTime() - Date.now()) / 1000;
+                }
+
+                schedule = await response.json();
+                renderSchedule();
+                window.setInterval(renderSchedule, 1000);
+            } catch (error) {
+                title.textContent = '{{ station_name }}';
+                artist.textContent = 'Live stream';
+                nextTitle.textContent = 'Track details temporarily unavailable';
+                console.warn('Radio schedule unavailable:', error);
+            }
+        };
+
+        audio.volume = 0.25;
+        audio.addEventListener('loadedmetadata', () => {
+            audio.volume = 0.25;
+        });
+        audio.addEventListener('play', () => {
+            setPlaybackState(true, 'Live stream playing');
+        });
+        audio.addEventListener('pause', () => {
+            setPlaybackState(false, audio.currentTime > 0 ? 'Playback paused' : 'Click Play when you are ready.');
+        });
+        audio.addEventListener('waiting', () => {
+            setPlaybackState(false, 'Buffering live stream…');
+        });
+        audio.addEventListener('playing', () => {
+            setPlaybackState(true, 'Live stream playing');
+        });
+        audio.addEventListener('error', () => {
+            setPlaybackState(false, 'Playback is temporarily unavailable');
+        });
+
+        loadSchedule();
+    })();
+</script>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,28 @@
+[Unit]
+Description=Yorushika audio-only HLS radio
+After=local-fs.target
+
+[Service]
+Type=simple
+User=root
+Group=www-data
+WorkingDirectory=/root/projects/archived/Yorushika-24h-Radio
+Environment="RADIO_MUSIC_DIR=/root/projects/archived/Yorushika-24h-Radio/assets/music"
+Environment="RADIO_RUNTIME_DIR=/run/yorushika-radio"
+Environment="RADIO_STATION_NAME=Yorushika Radio"
+Environment="RADIO_BUFFER_DELAY_SECONDS=16"
+RuntimeDirectory=yorushika-radio
+RuntimeDirectoryMode=0755
+ExecStartPre=/usr/bin/python3 /var/www/My_Homepage/scripts/generate_radio_schedule.py
+ExecStart=/usr/bin/ffmpeg -hide_banner -loglevel warning -re -stream_loop -1 -f concat -safe 0 -i /run/yorushika-radio/playlist.txt -vn -c:a aac -b:a 128k -ar 44100 -ac 2 -f hls -hls_time 4 -hls_list_size 10 -hls_flags delete_segments+independent_segments+omit_endlist+program_date_time -hls_segment_filename /run/yorushika-radio/hls/yorushika-%%08d.ts /run/yorushika-radio/hls/yorushika.m3u8
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+Nice=10
+CPUWeight=20
+MemoryMax=512M
+NoNewPrivileges=true
+UMask=0022
+
+[Install]
+WantedBy=multi-user.target

@@ -1,96 +1,82 @@
 # Operations Guide
 
 ## Runtime Baseline
-- Domain: `music.yoruming.cn`
+
+- Entry: `http://81.68.72.245/`
+- Access boundary: localhost and Tian's current public IPv4 only
 - Reverse proxy: `Nginx`
 - App server: `Gunicorn + Flask`
-- Service name: `yorushika-web`
+- App service: `musichub.service`
+- Radio service: `yorushika-radio.service`
 - App path: `/var/www/My_Homepage`
+- HLS runtime path: `/run/yorushika-radio/hls`
 
-## Deployment (Recommended)
-### A) Default path (stable on weak network): local package + SCP
-```powershell
-# Local Windows
-cd D:\Workspace\My_Homepage
-git archive --format=tar.gz -o Music-Hub-main.tar.gz HEAD
-scp .\Music-Hub-main.tar.gz root@<SERVER_IP>:/tmp/
-```
+The retired `music.yoruming.cn` DNS and HTTPS entry are not part of the current runtime.
 
-```bash
-# Server Linux
-rm -rf /tmp/music-hub-release && mkdir -p /tmp/music-hub-release
-tar --warning=no-unknown-keyword -xzf /tmp/Music-Hub-main.tar.gz -C /tmp/music-hub-release
-sudo rsync -a --delete \
-  --exclude ".env" \
-  --exclude "venv/" \
-  --exclude "static/uploads/" \
-  --exclude "current_avatar.txt" \
-  /tmp/music-hub-release/ /var/www/My_Homepage/
-sudo systemctl restart yorushika-web
-```
+## Persistent Radio Design
 
-### B) One-click script (when server can access GitHub smoothly)
+`yorushika-radio.service` performs the full startup sequence:
+
+1. Creates `/run/yorushika-radio/` through systemd `RuntimeDirectory`.
+2. Runs `scripts/generate_radio_schedule.py`.
+3. Builds a deterministic FFmpeg concat playlist from the server's local MP3 collection.
+4. Probes the real duration of each track and writes `radio-schedule.json`.
+5. Starts an audio-only FFmpeg HLS stream.
+6. Regenerates runtime files after service restart or server reboot.
+
+The repository intentionally excludes the MP3 collection, generated HLS segments, `.env`, databases, uploads, and virtual environments.
+
+## Install Versioned Runtime Configuration
+
 ```bash
 cd /var/www/My_Homepage
-chmod +x scripts/deploy_music_hub.sh
-./scripts/deploy_music_hub.sh
-```
 
-## Ops Command Cheat Sheet
-```bash
-# Service status
-sudo systemctl status yorushika-web --no-pager
+sudo install -m 0644 deploy/systemd/musichub.service \
+  /etc/systemd/system/musichub.service
+sudo install -m 0644 deploy/systemd/yorushika-radio.service \
+  /etc/systemd/system/yorushika-radio.service
+sudo install -m 0644 deploy/nginx/musichub-ip.conf \
+  /etc/nginx/conf.d/musichub-ip.conf
 
-# Start / Stop / Restart
-sudo systemctl start yorushika-web
-sudo systemctl stop yorushika-web
-sudo systemctl restart yorushika-web
-
-# Enable / Disable on boot
-sudo systemctl enable yorushika-web
-sudo systemctl disable yorushika-web
-
-# Logs
-sudo journalctl -u yorushika-web -f
-sudo journalctl -u yorushika-web -n 120 --no-pager
-
-# Nginx check and reload
+sudo systemctl daemon-reload
 sudo nginx -t
+sudo systemctl enable --now yorushika-radio.service
+sudo systemctl enable --now musichub.service
 sudo systemctl reload nginx
-
-# Health checks
-curl -Ik https://music.yoruming.cn
-curl -I -H "Host: music.yoruming.cn" http://127.0.0.1
 ```
 
-## Maintenance / Stop Site
-### Temporary maintenance
-```bash
-sudo systemctl stop yorushika-web
-# Optional full stop (including gateway):
-# sudo systemctl stop nginx
-```
+When Tian's public IPv4 changes, update the `allow` line in the Nginx configuration before expecting remote access.
 
-### Resume service
-```bash
-sudo systemctl start yorushika-web
-sudo systemctl status yorushika-web --no-pager
-curl -Ik https://music.yoruming.cn
-```
-
-## Hotfix (single file)
-```powershell
-# Local: upload one changed file
-scp .\templates\radio.html root@<SERVER_IP>:/var/www/My_Homepage/templates/radio.html
-```
+## Service Checks
 
 ```bash
-# Server: restart and verify
-sudo systemctl restart yorushika-web
-curl -I https://music.yoruming.cn/radio
+systemctl status musichub.service --no-pager
+systemctl status yorushika-radio.service --no-pager
+systemctl is-enabled musichub.service yorushika-radio.service
+journalctl -u musichub.service -n 100 --no-pager
+journalctl -u yorushika-radio.service -n 100 --no-pager
 ```
 
-## Post-change Validation
-1. `/` `/search` `/lyrics` `/radio` `/about` all return `200`.
-2. `yorushika-web` is `active (running)`.
-3. Browser hard refresh shows latest page content.
+## Health Checks
+
+```bash
+nginx -t
+curl -I -H "Host: 81.68.72.245" http://127.0.0.1/
+curl -I -H "Host: 81.68.72.245" http://127.0.0.1/radio
+curl -I -H "Host: 81.68.72.245" http://127.0.0.1/hls/yorushika.m3u8
+curl -I -H "Host: 81.68.72.245" http://127.0.0.1/hls/radio-schedule.json
+```
+
+Browser acceptance should additionally prove:
+
+1. Current track, approximate progress, and next track are populated.
+2. Initial audio volume is `0.25`.
+3. Playback advances with `readyState=4` and no media error.
+4. Mobile layout has no horizontal overflow.
+5. `https://yoruming.cn/` remains healthy because it is a separate project.
+
+## Deployment
+
+The existing `scripts/deploy_music_hub.sh` keeps `.env`, `venv/`, uploads, and local avatar state. It now restarts both persistent Music Hub services and checks the local IP-based Nginx route.
+
+Before deploying, keep an external rollback point or a known-good Git commit. The Git repository covers source and deployment configuration, not the MP3 collection, databases, uploads, or complete server state.

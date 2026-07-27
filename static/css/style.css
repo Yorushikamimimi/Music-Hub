@@ -381,3 +381,307 @@ body {
 .radio-hero {
     border-left: 4px solid var(--accent-color);
 }
+
+/* --- radio: live now-playing workbench --- */
+.radio-page {
+    max-width: 1200px;
+}
+
+.radio-kicker {
+    color: var(--accent-color);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+}
+
+.radio-station-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: fit-content;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid rgba(251, 114, 153, 0.22);
+    border-radius: 999px;
+    color: var(--text-color);
+    background: rgba(251, 114, 153, 0.08);
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.radio-station-chip i {
+    color: var(--accent-color);
+}
+
+.radio-player-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.radio-player-card::before {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    content: "";
+    background: linear-gradient(90deg, var(--accent-color), #a78bfa, #7c8cff);
+}
+
+.radio-player-card:hover {
+    transform: none;
+    border-color: rgba(251, 114, 153, 0.45);
+}
+
+.radio-player-heading,
+.radio-progress-time,
+.radio-player-note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.radio-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(251, 114, 153, 0.24);
+    border-radius: 999px;
+    background: rgba(251, 114, 153, 0.1);
+    color: var(--accent-color);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.radio-live-dot {
+    width: 0.48rem;
+    height: 0.48rem;
+    border-radius: 50%;
+    background: var(--accent-color);
+    box-shadow: 0 0 0 0 rgba(251, 114, 153, 0.45);
+    animation: radio-live-pulse 1.8s ease-out infinite;
+}
+
+.radio-now-playing {
+    display: grid;
+    grid-template-columns: minmax(190px, 0.72fr) minmax(0, 2fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+    margin: 2rem 0;
+}
+
+.radio-cover {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    width: min(100%, 240px);
+    margin-inline: auto;
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at 26% 20%, rgba(255, 255, 255, 0.75), transparent 26%),
+        linear-gradient(145deg, rgba(251, 114, 153, 0.88), rgba(167, 139, 250, 0.9) 52%, rgba(124, 140, 255, 0.88));
+    box-shadow: 0 18px 45px rgba(115, 91, 150, 0.2);
+}
+
+.radio-disc {
+    display: grid;
+    place-items: center;
+    width: 46%;
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.radio-equalizer {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    align-items: end;
+    gap: 0.24rem;
+    height: 1.4rem;
+}
+
+.radio-equalizer span {
+    width: 0.24rem;
+    height: 32%;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.86);
+}
+
+.radio-equalizer.is-playing span {
+    animation: radio-equalizer 0.9s ease-in-out infinite alternate;
+}
+
+.radio-equalizer.is-playing span:nth-child(2) {
+    animation-delay: -0.55s;
+}
+
+.radio-equalizer.is-playing span:nth-child(3) {
+    animation-delay: -0.2s;
+}
+
+.radio-equalizer.is-playing span:nth-child(4) {
+    animation-delay: -0.72s;
+}
+
+.radio-track-panel {
+    min-width: 0;
+}
+
+.radio-track-label,
+.radio-next-label {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.radio-track-title {
+    overflow: hidden;
+    color: var(--text-color);
+    font-size: clamp(1.45rem, 3vw, 2.25rem);
+    font-weight: 800;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+}
+
+.radio-track-artist {
+    color: #94a3b8;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.radio-progress-track {
+    height: 0.5rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.2);
+}
+
+.radio-progress-fill {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent-color), #a78bfa);
+    box-shadow: 0 0 16px rgba(251, 114, 153, 0.28);
+    transition: width 0.8s linear;
+}
+
+.radio-progress-time {
+    margin-top: 0.55rem;
+    color: #94a3b8;
+    font-size: 0.76rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.radio-next-track {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 0;
+    margin-top: 1.4rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    background: rgba(148, 163, 184, 0.06);
+}
+
+.radio-next-title {
+    overflow: hidden;
+    color: var(--text-color);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.radio-native-player {
+    padding: 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    background: rgba(148, 163, 184, 0.07);
+}
+
+.radio-native-player audio {
+    display: block;
+    width: 100%;
+}
+
+.radio-player-note {
+    margin-top: 0.7rem;
+    color: #94a3b8;
+    font-size: 0.75rem;
+}
+
+.radio-sync-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    line-height: 1.55;
+}
+
+.radio-sync-note i {
+    margin-top: 0.12rem;
+    color: var(--accent-color);
+}
+
+@keyframes radio-live-pulse {
+    70% {
+        box-shadow: 0 0 0 0.45rem rgba(251, 114, 153, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(251, 114, 153, 0);
+    }
+}
+
+@keyframes radio-equalizer {
+    from {
+        height: 30%;
+    }
+    to {
+        height: 100%;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .radio-now-playing {
+        grid-template-columns: 1fr;
+        margin: 1.5rem 0;
+    }
+
+    .radio-cover {
+        width: min(58vw, 210px);
+    }
+
+    .radio-player-heading {
+        align-items: flex-start;
+    }
+
+    .radio-player-note {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .radio-live-dot,
+    .radio-equalizer.is-playing span {
+        animation: none;
+    }
+
+    .radio-progress-fill {
+        transition: none;
+    }
+}
