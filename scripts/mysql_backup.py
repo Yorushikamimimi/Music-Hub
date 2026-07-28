@@ -248,13 +248,43 @@ def docker_exec_with_stdin(
     source,
     timeout: int,
 ) -> subprocess.CompletedProcess:
-    return subprocess.run(
+    return run_with_streamed_stdin(
         ["docker", "exec", "--interactive", container, "sh", "-ec", command],
-        stdin=source,
-        capture_output=True,
-        check=False,
-        timeout=timeout,
+        source,
+        timeout,
     )
+
+
+def run_with_streamed_stdin(
+    command: list[str],
+    source,
+    timeout: int,
+) -> subprocess.CompletedProcess:
+    process = subprocess.Popen(
+        command,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if process.stdin is None:
+        process.kill()
+        raise RuntimeError("failed to open subprocess stdin")
+
+    try:
+        try:
+            shutil.copyfileobj(source, process.stdin, length=1024 * 1024)
+        except BrokenPipeError:
+            pass
+        finally:
+            process.stdin.close()
+            process.stdin = None
+        stdout, stderr = process.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        process.communicate()
+        raise
+
+    return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
 
 
 def verify_restore(

@@ -3,6 +3,7 @@ import io
 import os
 import pathlib
 import subprocess
+import sys
 import tarfile
 
 import pytest
@@ -112,6 +113,24 @@ def test_restore_waits_for_authenticated_query_before_import(tmp_path, monkeypat
     assert result["status"] == "ok"
     assert readiness_commands
     assert all("mysqladmin ping" not in command for command in readiness_commands)
+
+
+def test_streamed_restore_input_uses_decompressed_sql(tmp_path):
+    backup = tmp_path / "backup.sql.gz"
+    sql = b"-- MySQL dump 10.13\nCREATE TABLE music_yorushika (id int);\n"
+    with gzip.open(backup, "wb") as output:
+        output.write(sql)
+
+    with gzip.open(backup, "rb") as source:
+        result = mysql_backup.run_with_streamed_stdin(
+            [sys.executable, "-c", "import sys; sys.stdout.buffer.write(sys.stdin.buffer.read())"],
+            source,
+            timeout=10,
+        )
+
+    assert result.returncode == 0
+    assert result.stdout == sql
+    assert not result.stdout.startswith(b"\x1f\x8b")
 
 
 def test_release_snapshot_excludes_secrets_runtime_and_uploads(tmp_path):
