@@ -135,6 +135,14 @@ minimal status is written to:
 This is local error monitoring, not an off-server notification channel. It does
 not send email, SMS or chat messages.
 
+Production activation evidence from 2026-07-28:
+
+- `music-hub-health.timer` and `music-hub-backup.timer` are enabled and waiting.
+- A transient non-production failure invoked `music-hub-failure@.service`,
+  produced the expected unit result, and was then cleaned up.
+- The recorded deployed version is
+  `fd4fa94957c9d0103ca82691f64c52fd96ab2cc6`.
+
 ## MySQL Backup and Restore Proof
 
 systemd injects the existing protected application database variables into the
@@ -172,6 +180,11 @@ systemctl list-timers music-hub-backup.timer --no-pager
 
 The daily local backup is not an automatic off-server backup. Disk loss still
 requires the separately maintained Mac copy or another off-host destination.
+
+The first production proof created
+`musichub-mysql-20260728T053055121496Z.sql.gz`, verified gzip and SHA-256
+integrity, restored it in an isolated MySQL 8 container, found the
+`music_yorushika` table, and removed the temporary container.
 
 ## Release Snapshots and Rollback
 

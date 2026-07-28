@@ -3,10 +3,10 @@
 > Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Reliability hardening release candidate`
+- Stage: `Reliability baseline live`
 - Meaning: The selected content, privacy, migration, performance and non-root runtime
   work is live. Automated health, backup, failure recording and rollback tooling is
-  implemented locally and pending a controlled production activation.
+  installed, enabled and production-verified on the private server.
 
 ## Completed in This Round
 1. Performance
@@ -34,7 +34,7 @@
   dry-run-first rollback command that preserves `.env`, uploads and the virtualenv.
 - Added local failure-state recording in systemd journal and
   `/var/lib/music-hub-monitor/last-failure.json`.
-- Added 41 automated tests covering routes, catalog, CSP, migrations, Radio schedule
+- Added 43 automated tests covering routes, catalog, CSP, migrations, Radio schedule
   and reliability safety boundaries.
 
 ## Current Deliverables
@@ -44,12 +44,23 @@
 - Radio page (`/radio`, optional `RADIO_STREAM_URL`).
 - About page and local favorites.
 
-## Pending Production Proof
-1. Deploy the reliability scripts and install the new systemd units.
-2. Run the health service once and enable its five-minute timer.
-3. Create one live MySQL backup, restore it into an isolated temporary container,
-   and enable the daily timer only after that proof passes.
-4. Create one complete release snapshot and run rollback in plan-only mode.
-5. Re-run desktop/mobile and real Radio playback regression after the Web restart.
+## Production Proof (2026-07-28)
+1. Deployed commit `fd4fa94957c9d0103ca82691f64c52fd96ab2cc6`; the server
+   worktree is clean and the prior releases have checksum-protected snapshots.
+2. Ran the full Web/database/Radio health service successfully and enabled the
+   five-minute timer. The daily backup timer is enabled for the 03:20 window.
+3. Created a mode-`0600` MySQL backup, verified its SHA-256 and gzip integrity,
+   restored it into an isolated MySQL 8 container, found `music_yorushika`, and
+   confirmed the temporary container was removed.
+4. Ran rollback in plan-only mode against the previous release. The command reported
+   `databaseRollback=false` and did not change the current commit or worktree.
+5. Triggered a harmless transient systemd failure, confirmed the dedicated failure
+   record and journal entry, then removed the self-test state.
+6. Regressed desktop and 390 px mobile Home/Radio pages with no console errors or
+   horizontal overflow; mobile navigation, current-track metadata and 25% initial
+   volume were present. The Playwright Chromium build does not support native HLS,
+   so audible playback remains outside this automated proof.
+7. Confirmed `https://yoruming.cn/` still served the Personal Knowledge Hub after
+   the Music Hub Web restart.
 
 The visual redesign remains intentionally deferred until a separate design version can be reviewed.
