@@ -3,10 +3,12 @@
 > Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Phase 4 archive-about release candidate`
-- Meaning: The About page now explains the archive's purpose, evidence rules,
-  private-listening boundary and build history instead of presenting an unrelated
-  developer profile. It has passed local automated and browser acceptance.
+- Stage: `Phase 5 source-backed release archive candidate`
+- Meaning: The first complete release archive now gives `盗作` a source-backed
+  overview, a clearly labelled personal listening path, the full 14-track order
+  and separate verified video links. The server clone path is also hardened
+  against transient GitHub HTTP/2 failures. It has passed local automated and
+  browser acceptance but has not been committed, pushed or deployed.
 
 ## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
@@ -53,6 +55,23 @@
    acceptance passed with no console errors or horizontal overflow; the mobile
    navigation opens with the correct expanded state.
 
+## Phase 5 Release Candidate
+1. Added `/releases/tousaku` as the first complete release archive rather than
+   sending every album interaction directly to a flat track list.
+2. Kept official release facts and their three source links separate from the
+   site's explicitly labelled personal listening note.
+3. Added three editorial listening paths while preserving the official 14-track
+   order as the primary catalog sequence.
+4. Preserved internal song-detail navigation and exposed five manually verified
+   Bilibili video links as separate external actions.
+5. Linked the release archive from the home album thread, discography cover/title
+   and song-detail breadcrumb.
+6. Hardened the deployment clone step with forced HTTP/1.1, three bounded attempts
+   and increasing delays; a fresh branch clone from GitHub succeeded.
+7. The full 57-test suite passes. Desktop light/dark and 390 px mobile browser
+   acceptance passed with no console warnings, errors or horizontal overflow.
+   Mobile navigation and 44 px controls were verified.
+
 ## Completed in This Round
 1. Performance
 - Re-encoded 20 covers as WebP and removed roughly 20 MB of redundant CJK font files.
@@ -85,6 +104,7 @@
 ## Current Deliverables
 - Archive home page with daily recommendation and listening paths.
 - Discography page (`/discography`) with release filters and complete track order.
+- Source-backed release archive sample (`/releases/tousaku`).
 - Song detail pages (`/songs/<slug>`) with sources and adjacent tracks.
 - Search page (`/search`).
 - Song stories page (`/lyrics`).

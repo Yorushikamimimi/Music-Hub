@@ -45,6 +45,9 @@
         {% for album in albums %}
         <section class="album-entry" id="{{ album.title|replace(' ', '-') }}" aria-labelledby="album-{{ loop.index }}">
             <div class="album-entry-cover">
+                {% if album.detail_slug %}
+                <a href="{{ url_for('main.release_detail', slug=album.detail_slug) }}">
+                {% endif %}
                 <img
                     src="{{ url_for('static', filename='images/' + album.cover_path) }}"
                     alt="《{{ album.title }}》官方发行封面"
@@ -53,6 +56,9 @@
                     loading="lazy"
                     decoding="async"
                 >
+                {% if album.detail_slug %}
+                </a>
+                {% endif %}
             </div>
             <div class="album-entry-content">
                 <div class="album-entry-meta">
@@ -60,9 +66,20 @@
                     <span>{{ album.release_type }}</span>
                     <span>{{ album.songs|length }} 首完整曲序</span>
                 </div>
-                <h2 id="album-{{ loop.index }}">{{ album.title }}</h2>
+                <h2 id="album-{{ loop.index }}">
+                    {% if album.detail_slug %}
+                    <a href="{{ url_for('main.release_detail', slug=album.detail_slug) }}">{{ album.title }}</a>
+                    {% else %}
+                    {{ album.title }}
+                    {% endif %}
+                </h2>
                 <div class="album-entry-source">
                     <span>资料核对：{{ album.source_checked_at.strftime('%Y.%m.%d') }}</span>
+                    {% if album.detail_slug %}
+                    <a href="{{ url_for('main.release_detail', slug=album.detail_slug) }}">
+                        进入作品档案 <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </a>
+                    {% endif %}
                     <a href="{{ album.source_url }}" target="_blank" rel="noopener noreferrer">
                         官方发行页 <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
                     </a>

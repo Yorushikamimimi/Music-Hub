@@ -6,6 +6,7 @@ from flask import Blueprint, Response, abort, current_app, render_template, requ
 from sqlalchemy import or_
 
 from models import db, MusicYorushika
+from release_data import RELEASE_SLUGS_BY_TITLE, RELEASE_STORIES
 
 main_bp = Blueprint('main', __name__)
 
@@ -32,6 +33,7 @@ def _album_index(songs):
                 "cover_path": song.cover_path,
                 "source_url": song.source_url,
                 "source_checked_at": song.source_checked_at,
+                "detail_slug": RELEASE_SLUGS_BY_TITLE.get(key),
                 "songs": [],
                 "first_order": song.display_order,
             }
@@ -165,6 +167,43 @@ def song_detail(slug):
         previous_song=previous_song,
         next_song=next_song,
         related_songs=related_songs,
+        release_detail_slug=RELEASE_SLUGS_BY_TITLE.get(song.album_title),
+    )
+
+
+@main_bp.route('/releases/<slug>')
+def release_detail(slug):
+    release = RELEASE_STORIES.get(slug)
+    if release is None:
+        abort(404)
+
+    songs = [
+        song for song in _featured_songs()
+        if song.album_title == release["album_title"]
+    ]
+    if not songs:
+        abort(404)
+
+    songs_by_slug = {song.slug: song for song in songs}
+    chapters = [
+        {
+            **chapter,
+            "songs": [
+                songs_by_slug[track_slug]
+                for track_slug in chapter["track_slugs"]
+                if track_slug in songs_by_slug
+            ],
+        }
+        for chapter in release["chapters"]
+    ]
+
+    return render_template(
+        'release_detail.html',
+        release=release,
+        songs=songs,
+        chapters=chapters,
+        interlude_slugs=set(release["interlude_slugs"]),
+        video_count=sum(bool(song.link) for song in songs),
     )
 
 

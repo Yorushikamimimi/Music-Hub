@@ -8,6 +8,7 @@ from models import MusicYorushika, db
     [
         "/",
         "/discography",
+        "/releases/tousaku",
         "/songs/spring-thief",
         "/search",
         "/lyrics",
@@ -44,6 +45,7 @@ def test_home_uses_archive_identity_and_internal_listening_paths(client):
     assert 'href="/discography"' in page
     assert 'href="/songs/night-journey"' in page
     assert 'href="/search"' in page
+    assert 'href="/releases/tousaku"' in page
     assert 'aria-label="搜索作品"' in page
 
 
@@ -58,6 +60,7 @@ def test_discography_groups_tracks_and_supports_filters(client):
     assert "2020.07.29" in page
     assert "资料核对：2026.07.28" in page
     assert 'href="https://www.bilibili.com/video/BV1gw411e7Dk/"' in page
+    assert 'href="/releases/tousaku"' in page
     assert 'href="/songs/thoughtcrime"' in page
 
     filtered = client.get(
@@ -97,6 +100,31 @@ def test_song_sequence_stays_inside_the_same_release(client):
 
 def test_unknown_song_detail_returns_404(client):
     assert client.get("/songs/not-in-catalog").status_code == 404
+
+
+def test_tousaku_release_archive_separates_sources_and_editorial_paths(client):
+    page = client.get("/releases/tousaku").get_data(as_text=True)
+
+    assert "作品档案" in page
+    assert "官方公开信息" in page
+    assert "本站聆听笔记" in page
+    assert "个人整理 · 非官方章节划分" in page
+    assert "十四首完整曲序" in page
+    assert "约 130 页小说《盗作》" in page
+    assert "器乐过场" in page
+    assert "自白与侵入" in page
+    assert "复制与盛夏" in page
+    assert "逃亡与回望" in page
+    assert 'href="/songs/thoughtcrime"' in page
+    assert 'href="https://www.bilibili.com/video/BV1gw411e7Dk/"' in page
+    assert "https://yorushika.com/discography/detail/15/" in page
+    assert "https://yorushika.com/news/detail/11126" in page
+    assert "https://sp.universal-music.co.jp/yorushika/tousaku/" in page
+    assert "完整歌词" in page
+
+
+def test_unknown_release_archive_returns_404(client):
+    assert client.get("/releases/not-in-archive").status_code == 404
 
 
 def test_stories_use_curated_summaries_and_official_links(client):

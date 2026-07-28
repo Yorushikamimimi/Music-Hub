@@ -127,10 +127,17 @@
 
         <div class="album-thread-list">
             {% for album in album_spotlights %}
+            {% if album.detail_slug %}
+            <a
+                class="album-thread-row"
+                href="{{ url_for('main.release_detail', slug=album.detail_slug) }}"
+            >
+            {% else %}
             <a
                 class="album-thread-row"
                 href="{{ url_for('main.discography', year=album.release_year) }}#{{ album.title|replace(' ', '-') }}"
             >
+            {% endif %}
                 <span class="album-thread-year">{{ album.release_year }}</span>
                 <span class="album-thread-title">{{ album.title }}</span>
                 <span class="album-thread-count">{{ album.songs|length }} 首收录</span>

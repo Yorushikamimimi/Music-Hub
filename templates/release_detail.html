@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}{{ release.album_title }} · 作品档案 · 夜鹿集{% endblock %}
+{% block description %}{{ release.official_summary }}{% endblock %}
+
+{% block content %}
+<div class="container archive-shell py-4 py-lg-5">
+    <nav class="archive-breadcrumb" aria-label="面包屑">
+        <a href="{{ url_for('main.discography') }}">作品集</a>
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        <span aria-current="page">{{ release.album_title }}</span>
+    </nav>
+
+    <article class="release-archive-hero">
+        <div class="release-archive-cover">
+            <img
+                src="{{ url_for('static', filename='images/' + songs[0].cover_path) }}"
+                alt="《{{ release.album_title }}》官方发行封面"
+                width="760"
+                height="760"
+                decoding="async"
+            >
+            <span>{{ release.sequence_number }}</span>
+        </div>
+
+        <div class="release-archive-copy">
+            <p class="archive-eyebrow">RELEASE ARCHIVE · {{ release.archive_label }}</p>
+            <h1>{{ release.album_title }}</h1>
+            <p class="release-archive-en">{{ release.title_en }}</p>
+            <p class="release-archive-summary">{{ release.official_summary }}</p>
+
+            <dl class="release-archive-facts">
+                <div>
+                    <dt>发行日期</dt>
+                    <dd>{{ songs[0].release_date.strftime('%Y.%m.%d') }}</dd>
+                </div>
+                <div>
+                    <dt>作品类型</dt>
+                    <dd>{{ songs[0].release_type }}</dd>
+                </div>
+                <div>
+                    <dt>完整曲序</dt>
+                    <dd>{{ songs|length }} 首</dd>
+                </div>
+                <div>
+                    <dt>已核验影像</dt>
+                    <dd>{{ video_count }} 首</dd>
+                </div>
+            </dl>
+
+            <div class="archive-actions">
+                <a class="archive-button archive-button-primary" href="{{ release.sources[0].url }}" target="_blank" rel="noopener noreferrer">
+                    官方发行页 <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                </a>
+                <a class="archive-button archive-button-secondary" href="{{ release.sources[2].url }}" target="_blank" rel="noopener noreferrer">
+                    专辑特设页 <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </article>
+
+    <section class="release-context-grid" aria-label="作品背景与本站笔记">
+        <article class="release-context-card release-context-official">
+            <p class="archive-eyebrow">SOURCE FACTS</p>
+            <h2>官方公开信息</h2>
+            <ul>
+                {% for fact in release.official_facts %}
+                <li>{{ fact }}</li>
+                {% endfor %}
+            </ul>
+            <p class="release-source-date">
+                <i class="bi bi-shield-check" aria-hidden="true"></i>
+                来源最后核对：{{ release.source_checked_at.strftime('%Y.%m.%d') }}
+            </p>
+        </article>
+
+        <article class="release-context-card release-context-editorial">
+            <p class="archive-eyebrow">LISTENING NOTE</p>
+            <h2>本站聆听笔记</h2>
+            <p>{{ release.editorial_note }}</p>
+            <span>个人整理 · 非官方章节划分</span>
+        </article>
+    </section>
+
+    <section class="archive-section release-chapter-section" aria-labelledby="release-chapters-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">LISTENING PATH</p>
+                <h2 id="release-chapters-title">沿着三段路径听完整张作品</h2>
+            </div>
+            <p>不替代官方曲序，只提供一种进入作品的方法。</p>
+        </div>
+
+        <div class="release-chapter-grid">
+            {% for chapter in chapters %}
+            <article class="release-chapter-card">
+                <span class="release-chapter-number">{{ chapter.number }}</span>
+                <h3>{{ chapter.title }}</h3>
+                <p>{{ chapter.description }}</p>
+                <ol>
+                    {% for song in chapter.songs %}
+                    <li>
+                        <a href="{{ url_for('main.song_detail', slug=song.slug) }}">
+                            <span>{{ "%02d"|format(song.track_number) }}</span>
+                            <strong>{{ song.title_ja }}</strong>
+                            {% if song.slug in interlude_slugs %}<small>器乐过场</small>{% endif %}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ol>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="archive-section release-track-section" aria-labelledby="release-tracks-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">COMPLETE TRACKLIST</p>
+                <h2 id="release-tracks-title">十四首完整曲序</h2>
+            </div>
+            <p>点击曲名进入本站资料；已核验影像单独提供 B 站入口。</p>
+        </div>
+
+        <ol class="release-track-list">
+            {% for song in songs %}
+            <li>
+                <a class="release-track-main" href="{{ url_for('main.song_detail', slug=song.slug) }}">
+                    <span>{{ "%02d"|format(song.track_number) }}</span>
+                    <strong>{{ song.title_ja }}</strong>
+                    <small>
+                        {% if song.slug in interlude_slugs %}
+                        器乐过场
+                        {% elif song.title_en %}
+                        {{ song.title_en }}
+                        {% else %}
+                        本站曲目资料
+                        {% endif %}
+                    </small>
+                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
+                {% if song.link %}
+                <a
+                    class="release-track-video"
+                    href="{{ song.link }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="在 B 站打开 {{ song.title_ja }} 影像"
+                >
+                    <i class="bi bi-play-circle" aria-hidden="true"></i>
+                    影像
+                </a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ol>
+    </section>
+
+    <section class="release-source-panel" aria-labelledby="release-sources-title">
+        <div>
+            <p class="archive-eyebrow">SOURCES & BOUNDARY</p>
+            <h2 id="release-sources-title">资料来源与边界</h2>
+            <p>发行日期、曲序、概念设定和限定版信息来自下列官方页面；本站不转载完整歌词、小说正文或未经授权的译文。</p>
+        </div>
+        <ul>
+            {% for source in release.sources %}
+            <li>
+                <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">
+                    {{ source.label }} <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+</div>
+{% endblock %}

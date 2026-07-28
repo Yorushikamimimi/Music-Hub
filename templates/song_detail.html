@@ -8,6 +8,10 @@
     <nav class="archive-breadcrumb" aria-label="面包屑">
         <a href="{{ url_for('main.discography') }}">作品集</a>
         <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        {% if release_detail_slug %}
+        <a href="{{ url_for('main.release_detail', slug=release_detail_slug) }}">{{ song.album_title }}</a>
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        {% endif %}
         <span aria-current="page">{{ song.title_ja }}</span>
     </nav>
 

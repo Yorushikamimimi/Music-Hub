@@ -46,8 +46,24 @@ cleanup() {
 trap cleanup EXIT
 
 log "Start deploy: repo=${REPO_URL}, branch=${BRANCH}"
-rm -rf "${TMP_DIR}"
-git clone --depth 1 --branch "${BRANCH}" "${REPO_URL}" "${TMP_DIR}"
+for attempt in 1 2 3; do
+  rm -rf "${TMP_DIR}"
+  log "Clone attempt ${attempt}/3 (HTTP/1.1)"
+  if git -c http.version=HTTP/1.1 clone \
+    --depth 1 \
+    --branch "${BRANCH}" \
+    "${REPO_URL}" \
+    "${TMP_DIR}"; then
+    break
+  fi
+
+  if [[ "${attempt}" -eq 3 ]]; then
+    echo "Unable to clone ${REPO_URL} after 3 attempts" >&2
+    exit 1
+  fi
+
+  sleep "$((attempt * 3))"
+done
 source_commit="$(git -C "${TMP_DIR}" rev-parse --verify HEAD)"
 
 log "Prepare app and backup directories"
