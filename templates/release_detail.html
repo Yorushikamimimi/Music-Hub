@@ -25,7 +25,9 @@
 
         <div class="release-archive-copy">
             <p class="archive-eyebrow">RELEASE ARCHIVE · {{ release.archive_label }}</p>
-            <h1>{{ release.album_title }}</h1>
+            <h1 class="release-archive-title{% if release.album_title|length >= 12 %} release-archive-title-xlong{% elif release.album_title|length >= 8 %} release-archive-title-long{% endif %}">
+                {{ release.album_title }}
+            </h1>
             <p class="release-archive-en">{{ release.title_en }}</p>
             <p class="release-archive-summary">{{ release.official_summary }}</p>
 
@@ -52,9 +54,11 @@
                 <a class="archive-button archive-button-primary" href="{{ release.sources[0].url }}" target="_blank" rel="noopener noreferrer">
                     官方发行页 <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
                 </a>
-                <a class="archive-button archive-button-secondary" href="{{ release.sources[2].url }}" target="_blank" rel="noopener noreferrer">
+                {% if secondary_source %}
+                <a class="archive-button archive-button-secondary" href="{{ secondary_source.url }}" target="_blank" rel="noopener noreferrer">
                     {{ release.secondary_source_label }} <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
                 </a>
+                {% endif %}
             </div>
         </div>
     </article>
@@ -86,7 +90,7 @@
         <div class="archive-section-heading">
             <div>
                 <p class="archive-eyebrow">LISTENING PATH</p>
-                <h2 id="release-chapters-title">沿着三段路径听完整张作品</h2>
+                <h2 id="release-chapters-title">{{ listening_path_title }}</h2>
             </div>
             <p>不替代官方曲序，只提供一种进入作品的方法。</p>
         </div>
@@ -117,7 +121,7 @@
         <div class="archive-section-heading">
             <div>
                 <p class="archive-eyebrow">COMPLETE TRACKLIST</p>
-                <h2 id="release-tracks-title">十四首完整曲序</h2>
+                <h2 id="release-tracks-title">{{ tracklist_title }}</h2>
             </div>
             <p>点击曲名进入本站资料；已核验影像单独提供 B 站入口。</p>
         </div>
@@ -160,7 +164,7 @@
         <div>
             <p class="archive-eyebrow">SOURCES & BOUNDARY</p>
             <h2 id="release-sources-title">资料来源与边界</h2>
-            <p>发行日期、曲序、概念设定和限定版信息来自下列官方页面；本站不转载完整歌词、小说正文或未经授权的译文。</p>
+            <p>发行日期、作品形态、曲序与公开背景信息来自下列官方页面；本站不转载完整歌词、小说正文或未经授权的译文。</p>
         </div>
         <ul>
             {% for source in release.sources %}

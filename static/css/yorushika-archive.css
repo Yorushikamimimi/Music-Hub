@@ -1016,6 +1016,18 @@ a {
     line-height: 0.95;
 }
 
+.release-archive-copy h1.release-archive-title-long {
+    font-size: clamp(3.2rem, 6vw, 6rem);
+    letter-spacing: -0.055em;
+    line-height: 1;
+}
+
+.release-archive-copy h1.release-archive-title-xlong {
+    font-size: clamp(2.8rem, 4.8vw, 5.2rem);
+    letter-spacing: -0.045em;
+    line-height: 1.02;
+}
+
 .release-archive-en {
     margin: 0.85rem 0 0;
     color: var(--archive-muted);
@@ -1809,7 +1821,17 @@ a {
     }
 
     .release-archive-copy h1 {
-        font-size: clamp(4rem, 22vw, 7rem);
+        font-size: clamp(3.6rem, 19vw, 6rem);
+    }
+
+    .release-archive-copy h1.release-archive-title-long {
+        font-size: clamp(2.85rem, 12vw, 4.5rem);
+        line-height: 1.04;
+    }
+
+    .release-archive-copy h1.release-archive-title-xlong {
+        font-size: clamp(2.4rem, 10vw, 3.8rem);
+        line-height: 1.06;
     }
 
     .release-chapter-grid {

@@ -1,6 +1,8 @@
 import pytest
 
+from catalog_data import CATALOG_RELEASES
 from models import MusicYorushika, db
+from release_data import RELEASE_SLUGS_BY_TITLE, RELEASE_STORIES
 
 
 @pytest.mark.parametrize(
@@ -10,6 +12,12 @@ from models import MusicYorushika, db
         "/discography",
         "/releases/tousaku",
         "/releases/dakara-boku-wa-ongaku-wo-yameta",
+        "/releases/elma",
+        "/releases/gentou",
+        "/releases/sousaku",
+        "/releases/makeinu-ni-encore-wa-iranai",
+        "/releases/natsukusa-ga-jama-wo-suru",
+        "/releases/haru",
         "/songs/spring-thief",
         "/search",
         "/lyrics",
@@ -152,6 +160,77 @@ def test_dakara_boku_release_archive_keeps_facts_and_notes_separate(client):
     assert "https://store.universal-music.co.jp/products/dued1266" in page
     assert "https://sp.universal-music.co.jp/yorushika/elma/" in page
     assert "双作关系特设页" in page
+
+
+def test_every_catalog_release_has_a_complete_archive(client):
+    assert set(RELEASE_SLUGS_BY_TITLE) == {
+        release["title"] for release in CATALOG_RELEASES
+    }
+
+    for catalog_release in CATALOG_RELEASES:
+        title = catalog_release["title"]
+        slug = RELEASE_SLUGS_BY_TITLE[title]
+        story = RELEASE_STORIES[slug]
+        response = client.get(f"/releases/{slug}")
+        page = response.get_data(as_text=True)
+        catalog_track_slugs = [
+            track_slug for track_slug, _title in catalog_release["tracks"]
+        ]
+        chapter_track_slugs = [
+            track_slug
+            for chapter in story["chapters"]
+            for track_slug in chapter["track_slugs"]
+        ]
+
+        assert response.status_code == 200
+        assert story["official_summary"] in page
+        assert page.count('class="release-track-main"') == len(
+            catalog_track_slugs
+        )
+        assert chapter_track_slugs == catalog_track_slugs
+        assert catalog_release["source_url"] in page
+        assert all(
+            f'href="/songs/{track_slug}"' in page
+            for track_slug in catalog_track_slugs
+        )
+
+
+@pytest.mark.parametrize(
+    ("slug", "track_count", "fact", "path_title"),
+    [
+        ("elma", 14, "エルマ写下的日记本", "沿着三段路径"),
+        ("gentou", 25, "可聆听画集", "沿着两段路径"),
+        ("sousaku", 5, "没有 CD 的 CD", "沿着两段路径"),
+        (
+            "makeinu-ni-encore-wa-iranai",
+            9,
+            "booklet《生まれ変わり》",
+            "沿着三段路径",
+        ),
+        (
+            "natsukusa-ga-jama-wo-suru",
+            7,
+            "第一张 Mini Album",
+            "沿着三段路径",
+        ),
+        ("haru", 1, "《葬送的芙莉莲》", "从一条路径进入"),
+    ],
+)
+def test_new_release_archives_keep_source_facts_and_full_tracklists(
+    client,
+    slug,
+    track_count,
+    fact,
+    path_title,
+):
+    page = client.get(f"/releases/{slug}").get_data(as_text=True)
+
+    assert "官方公开信息" in page
+    assert "本站聆听笔记" in page
+    assert fact in page
+    assert path_title in page
+    assert page.count('class="release-track-main"') == track_count
+    assert "资料来源与边界" in page
 
 
 def test_unknown_release_archive_returns_404(client):

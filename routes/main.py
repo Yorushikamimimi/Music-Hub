@@ -10,6 +10,21 @@ from release_data import RELEASE_SLUGS_BY_TITLE, RELEASE_STORIES
 
 main_bp = Blueprint('main', __name__)
 
+_CHINESE_COUNTS = {
+    1: "一",
+    2: "两",
+    3: "三",
+    5: "五",
+    7: "七",
+    9: "九",
+    14: "十四",
+    25: "二十五",
+}
+
+
+def _chinese_count(value):
+    return _CHINESE_COUNTS.get(value, str(value))
+
 
 def _featured_songs():
     return (
@@ -196,6 +211,17 @@ def release_detail(slug):
         }
         for chapter in release["chapters"]
     ]
+    secondary_source = None
+    if len(release["sources"]) > 1:
+        secondary_source = release["sources"][
+            release.get("secondary_source_index", 1)
+        ]
+    chapter_count = len(chapters)
+    listening_path_title = (
+        "从一条路径进入这部作品"
+        if chapter_count == 1
+        else f"沿着{_chinese_count(chapter_count)}段路径听完整部作品"
+    )
 
     return render_template(
         'release_detail.html',
@@ -204,6 +230,9 @@ def release_detail(slug):
         chapters=chapters,
         track_badges=release["track_badges"],
         video_count=sum(bool(song.link) for song in songs),
+        secondary_source=secondary_source,
+        listening_path_title=listening_path_title,
+        tracklist_title=f"{_chinese_count(len(songs))}首完整曲序",
     )
 
 
