@@ -10,3 +10,11 @@ def test_web_service_can_read_private_environment_and_share_socket():
     assert "--umask 007" in unit
     assert "--no-control-socket" in unit
     assert "ExecStart=/usr/bin/env RADIO_STREAM_URL=/hls/yorushika.m3u8" in unit
+
+
+def test_radio_restarts_after_a_clean_playlist_completion():
+    unit = Path("deploy/systemd/yorushika-radio.service").read_text(encoding="utf-8")
+
+    assert "Restart=always" in unit
+    assert "Restart=on-failure" not in unit
+    assert "-stream_loop" not in unit
