@@ -51,7 +51,9 @@ def test_reliability_units_have_timers_failure_recording_and_narrow_paths():
 def test_deploy_creates_recovery_points_and_preserves_runtime_data():
     deploy = Path("scripts/deploy_music_hub.sh").read_text(encoding="utf-8")
 
+    assert 'BRANCH="${BRANCH:-codex/yorushika-redesign-prototype}"' in deploy
     assert "release_snapshot.py\" create" in deploy
+    assert 'systemctl start "${BACKUP_SERVICE_NAME}"' in deploy
     assert "mysql_backup.py\" backup" in deploy
     assert "health_check.py" in deploy
     assert "release_snapshot.py\" record" in deploy

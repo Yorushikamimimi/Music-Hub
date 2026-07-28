@@ -5,12 +5,13 @@ APP_DIR="${APP_DIR:-/var/www/My_Homepage}"
 SERVICE_NAME="${SERVICE_NAME:-musichub.service}"
 RADIO_SERVICE_NAME="${RADIO_SERVICE_NAME:-yorushika-radio.service}"
 HOST_HEADER="${HOST_HEADER:-81.68.72.245}"
-BRANCH="${BRANCH:-codex/musichub-hardening}"
+BRANCH="${BRANCH:-codex/yorushika-redesign-prototype}"
 REPO_URL="${REPO_URL:-https://github.com/Yorushikamimimi/Music-Hub.git}"
 TMP_DIR="${TMP_DIR:-/tmp/music-hub-release}"
 BACKUP_ROOT="${BACKUP_ROOT:-/var/backups/music-hub}"
 RELEASE_BACKUP_DIR="${RELEASE_BACKUP_DIR:-${BACKUP_ROOT}/releases}"
 MYSQL_BACKUP_DIR="${MYSQL_BACKUP_DIR:-${BACKUP_ROOT}/mysql}"
+BACKUP_SERVICE_NAME="${BACKUP_SERVICE_NAME:-music-hub-backup.service}"
 DEPLOY_STATE_FILE="${DEPLOY_STATE_FILE:-/var/lib/music-hub-monitor/deployed-version.json}"
 RELEASE_KEEP="${RELEASE_KEEP:-5}"
 MYSQL_KEEP="${MYSQL_KEEP:-14}"
@@ -85,10 +86,14 @@ log "Run compile check"
 ${SUDO} "${APP_DIR}/venv/bin/python" -m compileall -q "${APP_DIR}"
 
 log "Create a verified pre-migration MySQL backup"
-${SUDO} python3 "${APP_DIR}/scripts/mysql_backup.py" backup \
-  --backup-dir "${MYSQL_BACKUP_DIR}" \
-  --keep "${MYSQL_KEEP}" \
-  --prune apply
+if ${SUDO} systemctl cat "${BACKUP_SERVICE_NAME}" >/dev/null 2>&1; then
+  ${SUDO} systemctl start "${BACKUP_SERVICE_NAME}"
+else
+  ${SUDO} python3 "${APP_DIR}/scripts/mysql_backup.py" backup \
+    --backup-dir "${MYSQL_BACKUP_DIR}" \
+    --keep "${MYSQL_KEEP}" \
+    --prune apply
+fi
 
 log "Apply additive database migrations"
 (

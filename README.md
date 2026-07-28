@@ -38,7 +38,7 @@ chmod +x scripts/deploy_music_hub.sh
 常用参数覆盖（按需）：
 
 ```bash
-BRANCH=codex/musichub-hardening \
+BRANCH=codex/yorushika-redesign-prototype \
 HOST_HEADER=81.68.72.245 \
 SERVICE_NAME=musichub.service \
 RADIO_SERVICE_NAME=yorushika-radio.service \
