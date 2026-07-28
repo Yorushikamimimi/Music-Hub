@@ -3,10 +3,10 @@
 > Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Phase 3 complete-catalog release`
-- Meaning: The Phase 3 release completes
-  the official physical/art-book sequence for the same eight releases, adds exact
-  release dates and audit dates, and has passed local automated and browser acceptance.
+- Stage: `Phase 4 archive-about release candidate`
+- Meaning: The About page now explains the archive's purpose, evidence rules,
+  private-listening boundary and build history instead of presenting an unrelated
+  developer profile. It has passed local automated and browser acceptance.
 
 ## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
@@ -24,7 +24,7 @@
 7. Expanded the automated suite to 52 tests and completed desktop/mobile browser
    regression with no console errors or horizontal overflow.
 
-## Phase 3 Local Candidate
+## Phase 3 Production Release
 1. Re-audited the same eight releases against their complete official release pages
    instead of relying on lyric-only listings.
 2. Expanded the catalog from 63 to 89 tracks, including instrumental interludes and
@@ -38,6 +38,20 @@
 6. The full automated suite passes with 54 tests. Desktop and 390 px mobile browser
    acceptance passed with no console errors or horizontal overflow; a verified
    Bilibili entry opened the expected video page in a separate tab.
+
+## Phase 4 Release Candidate
+1. Replaced the generic avatar, job-seeking badges and skill percentages with a
+   site-specific `关于夜鹿集` introduction.
+2. Added a curation-principles section that separates sourced release facts,
+   personal listening notes and private Radio boundaries.
+3. Added an archive-building timeline and an explicit list of what the site does
+   and does not provide.
+4. The release, track, video and source-check figures are computed from the curated
+   database instead of copied into static text.
+5. Kept browser-local favorites as a secondary private shelf at the end of the page.
+6. The full 54-test suite passes. Desktop, dark-theme and 390 px mobile browser
+   acceptance passed with no console errors or horizontal overflow; the mobile
+   navigation opens with the correct expanded state.
 
 ## Completed in This Round
 1. Performance
@@ -75,7 +89,7 @@
 - Search page (`/search`).
 - Song stories page (`/lyrics`).
 - Radio page (`/radio`, optional `RADIO_STREAM_URL`).
-- About page and local favorites.
+- Archive About page and local favorites.
 
 ## Production Proof (2026-07-28)
 1. Deployed commit `04f9199a6bac071e2dfd372e11d0dd0392b118e2`; the server

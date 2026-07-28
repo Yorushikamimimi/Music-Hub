@@ -2,7 +2,7 @@ import os
 import random
 import datetime
 
-from flask import Blueprint, Response, abort, current_app, render_template, request, url_for
+from flask import Blueprint, Response, abort, current_app, render_template, request
 from sqlalchemy import or_
 
 from models import db, MusicYorushika
@@ -216,16 +216,21 @@ def search():
 
 @main_bp.route('/about')
 def about():
-    avatar_url = url_for('static', filename='images/avatar-placeholder.svg')
-
-    skills = [
-        {'name': 'Python / Flask', 'progress': 90, 'color': 'success'},
-        {'name': 'Linux / Ops', 'progress': 75, 'color': 'info'},
-        {'name': 'MySQL / Database', 'progress': 80, 'color': 'warning'},
-        {'name': 'Java / Backend', 'progress': 60, 'color': 'danger'},
+    songs = _featured_songs()
+    albums = _album_index(songs)
+    source_checked_dates = [
+        song.source_checked_at
+        for song in songs
+        if song.source_checked_at is not None
     ]
 
-    return render_template('about.html', skills=skills, avatar_url=avatar_url)
+    return render_template(
+        'about.html',
+        release_count=len(albums),
+        song_count=len(songs),
+        video_count=sum(bool(song.link) for song in songs),
+        source_checked_at=max(source_checked_dates) if source_checked_dates else None,
+    )
 
 
 @main_bp.route('/lyrics')

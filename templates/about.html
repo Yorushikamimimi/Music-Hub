@@ -1,136 +1,188 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
+
+{% block title %}关于夜鹿集 · 一份私人的 Yorushika 作品索引{% endblock %}
+{% block description %}了解夜鹿集的整理缘起、资料原则、收录边界与建站过程。{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="glass-card p-5 mb-5 overflow-hidden">
-                <div class="row align-items-center">
-                    <div class="col-md-4 text-center">
-                        <div class="position-relative d-inline-block">
-                            <img id="avatar-img" src="{{ avatar_url }}" class="rounded-circle img-fluid shadow-lg"
-                                alt="Music Hub 站点头像"
-                                style="width: 150px; height: 150px; object-fit: cover; object-position: center; border: 4px solid var(--accent-color); background: var(--bg-color);">
-                            <div class="position-absolute bottom-0 end-0 bg-success border border-white border-3 rounded-circle"
-                                style="width: 25px; height: 25px; transform: translate(-15px, -15px);"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">Full Stack Aspirant</span>
-                            <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">Open to Work</span>
-                        </div>
-                        <h1 class="fw-bold mb-2">你好</h1>
-                        <p class="text-muted mb-4">Telecomm Intern & Backend Developer</p>
-                        <p class="lead" style="font-size: 1.1rem;">
-                            我正在持续学习和构建真实可用的项目，重点在 Python、后端能力和工程化实践。
-                        </p>
-                        <div class="d-flex gap-3 mt-4">
-                            <a href="https://github.com/Yorushikamimimi" target="_blank" rel="noopener noreferrer" class="btn btn-dark rounded-pill px-4 py-2">
-                                <i class="bi bi-github me-2"></i>GitHub
-                            </a>
-                        </div>
-                        <p class="small text-muted mt-3 mb-0">头像上传功能已关闭。</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="glass-card p-4 h-100">
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="icon-box bg-primary bg-opacity-10 me-3">
-                                <i class="bi bi-tools text-primary fs-4"></i>
-                            </div>
-                            <h4 class="fw-bold mb-0">技术栈</h4>
-                        </div>
-                        {% for skill in skills %}
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="fw-bold">{{ skill.name }}</span>
-                                <span class="badge bg-{{ skill.color }} bg-opacity-10 text-{{ skill.color }}">{{ skill.progress }}%</span>
-                            </div>
-                            <div class="progress rounded-pill" style="height: 10px; background: rgba(0,0,0,0.05);">
-                                <div class="progress-bar bg-{{ skill.color }} shadow-sm" role="progressbar"
-                                    style="width: {{ skill.progress }}%; transition: width 1.5s ease-in-out;"></div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="glass-card p-4 h-100">
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="icon-box bg-warning bg-opacity-10 me-3">
-                                <i class="bi bi-stars text-warning fs-4"></i>
-                            </div>
-                            <h4 class="fw-bold mb-0">个人兴趣</h4>
-                        </div>
-                        <div class="list-group list-group-flush bg-transparent">
-                            <div class="list-group-item bg-transparent border-0 px-0 py-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-box bg-primary bg-opacity-10 me-3">
-                                        <i class="bi bi-music-player text-primary"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">本命乐队</div>
-                                        <div class="small text-muted">Yorushika</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="list-group-item bg-transparent border-0 px-0 py-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-box bg-info bg-opacity-10 me-3">
-                                        <i class="bi bi-laptop text-info"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">开发环境</div>
-                                        <div class="small text-muted">VS Code + Ubuntu</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="list-group-item bg-transparent border-0 px-0 py-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-box bg-danger bg-opacity-10 me-3">
-                                        <i class="bi bi-cup-hot text-danger"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">灵感来源</div>
-                                        <div class="small text-muted">咖啡 & 奶茶</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-card p-4 mt-4" id="wishlist-card">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-box bg-danger bg-opacity-10 me-3">
-                            <i class="bi bi-heart-fill text-danger"></i>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold mb-0">我的心愿单</h4>
-                            <p class="small text-muted mb-0">在歌曲列表中点击 ❤ 即可收藏</p>
-                        </div>
-                    </div>
-                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3" id="clear-favs-btn" style="display:none;">
-                        <i class="bi bi-trash3 me-1"></i>清空
-                    </button>
-                </div>
-                <div id="wishlist-body"></div>
-            </div>
-
-            <div class="text-center mt-5">
-                <a href="/" class="btn btn-link link-secondary text-decoration-none">
-                    <i class="bi bi-arrow-left me-1"></i> 返回首页
+<div class="container archive-shell about-page py-4 py-lg-5">
+    <section class="about-hero" aria-labelledby="about-title">
+        <div class="about-hero-copy">
+            <p class="archive-eyebrow">ABOUT THE ARCHIVE</p>
+            <h1 id="about-title">关于夜鹿集</h1>
+            <p class="about-hero-statement">
+                它不是一份热度榜，<br>
+                而是一条可以慢慢走完的聆听路径。
+            </p>
+            <p class="archive-lead">
+                夜鹿集是一份个人整理的非官方 Yorushika 作品索引。
+                我想把分散的发行资料、作品曲序和反复回到的歌曲放在同一个安静的空间里，
+                让每次聆听都能找到它所在的作品与时期。
+            </p>
+            <div class="archive-actions">
+                <a class="archive-button archive-button-primary" href="{{ url_for('main.discography') }}">
+                    从作品集开始 <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
+                <a class="archive-button archive-button-secondary" href="{{ url_for('main.lyrics') }}">
+                    阅读聆听手记
                 </a>
             </div>
         </div>
-    </div>
+
+        <aside class="about-index-card" aria-label="当前整理范围">
+            <div class="about-index-mark" aria-hidden="true">ヨ</div>
+            <p class="archive-eyebrow">CURRENT EDITION</p>
+            <h2>当前整理范围</h2>
+            <dl class="about-metric-list">
+                <div>
+                    <dt>发行作品</dt>
+                    <dd>{{ release_count }} <span>部</span></dd>
+                </div>
+                <div>
+                    <dt>完整曲序</dt>
+                    <dd>{{ song_count }} <span>首</span></dd>
+                </div>
+                <div>
+                    <dt>已核验影像</dt>
+                    <dd>{{ video_count }} <span>首</span></dd>
+                </div>
+            </dl>
+            <p class="about-index-note">
+                {% if source_checked_at %}
+                资料最后核对于 {{ source_checked_at.strftime('%Y.%m.%d') }}
+                {% else %}
+                资料仍在持续核对
+                {% endif %}
+            </p>
+        </aside>
+    </section>
+
+    <section class="archive-section about-principles" aria-labelledby="principles-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">CURATION PRINCIPLES</p>
+                <h2 id="principles-title">这里怎样整理内容</h2>
+            </div>
+            <p>事实、感受与访问边界分开表达，宁可留下空白，也不把推测写成确定信息。</p>
+        </div>
+
+        <div class="about-principle-grid">
+            <article class="about-principle-card">
+                <span>01</span>
+                <i class="bi bi-journal-check" aria-hidden="true"></i>
+                <h3>资料有出处</h3>
+                <p>发行日期、收录作品和曲序以官方作品页为主要依据，并保留来源与核对日期。</p>
+            </article>
+            <article class="about-principle-card">
+                <span>02</span>
+                <i class="bi bi-pencil" aria-hidden="true"></i>
+                <h3>感受是个人笔记</h3>
+                <p>聆听手记只代表个人理解，不把主观解读包装成作品设定或作者原意。</p>
+            </article>
+            <article class="about-principle-card">
+                <span>03</span>
+                <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                <h3>聆听保持私人</h3>
+                <p>Radio 仅用于个人白名单访问，不提供音频下载，也不替代官方音乐平台。</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="archive-section about-story-section" aria-labelledby="story-title">
+        <div class="about-story-copy">
+            <p class="archive-eyebrow">BUILDING NOTES</p>
+            <h2 id="story-title">从网页模板，到一份作品档案</h2>
+            <p>
+                这个站最初只是一个练习用的音乐列表。后来我逐步移除了虚假的热度与排行，
+                按发行作品重新核对曲序，补上单曲资料、官方来源、影像入口和私人 Radio，
+                最后把它收束成现在的“夜鹿集”。
+            </p>
+            <p>
+                当前只收录已经逐项核对的八部作品。这不是 Yorushika 全时期的完整百科，
+                也不会为了显得丰富而自动填入未经确认的资料。新的作品会在完成来源核验后再加入。
+            </p>
+        </div>
+
+        <ol class="about-timeline" aria-label="夜鹿集建站阶段">
+            <li>
+                <span>01</span>
+                <div>
+                    <h3>去掉排行榜模板</h3>
+                    <p>不再用 HOT、评分或虚构数据定义歌曲。</p>
+                </div>
+            </li>
+            <li>
+                <span>02</span>
+                <div>
+                    <h3>重建作品目录</h3>
+                    <p>按官方发行页整理 {{ release_count }} 部作品与 {{ song_count }} 首完整曲序。</p>
+                </div>
+            </li>
+            <li>
+                <span>03</span>
+                <div>
+                    <h3>建立私人聆听入口</h3>
+                    <p>补齐单曲详情、聆听手记、收藏与白名单 Radio。</p>
+                </div>
+            </li>
+            <li>
+                <span>04</span>
+                <div>
+                    <h3>继续缓慢扩充</h3>
+                    <p>下一步是专辑背景、时期脉络和有来源的个人听歌笔记。</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <section class="archive-section about-boundary-section" aria-labelledby="boundary-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">SCOPE & BOUNDARY</p>
+                <h2 id="boundary-title">这座档案馆做什么，也不做什么</h2>
+            </div>
+        </div>
+
+        <div class="about-boundary-grid">
+            <article>
+                <p class="about-boundary-label">保留</p>
+                <ul>
+                    <li>可追溯的作品资料与官方来源</li>
+                    <li>专辑内部的完整曲序和前后关系</li>
+                    <li>明确标注为个人感受的聆听手记</li>
+                    <li>经人工确认的官方或可靠影像入口</li>
+                </ul>
+            </article>
+            <article>
+                <p class="about-boundary-label">不提供</p>
+                <ul>
+                    <li>完整歌词转载与公开音乐分发</li>
+                    <li>未经核实的设定、排名和热度数字</li>
+                    <li>自动抓取后直接公开的第三方内容</li>
+                    <li>替代官方平台的下载或公开 Radio</li>
+                </ul>
+            </article>
+        </div>
+        <p class="about-source-note">
+            夜鹿集与 Yorushika 官方无隶属关系。作品版权归原权利人所有；
+            本站仅作私人整理与个人聆听记录。
+        </p>
+    </section>
+
+    <section class="archive-section about-favorites-section" id="wishlist-card" aria-labelledby="favorites-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">PRIVATE SHELF</p>
+                <h2 id="favorites-title">我的收藏</h2>
+            </div>
+            <div class="about-favorites-actions">
+                <p>收藏只保存在当前浏览器，不会上传到服务器。</p>
+                <button class="archive-button archive-button-secondary" id="clear-favs-btn" type="button" style="display:none;">
+                    <i class="bi bi-trash3" aria-hidden="true"></i> 清空收藏
+                </button>
+            </div>
+        </div>
+        <div class="about-favorites-panel" id="wishlist-body"></div>
+    </section>
 </div>
 {% endblock %}
 

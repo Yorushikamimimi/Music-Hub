@@ -124,11 +124,21 @@ def test_mobile_navigation_and_landmarks_are_present(client):
     assert '<main id="main-content"' in page
 
 
-def test_about_has_real_github_link_and_no_placeholder_contact(client):
+def test_about_explains_archive_identity_scope_and_boundaries(client):
     page = client.get("/about").get_data(as_text=True)
 
-    assert "https://github.com/Yorushikamimimi" in page
-    assert "your_email@example.com" not in page
+    assert "关于夜鹿集" in page
+    assert "它不是一份热度榜" in page
+    assert "8 <span>部</span>" in page
+    assert "89 <span>首</span>" in page
+    assert "24 <span>首</span>" in page
+    assert "资料有出处" in page
+    assert "感受是个人笔记" in page
+    assert "聆听保持私人" in page
+    assert "不提供" in page
+    assert "Full Stack Aspirant" not in page
+    assert "Open to Work" not in page
+    assert "技术栈" not in page
 
 
 def test_radio_is_marked_private_and_never_autoplays(client):
