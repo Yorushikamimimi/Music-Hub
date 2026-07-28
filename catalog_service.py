@@ -18,6 +18,19 @@ def _clean_external_url(url: str | None) -> str | None:
     return urlunsplit((parts.scheme, parts.netloc, parts.path, "", ""))
 
 
+def _clean_bilibili_url(url: str | None) -> str | None:
+    if not url:
+        return None
+    parts = urlsplit(url)
+    if (
+        parts.scheme != "https"
+        or parts.hostname not in {"bilibili.com", "www.bilibili.com"}
+        or not parts.path.startswith("/video/BV")
+    ):
+        return None
+    return urlunsplit(("https", "www.bilibili.com", parts.path, "", ""))
+
+
 def sync_catalog(commit: bool = True) -> dict:
     """Upsert curated catalog rows without deleting unknown records."""
     created = 0
@@ -29,7 +42,7 @@ def sync_catalog(commit: bool = True) -> dict:
             song = MusicYorushika.query.filter_by(
                 cover_path=track["cover_path"].replace(".webp", ".jpg")
             ).first()
-        if song is None:
+        if song is None and track["title_en"]:
             song = MusicYorushika.query.filter(
                 MusicYorushika.title.contains(track["title_en"])
             ).first()
@@ -49,7 +62,7 @@ def sync_catalog(commit: bool = True) -> dict:
         song.release_type = track["release_type"]
         song.release_year = track["release_year"]
         song.cover_path = track["cover_path"]
-        song.link = track["source_url"]
+        song.link = _clean_bilibili_url(track.get("mv_url"))
         song.story_summary = track["story_summary"]
         song.source_url = _clean_external_url(track["source_url"])
         song.display_order = display_order

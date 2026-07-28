@@ -7,6 +7,8 @@ from models import MusicYorushika, db
     "path",
     [
         "/",
+        "/discography",
+        "/songs/spring-thief",
         "/search",
         "/lyrics",
         "/radio",
@@ -28,6 +30,66 @@ def test_search_matches_japanese_title_and_real_album(client):
     assert response.status_code == 200
     assert "Spring Thief (春泥棒)" in page
     assert "創作" in page
+    assert 'href="/songs/spring-thief"' in page
+
+
+def test_home_uses_archive_identity_and_internal_listening_paths(client):
+    page = client.get("/").get_data(as_text=True)
+
+    assert "夜鹿集" in page
+    assert "从一首歌开始" in page
+    assert "按此刻的心情进入" in page
+    assert "Yorushika Picks" not in page
+    assert "rank-num" not in page
+    assert 'href="/discography"' in page
+    assert 'href="/songs/night-journey"' in page
+    assert 'href="/search"' in page
+    assert 'aria-label="搜索作品"' in page
+
+
+def test_discography_groups_tracks_and_supports_filters(client):
+    page = client.get("/discography").get_data(as_text=True)
+
+    assert "作品集" in page
+    assert "63 首已核对曲目" in page
+    assert "盗作" in page
+    assert "10 首完整曲序" in page
+    assert 'href="https://www.bilibili.com/video/BV1gw411e7Dk/"' in page
+    assert 'href="/songs/thoughtcrime"' in page
+
+    filtered = client.get(
+        "/discography",
+        query_string={"year": "2021", "type": "EP"},
+    ).get_data(as_text=True)
+    assert "創作" in filtered
+    assert "春泥棒" in filtered
+    assert "盗作" not in filtered
+
+
+def test_song_detail_separates_facts_note_and_official_source(client):
+    page = client.get("/songs/spring-thief").get_data(as_text=True)
+
+    assert "<h1>" in page
+    assert ">春泥棒</a>" in page
+    assert "Spring Thief" in page
+    assert "收录作品" in page
+    assert "个人整理" in page
+    assert "在 B 站观看影像" in page
+    assert "https://www.bilibili.com/video/BV16k8bzGE31/" in page
+    assert "https://yorushika.com/discography/detail/18/" in page
+    assert 'rel="noopener noreferrer"' in page
+
+
+def test_song_sequence_stays_inside_the_same_release(client):
+    page = client.get("/songs/night-journey").get_data(as_text=True)
+
+    assert "逃亡" in page
+    assert "花に亡霊" in page
+    assert "アルジャーノン" not in page
+
+
+def test_unknown_song_detail_returns_404(client):
+    assert client.get("/songs/not-in-catalog").status_code == 404
 
 
 def test_stories_use_curated_summaries_and_official_links(client):

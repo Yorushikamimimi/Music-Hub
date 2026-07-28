@@ -3,10 +3,26 @@
 > Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Reliability baseline live`
-- Meaning: The selected content, privacy, migration, performance and non-root runtime
-  work is live. Automated health, backup, failure recording and rollback tooling is
-  installed, enabled and production-verified on the private server.
+- Stage: `Phase 2 archive redesign ready for deployment`
+- Meaning: The reliability baseline remains live. The reviewed second-stage release
+  adds a source-backed 63-track discography, song detail routes and the approved
+  Yorushika archive visual direction. Production proof is recorded in the Vault
+  operations log after the confirmed deployment.
+
+## Phase 2 Release Candidate
+1. Replaced the generic Music Hub presentation with the reviewed
+   `夜鹿集 / YORUSHIKA ARCHIVE` editorial identity.
+2. Rebuilt the home page around a daily selection, listening paths and release
+   spotlights instead of chart-like song columns.
+3. Added `/discography` filters and `/songs/<slug>` detail pages with release-local
+   previous/next navigation.
+4. Expanded the curated catalog from 20 tracks to 8 releases and 63 tracks while
+   preserving official release order and source URLs.
+5. Restored 20 manually verified Bilibili video links; tracks without a verified
+   video keep only the official release source.
+6. Added eight compressed release-cover assets and a permanent design-system record.
+7. Expanded the automated suite to 52 tests and completed desktop/mobile browser
+   regression with no console errors or horizontal overflow.
 
 ## Completed in This Round
 1. Performance
@@ -38,7 +54,9 @@
   and reliability safety boundaries.
 
 ## Current Deliverables
-- Home page with daily recommendation.
+- Archive home page with daily recommendation and listening paths.
+- Discography page (`/discography`) with release filters and complete track order.
+- Song detail pages (`/songs/<slug>`) with sources and adjacent tracks.
 - Search page (`/search`).
 - Song stories page (`/lyrics`).
 - Radio page (`/radio`, optional `RADIO_STREAM_URL`).
@@ -63,4 +81,5 @@
 7. Confirmed `https://yoruming.cn/` still served the Personal Knowledge Hub after
    the Music Hub Web restart.
 
-The visual redesign remains intentionally deferred until a separate design version can be reviewed.
+The remaining content-design task is to replace the legacy About page with a
+source-aware archive introduction and to add deeper release notes over time.

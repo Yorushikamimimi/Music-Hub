@@ -14,7 +14,7 @@
     };
 
     const savedTheme = localStorage.getItem('theme');
-    const initialTheme = savedTheme === 'light' ? 'light' : 'dark';
+    const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
     root.setAttribute('data-theme', initialTheme);
     updateThemeControl(initialTheme);
 

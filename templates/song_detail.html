@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{{ song.title_ja }} · 夜鹿集{% endblock %}
+{% block description %}{{ song.story_summary }}{% endblock %}
+
+{% block content %}
+<div class="container archive-shell py-4 py-lg-5">
+    <nav class="archive-breadcrumb" aria-label="面包屑">
+        <a href="{{ url_for('main.discography') }}">作品集</a>
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        <span aria-current="page">{{ song.title_ja }}</span>
+    </nav>
+
+    <article class="song-detail-hero">
+        <div class="song-detail-cover">
+            <img
+                src="{{ url_for('static', filename='images/' + song.cover_path) }}"
+                alt="《{{ song.album_title }}》官方发行封面"
+                width="720"
+                height="720"
+                decoding="async"
+            >
+            <span>{{ "%02d"|format(song.display_order) }}</span>
+        </div>
+
+        <div class="song-detail-copy">
+            <p class="archive-eyebrow">SONG NOTE · {{ song.release_year }}</p>
+            <h1>
+                {% if song.link %}
+                <a href="{{ song.link }}" target="_blank" rel="noopener noreferrer" aria-label="在 B 站打开 {{ song.title_ja }} 影像">{{ song.title_ja }}</a>
+                {% else %}
+                {{ song.title_ja }}
+                {% endif %}
+            </h1>
+            {% if song.title_en %}<p class="song-detail-en">{{ song.title_en }}</p>{% endif %}
+            <dl class="song-fact-list">
+                <div>
+                    <dt>收录作品</dt>
+                    <dd>《{{ song.album_title }}》</dd>
+                </div>
+                <div>
+                    <dt>发行类型</dt>
+                    <dd>{{ song.release_type }}</dd>
+                </div>
+                <div>
+                    <dt>发行年份</dt>
+                    <dd>{{ song.release_year }}</dd>
+                </div>
+            </dl>
+            <div class="archive-actions">
+                {% if song.link %}
+                <a class="archive-button archive-button-primary" href="{{ song.link }}" target="_blank" rel="noopener noreferrer">
+                    在 B 站观看影像 <i class="bi bi-play-circle" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a class="archive-button archive-button-secondary" href="{{ song.source_url }}" target="_blank" rel="noopener noreferrer">
+                    查看官方作品页 <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                </a>
+                <button
+                    class="archive-button archive-button-secondary fav-btn fav-btn-detail"
+                    type="button"
+                    data-song-id="{{ song.id }}"
+                    data-song-title="{{ song.title }}"
+                    data-song-album="{{ song.album_title }}"
+                    data-song-link="{{ song.link or song.source_url }}"
+                    data-song-year="{{ song.release_year }}"
+                    aria-label="收藏 {{ song.title }}"
+                >
+                    <i class="bi bi-heart" aria-hidden="true"></i> 收藏
+                </button>
+            </div>
+        </div>
+    </article>
+
+    <section class="song-note-grid" aria-labelledby="note-title">
+        <div class="song-note-main">
+            <p class="archive-eyebrow">LISTENING NOTE</p>
+            <h2 id="note-title">这首歌在本站的路径</h2>
+            <p>{{ song.story_summary }}</p>
+        </div>
+        <aside class="song-source-note">
+            <i class="bi bi-shield-check" aria-hidden="true"></i>
+            <div>
+                <h2>资料边界</h2>
+                <p>发行信息来自官方作品页；上方短文为本站的个人整理，不包含完整歌词或未经授权的译文。</p>
+            </div>
+        </aside>
+    </section>
+
+    {% if related_songs %}
+    <section class="archive-section" aria-labelledby="related-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">FROM THE SAME WORK</p>
+                <h2 id="related-title">同一作品中的其他曲目</h2>
+            </div>
+        </div>
+        <div class="related-track-list">
+            {% for item in related_songs %}
+            <a href="{{ url_for('main.song_detail', slug=item.slug) }}">
+                <img src="{{ url_for('static', filename='images/' + item.cover_path) }}" alt="" width="72" height="72" loading="lazy">
+                <span><strong>{{ item.title_ja }}</strong>{% if item.title_en %}<small>{{ item.title_en }}</small>{% endif %}</span>
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <nav class="song-sequence-nav" aria-label="上一首和下一首">
+        {% if previous_song %}
+        <a href="{{ url_for('main.song_detail', slug=previous_song.slug) }}">
+            <small><i class="bi bi-arrow-left" aria-hidden="true"></i> 上一首</small>
+            <strong>{{ previous_song.title_ja }}</strong>
+        </a>
+        {% else %}<span></span>{% endif %}
+        {% if next_song %}
+        <a class="text-end" href="{{ url_for('main.song_detail', slug=next_song.slug) }}">
+            <small>下一首 <i class="bi bi-arrow-right" aria-hidden="true"></i></small>
+            <strong>{{ next_song.title_ja }}</strong>
+        </a>
+        {% endif %}
+    </nav>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='favorites.js') }}"></script>
+{% endblock %}

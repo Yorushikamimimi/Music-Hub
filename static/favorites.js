@@ -65,11 +65,11 @@ function initFavButtons() {
             if (added) {
                 btn.classList.add('favorited');
                 icon.classList.replace('bi-heart', 'bi-heart-fill');
-                showToast(`❤️ 已收藏《${song.title}》`);
+                showToast(`已收藏《${song.title}》`);
             } else {
                 btn.classList.remove('favorited');
                 icon.classList.replace('bi-heart-fill', 'bi-heart');
-                showToast(`🩶 已取消收藏《${song.title}》`);
+                showToast(`已取消收藏《${song.title}》`);
             }
             // 如果当前在 about 页面，实时刷新心愿单
             if (typeof window.renderWishlist === 'function') window.renderWishlist();

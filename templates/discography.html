@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}作品集 · 夜鹿集{% endblock %}
+{% block description %}按年份与发行类型浏览本站整理的 Yorushika 作品与专辑脉络。{% endblock %}
+
+{% block content %}
+<div class="container archive-shell py-4 py-lg-5">
+    <header class="archive-page-header">
+        <p class="archive-eyebrow">DISCOGRAPHY</p>
+        <h1>作品集</h1>
+        <p>按 Yorushika 官方作品页的曲序整理。当前覆盖 8 个已核对作品集合；带播放标识的歌名可直达已核验的 B 站影像。</p>
+    </header>
+
+    <form class="discography-filter" action="{{ url_for('main.discography') }}" method="get">
+        <div>
+            <label for="discography-year">发行年份</label>
+            <select id="discography-year" name="year">
+                <option value="">全部年份</option>
+                {% for year in years %}
+                <option value="{{ year }}" {% if selected_year == year|string %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="discography-type">作品类型</label>
+            <select id="discography-type" name="type">
+                <option value="">全部类型</option>
+                {% for release_type in release_types %}
+                <option value="{{ release_type }}" {% if selected_type == release_type %}selected{% endif %}>{{ release_type }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="archive-button archive-button-primary" type="submit">应用筛选</button>
+        {% if selected_year or selected_type %}
+        <a class="archive-button archive-button-secondary" href="{{ url_for('main.discography') }}">重置</a>
+        {% endif %}
+    </form>
+
+    <div class="discography-summary" aria-live="polite">
+        <span>当前显示 {{ albums|length }} 个作品集合</span>
+        <span>{{ result_count }} 首已核对曲目</span>
+    </div>
+
+    <div class="discography-list">
+        {% for album in albums %}
+        <section class="album-entry" id="{{ album.title|replace(' ', '-') }}" aria-labelledby="album-{{ loop.index }}">
+            <div class="album-entry-cover">
+                <img
+                    src="{{ url_for('static', filename='images/' + album.cover_path) }}"
+                    alt="《{{ album.title }}》官方发行封面"
+                    width="480"
+                    height="480"
+                    loading="lazy"
+                    decoding="async"
+                >
+            </div>
+            <div class="album-entry-content">
+                <div class="album-entry-meta">
+                    <span>{{ album.release_year }}</span>
+                    <span>{{ album.release_type }}</span>
+                    <span>{{ album.songs|length }} 首完整曲序</span>
+                </div>
+                <h2 id="album-{{ loop.index }}">{{ album.title }}</h2>
+                <ol class="album-track-list">
+                    {% for song in album.songs %}
+                    <li class="album-track-item">
+                        <a
+                            class="album-track-main"
+                            href="{{ song.link or url_for('main.song_detail', slug=song.slug) }}"
+                            {% if song.link %}target="_blank" rel="noopener noreferrer" aria-label="在 B 站打开 {{ song.title_ja }} 影像"{% endif %}
+                        >
+                            <span>{{ "%02d"|format(loop.index) }}</span>
+                            <strong>{{ song.title_ja }}</strong>
+                            <small>{{ song.title_en or "官方曲序收录" }}</small>
+                            <i class="bi {% if song.link %}bi-play-circle{% else %}bi-arrow-up-right{% endif %}" aria-hidden="true"></i>
+                        </a>
+                        <a
+                            class="album-track-note"
+                            href="{{ url_for('main.song_detail', slug=song.slug) }}"
+                            aria-label="查看 {{ song.title_ja }} 的本站资料"
+                        >资料</a>
+                    </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </section>
+        {% else %}
+        <div class="archive-empty-state">
+            <i class="bi bi-disc" aria-hidden="true"></i>
+            <h2>没有符合条件的作品</h2>
+            <p>换一个年份或发行类型，再继续浏览。</p>
+            <a class="archive-button archive-button-secondary" href="{{ url_for('main.discography') }}">查看全部</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

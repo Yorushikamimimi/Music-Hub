@@ -1,304 +1,229 @@
-"""Curated Yorushika catalog metadata backed by official discography pages."""
+"""Source-backed Yorushika release and track metadata.
 
-CATALOG_TRACKS = (
+Release membership and track order follow the linked Yorushika official
+discography pages. Bilibili links are optional, manually verified listening
+links retained from the original Music Hub catalog.
+"""
+
+VERIFIED_BILIBILI_VIDEOS = {
+    "haru": "https://www.bilibili.com/video/BV1kQ4y1L77o/",
+    "spring-thief": "https://www.bilibili.com/video/BV16k8bzGE31/",
+    "just-a-sunny-day-for-you": "https://www.bilibili.com/video/BV1dW41137on/",
+    "night-journey": "https://www.bilibili.com/video/BV1A7tBzYEuw/",
+    "left-right-confusion": "https://www.bilibili.com/video/BV1Nznrz8EUR/",
+    "algernon": "https://www.bilibili.com/video/BV1Nk5izhEsB/",
+    "thoughtcrime": "https://www.bilibili.com/video/BV1gw411e7Dk/",
+    "flower-and-badger-game": "https://www.bilibili.com/video/BV1uY4y1z7n6/",
+    "nautilus": "https://www.bilibili.com/video/BV1GhHJzJESB/",
+    "thats-why-i-gave-up-on-music": "https://www.bilibili.com/video/BV1HA411973b/",
+    "ghost-in-a-flower": "https://www.bilibili.com/video/BV1nc3mz7EDT/",
+    "hitchcock": "https://www.bilibili.com/video/BV15KaNziEv1/",
+    "say-it": "https://www.bilibili.com/video/BV1ELraBoEaf/",
+    "deep-indigo": "https://www.bilibili.com/video/BV1KV411N7to/",
+    "rain-with-cappuccino": "https://www.bilibili.com/video/BV13AaYzGE6G/",
+    "parade": "https://www.bilibili.com/video/BV1ZFpmzMEah/",
+    "walking": "https://www.bilibili.com/video/BV13B4y1q7cV/",
+    "elma": "https://www.bilibili.com/video/BV1ypxuzUEpu/",
+    "hole-in-the-heart": "https://www.bilibili.com/video/BV1Pa4y157fr/",
+    "plagiarism": "https://www.bilibili.com/video/BV1UX8nzaEz8/",
+}
+
+
+TRACK_DETAILS = {
+    "haru": ("Sunny", "季节与前行"),
+    "spring-thief": ("Spring Thief", "春日、短暂与留恋"),
+    "just-a-sunny-day-for-you": ("Just a Sunny Day for You", "夏日与回望"),
+    "night-journey": ("Night Journey", "夜晚、行走与告别"),
+    "left-right-confusion": ("Left-Right Confusion", "距离与选择"),
+    "algernon": ("Algernon", "变化与理解"),
+    "thoughtcrime": ("Thoughtcrime", "创作与自我审视"),
+    "flower-and-badger-game": ("Flower and Badger Game", "触碰与确认"),
+    "nautilus": ("Nautilus", "书信与叙事终点"),
+    "thats-why-i-gave-up-on-music": (
+        "That's Why I Gave Up on Music",
+        "青年、音乐与告别",
+    ),
+    "ghost-in-a-flower": ("Ghost in a Flower", "夏日、记忆与告别"),
+    "hitchcock": ("Hitchcock", "成长与提问"),
+    "say-it": ("Say It.", "表达与错过"),
+    "deep-indigo": ("Deep Indigo", "创作旅程的起点"),
+    "rain-with-cappuccino": ("Rain with Cappuccino", "雨、城市与日记"),
+    "parade": ("Parade", "旅行、回忆与书信"),
+    "walking": ("Walking", "旅途与继续前行"),
+    "elma": ("Elma", "人物与概念专辑的联系"),
+    "hole-in-the-heart": ("Hole in the Heart", "缺失与继续前行"),
+    "plagiarism": ("Plagiarism", "模仿、创作与自我审视"),
+}
+
+
+CATALOG_RELEASES = (
     {
-        "slug": "haru",
-        "title": "Sunny (晴る)",
-        "title_ja": "晴る",
-        "title_en": "Sunny",
-        "album_title": "晴る",
+        "title": "晴る",
         "release_type": "Digital Single",
         "release_year": 2024,
-        "cover_path": "sunny.webp",
-        "story_summary": (
-            "2024 年发行的数字单曲。本站把它放在“季节与前行”的主题下，"
-            "只记录官方收录信息与个人听感，不转载完整歌词。"
-        ),
+        "cover_path": "release_haru.webp",
         "source_url": "https://yorushika.com/discography/detail/37/",
+        "tracks": (("haru", "晴る"),),
     },
     {
-        "slug": "spring-thief",
-        "title": "Spring Thief (春泥棒)",
-        "title_ja": "春泥棒",
-        "title_en": "Spring Thief",
-        "album_title": "創作",
+        "title": "幻燈",
+        "release_type": "Music Art Book",
+        "release_year": 2023,
+        "cover_path": "release_gentou.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/45/",
+        "tracks": (
+            ("summer-portrait", "夏の肖像"),
+            ("miyakoochi", "都落ち"),
+            ("bremen", "ブレーメン"),
+            ("chinokate", "チノカテ"),
+            ("snow-country", "雪国"),
+            ("howl-at-the-moon", "月に吠える"),
+            ("four-fifty-one", "451"),
+            ("pas-de-deux", "パドドゥ"),
+            ("matasaburo", "又三郎"),
+            ("kutsu-no-hanabi-gentou", "靴の花火"),
+            ("old-man-and-the-sea", "老人と海"),
+            ("goodbye-molten", "さよならモルテン"),
+            ("isana", "いさな"),
+            ("left-right-confusion", "左右盲"),
+            ("algernon", "アルジャーノン"),
+            ("first-night", "第一夜"),
+        ),
+    },
+    {
+        "title": "創作",
         "release_type": "EP",
         "release_year": 2021,
-        "cover_path": "spring_thief.webp",
-        "story_summary": (
-            "收录于 EP《創作》。这里将它作为春季作品索引的入口，"
-            "关注季节更替带来的短暂与留恋。"
-        ),
+        "cover_path": "release_sousaku.webp",
         "source_url": "https://yorushika.com/discography/detail/18/",
-    },
-    {
-        "slug": "just-a-sunny-day-for-you",
-        "title": "Just a Sunny Day for You (ただ君に晴れ)",
-        "title_ja": "ただ君に晴れ",
-        "title_en": "Just a Sunny Day for You",
-        "album_title": "負け犬にアンコールはいらない",
-        "release_type": "Mini Album",
-        "release_year": 2018,
-        "cover_path": "sunny_day.webp",
-        "story_summary": (
-            "收录于第二张迷你专辑《負け犬にアンコールはいらない》。"
-            "本站把它归入早期作品与夏日意象的阅读路径。"
+        "tracks": (
+            ("robbery-and-bouquet", "強盗と花束"),
+            ("spring-thief", "春泥棒"),
+            ("creation", "創作"),
+            ("eat-the-wind", "風を食む"),
+            ("false-moon", "嘘月"),
         ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/40/",
     },
     {
-        "slug": "night-journey",
-        "title": "Night Journey (夜行)",
-        "title_ja": "夜行",
-        "title_en": "Night Journey",
-        "album_title": "盗作",
+        "title": "盗作",
         "release_type": "Full Album",
         "release_year": 2020,
-        "cover_path": "night_journey.webp",
-        "story_summary": (
-            "收录于第三张完整专辑《盗作》。在本站的作品脉络中，"
-            "它连接夜晚、行走与回望三个主题。"
-        ),
+        "cover_path": "release_tousaku.webp",
         "source_url": "https://yorushika.com/discography/artist/2/detail/43/",
-    },
-    {
-        "slug": "left-right-confusion",
-        "title": "Left-Right Confusion (左右盲)",
-        "title_ja": "左右盲",
-        "title_en": "Left-Right Confusion",
-        "album_title": "幻燈",
-        "release_type": "Music Art Book",
-        "release_year": 2023,
-        "cover_path": "left_right.webp",
-        "story_summary": (
-            "收录于音乐画集《幻燈》。本站将它放在“距离与选择”的主题中，"
-            "并以官方作品页作为资料依据。"
+        "tracks": (
+            ("daytime-nighthawk", "昼鳶"),
+            ("haruhisagi", "春ひさぎ"),
+            ("bakudanma-tousaku", "爆弾魔"),
+            ("replicant", "レプリカント"),
+            ("flower-and-badger-game", "花人局"),
+            ("plagiarism", "盗作"),
+            ("thoughtcrime", "思想犯"),
+            ("escape", "逃亡"),
+            ("night-journey", "夜行"),
+            ("ghost-in-a-flower", "花に亡霊"),
         ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/45/",
     },
     {
-        "slug": "algernon",
-        "title": "Algernon (アルジャーノン)",
-        "title_ja": "アルジャーノン",
-        "title_en": "Algernon",
-        "album_title": "幻燈",
-        "release_type": "Music Art Book",
-        "release_year": 2023,
-        "cover_path": "algernon.webp",
-        "story_summary": (
-            "收录于音乐画集《幻燈》。页面以作品标题和官方收录顺序为线索，"
-            "保留后续补充个人阅读笔记的空间。"
-        ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/45/",
-    },
-    {
-        "slug": "thoughtcrime",
-        "title": "Thoughtcrime (思想犯)",
-        "title_ja": "思想犯",
-        "title_en": "Thoughtcrime",
-        "album_title": "盗作",
-        "release_type": "Full Album",
-        "release_year": 2020,
-        "cover_path": "thoughtcrime.webp",
-        "story_summary": (
-            "收录于《盗作》。本站把它放进创作、模仿与自我审视的主题路径，"
-            "正文只保留原创短评和官方来源链接。"
-        ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/43/",
-    },
-    {
-        "slug": "flower-and-badger-game",
-        "title": "Flower and Badger Game (花人局)",
-        "title_ja": "花人局",
-        "title_en": "Flower and Badger Game",
-        "album_title": "盗作",
-        "release_type": "Full Album",
-        "release_year": 2020,
-        "cover_path": "flower_badger.webp",
-        "story_summary": (
-            "收录于《盗作》。它在本站作为专辑中段作品展示，"
-            "后续笔记将区分官方事实、个人理解和仍待考证的内容。"
-        ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/43/",
-    },
-    {
-        "slug": "nautilus",
-        "title": "Nautilus (ノーチラス)",
-        "title_ja": "ノーチラス",
-        "title_en": "Nautilus",
-        "album_title": "エルマ",
+        "title": "エルマ",
         "release_type": "Full Album",
         "release_year": 2019,
-        "cover_path": "nautilus.webp",
-        "story_summary": (
-            "收录于第二张完整专辑《エルマ》。作为专辑末尾的重要曲目，"
-            "本站用它连接《だから僕は音楽を辞めた》与《エルマ》的叙事脉络。"
-        ),
+        "cover_path": "release_elma.webp",
         "source_url": "https://yorushika.com/discography/artist/2/detail/42/",
+        "tracks": (
+            ("only-sorrow", "憂一乗"),
+            ("evening-calm-flower-confusion", "夕凪、某、花惑い"),
+            ("rain-with-cappuccino", "雨とカプチーノ"),
+            ("dance-of-god", "神様のダンス"),
+            ("rain-clears", "雨晴るる"),
+            ("walking", "歩く"),
+            ("hole-in-the-heart", "心に穴が空いた"),
+            ("voice", "声"),
+            ("amy", "エイミー"),
+            ("nautilus", "ノーチラス"),
+        ),
     },
     {
-        "slug": "thats-why-i-gave-up-on-music",
-        "title": "That's Why I Gave Up on Music (だから僕は音楽を辞めた)",
-        "title_ja": "だから僕は音楽を辞めた",
-        "title_en": "That's Why I Gave Up on Music",
-        "album_title": "だから僕は音楽を辞めた",
+        "title": "だから僕は音楽を辞めた",
         "release_type": "Full Album",
         "release_year": 2019,
-        "cover_path": "gave_up_music.webp",
-        "story_summary": (
-            "第一张完整专辑的同名曲。本站将它作为青年与エルマ作品脉络的核心入口，"
-            "并把官方专辑页作为主要事实来源。"
-        ),
+        "cover_path": "release_dakara_boku.webp",
         "source_url": "https://yorushika.com/discography/artist/2/detail/41/",
-    },
-    {
-        "slug": "ghost-in-a-flower",
-        "title": "Ghost in a Flower (花に亡霊)",
-        "title_ja": "花に亡霊",
-        "title_en": "Ghost in a Flower",
-        "album_title": "盗作",
-        "release_type": "Full Album",
-        "release_year": 2020,
-        "cover_path": "ghost_flower.webp",
-        "story_summary": (
-            "收录于《盗作》。本站将它放在夏日、记忆与告别的主题路径中，"
-            "不提供歌词全文或未经授权的翻译。"
+        "tracks": (
+            ("deep-indigo", "藍二乗"),
+            ("august-a-certain-moonlight", "八月、某、月明かり"),
+            ("poet-and-coffee", "詩書きとコーヒー"),
+            ("lets-dance", "踊ろうぜ"),
+            ("june-writes-rain-cleared-city", "六月は雨上がりの街を書く"),
+            ("from-the-window-of-may", "五月は花緑青の窓辺から"),
+            ("night-imitation", "夜紛い"),
+            ("parade", "パレード"),
+            ("elma", "エルマ"),
+            ("thats-why-i-gave-up-on-music", "だから僕は音楽を辞めた"),
         ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/43/",
     },
     {
-        "slug": "hitchcock",
-        "title": "Hitchcock (ヒッチコック)",
-        "title_ja": "ヒッチコック",
-        "title_en": "Hitchcock",
-        "album_title": "負け犬にアンコールはいらない",
+        "title": "負け犬にアンコールはいらない",
         "release_type": "Mini Album",
         "release_year": 2018,
-        "cover_path": "hitchcock.webp",
-        "story_summary": (
-            "收录于第二张迷你专辑《負け犬にアンコールはいらない》。"
-            "页面把它归入早期作品中的成长与提问主题。"
-        ),
+        "cover_path": "release_makeinu.webp",
         "source_url": "https://yorushika.com/discography/artist/2/detail/40/",
+        "tracks": (
+            ("makeinu-ni-encore-wa-iranai", "負け犬にアンコールはいらない"),
+            ("bakudanma-makeinu", "爆弾魔"),
+            ("hitchcock", "ヒッチコック"),
+            ("semi-transparent-boy", "準透明少年"),
+            ("just-a-sunny-day-for-you", "ただ君に晴れ"),
+            ("hibernation", "冬眠"),
+        ),
     },
     {
-        "slug": "say-it",
-        "title": "Say It. (言って。)",
-        "title_ja": "言って。",
-        "title_en": "Say It.",
-        "album_title": "夏草が邪魔をする",
+        "title": "夏草が邪魔をする",
         "release_type": "Mini Album",
         "release_year": 2017,
-        "cover_path": "say_it.webp",
-        "story_summary": (
-            "收录于第一张迷你专辑《夏草が邪魔をする》。"
-            "本站用它作为最早期作品和表达主题的入口。"
-        ),
+        "cover_path": "release_natsukusa.webp",
         "source_url": "https://yorushika.com/discography/artist/2/detail/39/",
-    },
-    {
-        "slug": "deep-indigo",
-        "title": "Deep Indigo (藍二乗)",
-        "title_ja": "藍二乗",
-        "title_en": "Deep Indigo",
-        "album_title": "だから僕は音楽を辞めた",
-        "release_type": "Full Album",
-        "release_year": 2019,
-        "cover_path": "deep_indigo.webp",
-        "story_summary": (
-            "收录于《だから僕は音楽を辞めた》，也是专辑叙事的重要起点。"
-            "本站以官方曲序和专辑设定组织后续阅读笔记。"
+        "tracks": (
+            ("cattleya", "カトレア"),
+            ("say-it", "言って。"),
+            ("bloom-in-that-summer", "あの夏に咲け"),
+            ("kutsu-no-hanabi-natsukusa", "靴の花火"),
+            ("cloud-and-ghost", "雲と幽霊"),
         ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/41/",
-    },
-    {
-        "slug": "rain-with-cappuccino",
-        "title": "Rain with Cappuccino (雨とカプチーノ)",
-        "title_ja": "雨とカプチーノ",
-        "title_en": "Rain with Cappuccino",
-        "album_title": "エルマ",
-        "release_type": "Full Album",
-        "release_year": 2019,
-        "cover_path": "rain_cappuccino.webp",
-        "story_summary": (
-            "收录于《エルマ》。本站把它放进雨、城市与日记感的主题路径，"
-            "后续内容只增加可标注来源的资料和个人短评。"
-        ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/42/",
-    },
-    {
-        "slug": "parade",
-        "title": "Parade (パレード)",
-        "title_ja": "パレード",
-        "title_en": "Parade",
-        "album_title": "だから僕は音楽を辞めた",
-        "release_type": "Full Album",
-        "release_year": 2019,
-        "cover_path": "parade.webp",
-        "story_summary": (
-            "收录于《だから僕は音楽を辞めた》。"
-            "在本站中，它连接专辑的旅行感、回忆与写信主题。"
-        ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/41/",
-    },
-    {
-        "slug": "walking",
-        "title": "Walking (歩く)",
-        "title_ja": "歩く",
-        "title_en": "Walking",
-        "album_title": "エルマ",
-        "release_type": "Full Album",
-        "release_year": 2019,
-        "cover_path": "walking.webp",
-        "story_summary": (
-            "收录于《エルマ》。本站把它作为旅途和移动主题的节点，"
-            "与同专辑其他曲目的顺序关系一起呈现。"
-        ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/42/",
-    },
-    {
-        "slug": "elma",
-        "title": "Elma (エルマ)",
-        "title_ja": "エルマ",
-        "title_en": "Elma",
-        "album_title": "だから僕は音楽を辞めた",
-        "release_type": "Full Album",
-        "release_year": 2019,
-        "cover_path": "elma.webp",
-        "story_summary": (
-            "收录于《だから僕は音楽を辞めた》。"
-            "本站把它作为人物与概念专辑关系的索引入口，而不是把同名标题误当作专辑字段。"
-        ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/41/",
-    },
-    {
-        "slug": "hole-in-the-heart",
-        "title": "Hole in the Heart (心に穴が空いた)",
-        "title_ja": "心に穴が空いた",
-        "title_en": "Hole in the Heart",
-        "album_title": "エルマ",
-        "release_type": "Full Album",
-        "release_year": 2019,
-        "cover_path": "hole_heart.webp",
-        "story_summary": (
-            "收录于《エルマ》。本站将它归入缺失、回忆与继续前行的主题路径，"
-            "并明确区分官方资料和个人理解。"
-        ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/42/",
-    },
-    {
-        "slug": "plagiarism",
-        "title": "Plagiarism (盗作)",
-        "title_ja": "盗作",
-        "title_en": "Plagiarism",
-        "album_title": "盗作",
-        "release_type": "Full Album",
-        "release_year": 2020,
-        "cover_path": "plagiarism.webp",
-        "story_summary": (
-            "第三张完整专辑的同名曲。本站用它作为《盗作》主题页的核心入口，"
-            "只收录官方作品信息和原创编辑说明。"
-        ),
-        "source_url": "https://yorushika.com/discography/artist/2/detail/43/",
     },
 )
+
+
+def _build_catalog_tracks():
+    catalog = []
+
+    for release in CATALOG_RELEASES:
+        for track_number, (slug, title_ja) in enumerate(
+            release["tracks"],
+            start=1,
+        ):
+            title_en, note_theme = TRACK_DETAILS.get(slug, ("", "作品脉络"))
+            title = f"{title_en} ({title_ja})" if title_en else title_ja
+            catalog.append(
+                {
+                    "slug": slug,
+                    "title": title,
+                    "title_ja": title_ja,
+                    "title_en": title_en,
+                    "album_title": release["title"],
+                    "release_type": release["release_type"],
+                    "release_year": release["release_year"],
+                    "cover_path": release["cover_path"],
+                    "story_summary": (
+                        f"《{release['title']}》官方曲序第 {track_number} 首。"
+                        f"本站把它放在“{note_theme}”的个人整理路径中；"
+                        "当前仅记录官方收录信息，不转载完整歌词。"
+                    ),
+                    "source_url": release["source_url"],
+                    "mv_url": VERIFIED_BILIBILI_VIDEOS.get(slug),
+                }
+            )
+
+    return tuple(catalog)
+
+
+CATALOG_TRACKS = _build_catalog_tracks()

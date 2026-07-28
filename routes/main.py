@@ -2,7 +2,7 @@ import os
 import random
 import datetime
 
-from flask import Blueprint, Response, current_app, render_template, request, url_for
+from flask import Blueprint, Response, abort, current_app, render_template, request, url_for
 from sqlalchemy import or_
 
 from models import db, MusicYorushika
@@ -10,21 +10,47 @@ from models import db, MusicYorushika
 main_bp = Blueprint('main', __name__)
 
 
-@main_bp.route('/')
-def index():
-    songs = (
+def _featured_songs():
+    return (
         MusicYorushika.query
         .filter_by(is_featured=True)
         .order_by(MusicYorushika.display_order.asc(), MusicYorushika.id.asc())
         .all()
     )
 
-    if len(songs) > 10:
-        yorushika_left = songs[:10]
-        yorushika_right = songs[10:]
-    else:
-        yorushika_left = songs
-        yorushika_right = []
+
+def _album_index(songs):
+    albums = {}
+    for song in songs:
+        key = song.album_title or "未整理作品"
+        if key not in albums:
+            albums[key] = {
+                "title": key,
+                "release_year": song.release_year,
+                "release_type": song.release_type,
+                "cover_path": song.cover_path,
+                "songs": [],
+                "first_order": song.display_order,
+            }
+        albums[key]["songs"].append(song)
+        if song.release_year and (
+            albums[key]["release_year"] is None
+            or song.release_year > albums[key]["release_year"]
+        ):
+            albums[key]["release_year"] = song.release_year
+
+    return sorted(
+        albums.values(),
+        key=lambda album: (
+            -(album["release_year"] or 0),
+            album["first_order"],
+        ),
+    )
+
+
+@main_bp.route('/')
+def index():
+    songs = _featured_songs()
 
     daily_song = None
     daily_note = ''
@@ -34,12 +60,102 @@ def index():
         daily_song = rng.choice(songs)
         daily_note = f"收录于《{daily_song.album_title}》"
 
+    song_by_slug = {song.slug: song for song in songs}
+    listening_paths = [
+        {
+            "eyebrow": "夜に歩く",
+            "title": "沿着夜色行走",
+            "description": "从《夜行》开始，进入行走、回望与无声告别的作品路径。",
+            "song": song_by_slug.get("night-journey"),
+        },
+        {
+            "eyebrow": "春を待つ",
+            "title": "等待春天抵达",
+            "description": "把春日的明亮和短暂放在一起听，感受季节流动的痕迹。",
+            "song": song_by_slug.get("spring-thief"),
+        },
+        {
+            "eyebrow": "雨の日記",
+            "title": "雨天与日记",
+            "description": "从雨、城市与书写出发，回到《エルマ》的叙事线索。",
+            "song": song_by_slug.get("rain-with-cappuccino"),
+        },
+    ]
+
+    albums = _album_index(songs)
+    album_spotlights = sorted(
+        albums,
+        key=lambda album: (-len(album["songs"]), -(album["release_year"] or 0)),
+    )[:4]
+
     return render_template(
         'index.html',
-        yorushika=yorushika_left,
-        yorushika_right=yorushika_right,
         daily_song=daily_song,
         daily_note=daily_note,
+        featured_songs=songs[:6],
+        total_song_count=len(songs),
+        listening_paths=listening_paths,
+        album_spotlights=album_spotlights,
+    )
+
+
+@main_bp.route('/discography')
+def discography():
+    songs = _featured_songs()
+    selected_year = request.args.get('year', '').strip()
+    selected_type = request.args.get('type', '').strip()
+
+    years = sorted(
+        {song.release_year for song in songs if song.release_year is not None},
+        reverse=True,
+    )
+    release_types = sorted(
+        {song.release_type for song in songs if song.release_type}
+    )
+
+    filtered_songs = [
+        song for song in songs
+        if (not selected_year or str(song.release_year) == selected_year)
+        and (not selected_type or song.release_type == selected_type)
+    ]
+
+    return render_template(
+        'discography.html',
+        albums=_album_index(filtered_songs),
+        years=years,
+        release_types=release_types,
+        selected_year=selected_year,
+        selected_type=selected_type,
+        result_count=len(filtered_songs),
+    )
+
+
+@main_bp.route('/songs/<slug>')
+def song_detail(slug):
+    songs = _featured_songs()
+    song = next((item for item in songs if item.slug == slug), None)
+    if song is None:
+        abort(404)
+
+    album_songs = [
+        item for item in songs
+        if item.album_title == song.album_title
+    ]
+    current_index = album_songs.index(song)
+    previous_song = album_songs[current_index - 1] if current_index > 0 else None
+    next_song = (
+        album_songs[current_index + 1]
+        if current_index + 1 < len(album_songs)
+        else None
+    )
+    related_songs = [item for item in album_songs if item.id != song.id][:4]
+
+    return render_template(
+        'song_detail.html',
+        song=song,
+        previous_song=previous_song,
+        next_song=next_song,
+        related_songs=related_songs,
     )
 
 

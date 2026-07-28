@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}搜索作品 · 夜鹿集{% endblock %}
+
 {% block content %}
 <div class="container py-4">
     <h1 class="visually-hidden">搜索 Yorushika 作品</h1>
@@ -60,9 +62,13 @@
                     <div class="flex-grow-1">
                         <h5 class="card-title fw-bold mb-1 text-truncate" style="max-width: 200px;"
                             title="{{ song.title }}">
-                            <a href="{{ song.source_url }}" target="_blank" rel="noopener noreferrer"
-                                class="text-decoration-none text-reset stretched-link">
+                            <a
+                                href="{{ song.link or url_for('main.song_detail', slug=song.slug) }}"
+                                class="text-decoration-none text-reset"
+                                {% if song.link %}target="_blank" rel="noopener noreferrer" aria-label="在 B 站打开 {{ song.title_ja }} 影像"{% endif %}
+                            >
                                 {{ song.title }}
+                                {% if song.link %}<i class="bi bi-play-circle ms-1" aria-hidden="true"></i>{% endif %}
                             </a>
                         </h5>
                         <p class="card-text small text-muted mb-1">
@@ -75,11 +81,16 @@
                             <div class="d-flex align-items-center">
                                 <button class="fav-btn fav-btn-sm" data-song-id="{{ song.id }}"
                                     data-song-title="{{ song.title }}" data-song-album="{{ song.album_title }}"
-                                    data-song-link="{{ song.source_url }}" data-song-year="{{ song.release_year }}"
+                                    data-song-link="{{ song.link or song.source_url }}" data-song-year="{{ song.release_year }}"
                                     title="收藏 {{ song.title }}" aria-label="收藏 {{ song.title }}"
                                     style="position: relative; z-index: 2;">
                                     <i class="bi bi-heart"></i>
                                 </button>
+                                <a
+                                    class="small text-decoration-none ms-2 position-relative"
+                                    href="{{ url_for('main.song_detail', slug=song.slug) }}"
+                                    style="z-index: 2;"
+                                >资料</a>
                             </div>
                         </div>
                     </div>

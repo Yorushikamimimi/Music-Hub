@@ -1,121 +1,143 @@
 {% extends "base.html" %}
 
+{% block title %}夜鹿集 · 从一首歌进入 Yorushika 的作品脉络{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-    <h1 class="visually-hidden">Yorushika 私人选曲与作品索引</h1>
-
-    {% if daily_song %}
-    <div class="daily-card mb-5" id="daily-pick">
-        <div class="daily-card-inner">
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="daily-tag">
-                    <i class="bi bi-calendar-heart-fill me-1"></i>Daily Pick
-                </span>
-                <span class="daily-year">{{ daily_song.release_year }}</span>
+<div class="container archive-shell py-4 py-lg-5">
+    <section class="archive-hero" aria-labelledby="home-title">
+        <div class="archive-hero-copy">
+            <p class="archive-eyebrow">私人的ヨルシカ作品索引</p>
+            <h1 id="home-title">从一首歌开始，<br>沿着夜色与季节继续听。</h1>
+            <p class="archive-lead">
+                这里不做热度排行，只整理作品、专辑与我反复回到的聆听路径。
+                每条资料都保留官方来源，感受则明确写成个人笔记。
+            </p>
+            <div class="archive-actions">
+                <a class="archive-button archive-button-primary" href="{{ url_for('main.discography') }}">
+                    浏览作品集 <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
+                <a class="archive-button archive-button-secondary" href="{{ url_for('main.radio') }}">
+                    进入私人电台
+                </a>
             </div>
-            <a href="{{ daily_song.source_url }}" target="_blank" rel="noopener noreferrer" class="daily-title">
-                {{ daily_song.title }}
-                <i class="bi bi-box-arrow-up-right ms-2" style="font-size:0.8em;"></i>
+        </div>
+
+        {% if daily_song %}
+        <article class="daily-listening-card" id="daily-pick">
+            <div class="daily-listening-cover">
+                <img
+                    src="{{ url_for('static', filename='images/' + daily_song.cover_path) }}"
+                    alt="《{{ daily_song.album_title }}》官方发行封面"
+                    width="520"
+                    height="520"
+                    decoding="async"
+                >
+                <span class="daily-listening-index">{{ "%02d"|format(daily_song.display_order) }}</span>
+            </div>
+            <div class="daily-listening-copy">
+                <p class="archive-eyebrow">TODAY'S LISTENING</p>
+                <h2>
+                    <a
+                        href="{{ daily_song.link or url_for('main.song_detail', slug=daily_song.slug) }}"
+                        {% if daily_song.link %}target="_blank" rel="noopener noreferrer" aria-label="在 B 站打开 {{ daily_song.title_ja }} 影像"{% endif %}
+                    >{{ daily_song.title_ja }}</a>
+                </h2>
+                {% if daily_song.title_en %}<p class="daily-listening-en">{{ daily_song.title_en }}</p>{% endif %}
+                <p>{{ daily_note }} · {{ daily_song.release_year }}</p>
+                <a class="archive-text-link" href="{{ url_for('main.song_detail', slug=daily_song.slug) }}">
+                    打开作品笔记 <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                </a>
+            </div>
+        </article>
+        {% endif %}
+    </section>
+
+    <section class="archive-section" aria-labelledby="paths-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">LISTENING PATHS</p>
+                <h2 id="paths-title">按此刻的心情进入</h2>
+            </div>
+            <p>不是算法推荐，而是三条可以慢慢走完的私人路径。</p>
+        </div>
+
+        <div class="listening-path-grid">
+            {% for path in listening_paths %}
+            {% if path.song %}
+            <a class="listening-path-card" href="{{ url_for('main.song_detail', slug=path.song.slug) }}">
+                <span class="listening-path-number">0{{ loop.index }}</span>
+                <div>
+                    <p>{{ path.eyebrow }}</p>
+                    <h3>{{ path.title }}</h3>
+                    <span>{{ path.description }}</span>
+                </div>
+                <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
             </a>
-            <p class="daily-lyric">{{ daily_note }}</p>
-            <div class="d-flex align-items-center gap-3 mt-3">
-                <span class="daily-album">
-                    <i class="bi bi-disc me-1"></i>{{ daily_song.album_title }}
-                </span>
-            </div>
+            {% endif %}
+            {% endfor %}
         </div>
-    </div>
-    {% endif %}
+    </section>
 
-    <div class="row g-5 home-columns">
-        <div class="col-lg-6">
-            <div class="glass-card h-100 p-4">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="icon-box me-3 bg-primary bg-opacity-10 p-3 rounded-4">
-                        <i class="bi bi-moon-stars text-primary fs-4"></i>
-                    </div>
-                    <div>
-                        <h3 class="mb-0 fw-bold">Yorushika Picks</h3>
-                        <p class="text-muted small mb-0">Yorushika Selection - Editorial Pick</p>
-                    </div>
-                </div>
-
-                <div class="music-list">
-                    {% for song in yorushika %}
-                    <div class="music-item d-flex align-items-center">
-                        <div class="rank-num {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% else %}rank-other{% endif %}">
-                            {{ "%02d"|format(loop.index) }}
-                        </div>
-
-                        <div class="flex-grow-1">
-                            <a href="{{ song.source_url }}" target="_blank" rel="noopener noreferrer" class="song-link">
-                                {{ song.title }}
-                                <i class="bi bi-play-circle-fill ms-2 opacity-50" style="font-size: 0.9rem;"></i>
-                            </a>
-                            <div class="sub-text d-flex align-items-center" style="color: var(--accent-color); font-style: italic;">
-                                <i class="bi bi-music-note-beamed me-1"></i> {{ song.album_title }}
-                            </div>
-                        </div>
-
-                        <div class="text-end d-flex align-items-center">
-                            <button class="fav-btn" data-song-id="{{ song.id }}" data-song-title="{{ song.title }}"
-                                data-song-album="{{ song.album_title }}" data-song-link="{{ song.source_url }}"
-                                data-song-year="{{ song.release_year }}"
-                                title="收藏 {{ song.title }}" aria-label="收藏 {{ song.title }}">
-                                <i class="bi bi-heart"></i>
-                            </button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
+    <section class="archive-section" aria-labelledby="songs-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">SELECTED WORKS</p>
+                <h2 id="songs-title">从这些作品开始</h2>
             </div>
+            <a class="archive-text-link" href="{{ url_for('main.discography') }}">查看全部 {{ total_song_count }} 首 <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
         </div>
 
-        <div class="col-lg-6">
-            <div class="glass-card h-100 p-4">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="icon-box me-3 bg-purple bg-opacity-10 p-3 rounded-4" style="background: rgba(111, 66, 193, 0.1);">
-                        <i class="bi bi-music-note-list text-purple fs-4" style="color: #6f42c1;"></i>
-                    </div>
-                    <div>
-                        <h3 class="mb-0 fw-bold">Yorushika More Picks</h3>
-                        <p class="text-muted small mb-0">More from n-buna & suis</p>
-                    </div>
+        <div class="featured-track-grid">
+            {% for song in featured_songs %}
+            <article class="featured-track-card">
+                <a class="featured-track-cover" href="{{ url_for('main.song_detail', slug=song.slug) }}" tabindex="-1" aria-hidden="true">
+                    <img
+                        src="{{ url_for('static', filename='images/' + song.cover_path) }}"
+                        alt=""
+                        width="420"
+                        height="420"
+                        loading="lazy"
+                        decoding="async"
+                    >
+                </a>
+                <div class="featured-track-meta">
+                    <span>{{ song.release_year }}</span>
+                    <span>{{ song.release_type }}</span>
                 </div>
-
-                <div class="music-list">
-                    {% for song in yorushika_right %}
-                    <div class="music-item d-flex align-items-center">
-                        <div class="rank-num rank-other">
-                            {{ "%02d"|format(loop.index + 10) }}
-                        </div>
-                        <div class="flex-grow-1">
-                            <a href="{{ song.source_url }}" target="_blank" rel="noopener noreferrer" class="song-link">
-                                {{ song.title }}
-                                <i class="bi bi-play-circle-fill ms-2 opacity-50" style="font-size: 0.9rem;"></i>
-                            </a>
-                            <div class="sub-text d-flex align-items-center" style="color: var(--accent-color); font-style: italic;">
-                                <i class="bi bi-music-note-beamed me-1"></i> {{ song.album_title }}
-                            </div>
-                        </div>
-                        <div class="text-end d-flex align-items-center">
-                            <button class="fav-btn" data-song-id="{{ song.id }}" data-song-title="{{ song.title }}"
-                                data-song-album="{{ song.album_title }}" data-song-link="{{ song.source_url }}"
-                                data-song-year="{{ song.release_year }}"
-                                title="收藏 {{ song.title }}" aria-label="收藏 {{ song.title }}">
-                                <i class="bi bi-heart"></i>
-                            </button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
+                <h3>
+                    <a
+                        href="{{ song.link or url_for('main.song_detail', slug=song.slug) }}"
+                        {% if song.link %}target="_blank" rel="noopener noreferrer" aria-label="在 B 站打开 {{ song.title_ja }} 影像"{% endif %}
+                    >{{ song.title_ja }}{% if song.link %} <i class="bi bi-play-circle" aria-hidden="true"></i>{% endif %}</a>
+                </h3>
+                <p>{% if song.title_en %}{{ song.title_en }} · {% endif %}《{{ song.album_title }}》</p>
+            </article>
+            {% endfor %}
         </div>
-    </div>
+    </section>
+
+    <section class="archive-section archive-album-section" aria-labelledby="albums-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">ALBUM THREADS</p>
+                <h2 id="albums-title">沿着专辑脉络继续</h2>
+            </div>
+            <p>本站当前收录范围中的代表专辑与作品集合。</p>
+        </div>
+
+        <div class="album-thread-list">
+            {% for album in album_spotlights %}
+            <a
+                class="album-thread-row"
+                href="{{ url_for('main.discography', year=album.release_year) }}#{{ album.title|replace(' ', '-') }}"
+            >
+                <span class="album-thread-year">{{ album.release_year }}</span>
+                <span class="album-thread-title">{{ album.title }}</span>
+                <span class="album-thread-count">{{ album.songs|length }} 首收录</span>
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
 </div>
-
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='favorites.js') }}"></script>
 {% endblock %}
