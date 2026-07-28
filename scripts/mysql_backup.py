@@ -316,7 +316,11 @@ def verify_restore(
                     container,
                     "sh",
                     "-ec",
-                    'mysqladmin ping --silent --user=root --password="$MYSQL_ROOT_PASSWORD"',
+                    (
+                        'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; '
+                        'exec mysql --batch --skip-column-names --user=root '
+                        '-e "SELECT 1;"'
+                    ),
                 ],
                 check=False,
                 capture_output=True,
@@ -331,7 +335,10 @@ def verify_restore(
         with gzip.open(backup, "rb") as dump_source:
             imported = docker_exec_with_stdin(
                 container,
-                'exec mysql --user=root --password="$MYSQL_ROOT_PASSWORD"',
+                (
+                    'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; '
+                    "exec mysql --user=root"
+                ),
                 dump_source,
                 timeout=max(timeout, 60),
             )
@@ -349,8 +356,8 @@ def verify_restore(
                 "sh",
                 "-ec",
                 (
-                    "exec mysql --batch --skip-column-names "
-                    '--user=root --password="$MYSQL_ROOT_PASSWORD" '
+                    'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; '
+                    "exec mysql --batch --skip-column-names --user=root "
                     "-e \"SELECT COUNT(*) FROM information_schema.tables "
                     "WHERE table_name='music_yorushika';\""
                 ),

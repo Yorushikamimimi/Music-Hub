@@ -2,6 +2,7 @@ import gzip
 import io
 import os
 import pathlib
+import subprocess
 import tarfile
 
 import pytest
@@ -75,6 +76,42 @@ def test_mysql_client_values_are_quoted_for_temporary_option_file():
     assert mysql_backup.mysql_option_value('pa"ss\\word#1') == '"pa\\"ss\\\\word#1"'
     with pytest.raises(ValueError, match="control character"):
         mysql_backup.mysql_option_value("line1\nline2")
+
+
+def test_restore_waits_for_authenticated_query_before_import(tmp_path, monkeypatch):
+    backup = tmp_path / "backup.sql.gz"
+    with gzip.open(backup, "wb") as output:
+        output.write(b"-- MySQL dump 10.13\nCREATE TABLE music_yorushika (id int);\n")
+
+    docker_commands = []
+
+    def fake_run(command, **_kwargs):
+        docker_commands.append(command)
+        shell_command = command[-1] if command[:2] == ["docker", "exec"] else ""
+        if "information_schema.tables" in shell_command:
+            return subprocess.CompletedProcess(command, 0, stdout="1\n", stderr="")
+        return subprocess.CompletedProcess(command, 0, stdout="ok\n", stderr="")
+
+    monkeypatch.setattr(mysql_backup, "require_command", lambda _command: None)
+    monkeypatch.setattr(mysql_backup.subprocess, "run", fake_run)
+    monkeypatch.setattr(
+        mysql_backup,
+        "docker_exec_with_stdin",
+        lambda *_args, **_kwargs: subprocess.CompletedProcess(
+            [], 0, stdout=b"", stderr=b""
+        ),
+    )
+
+    result = mysql_backup.verify_restore(backup, "mysql:8.0", timeout=1)
+
+    readiness_commands = [
+        command[-1]
+        for command in docker_commands
+        if command[:2] == ["docker", "exec"] and "SELECT 1" in command[-1]
+    ]
+    assert result["status"] == "ok"
+    assert readiness_commands
+    assert all("mysqladmin ping" not in command for command in readiness_commands)
 
 
 def test_release_snapshot_excludes_secrets_runtime_and_uploads(tmp_path):
