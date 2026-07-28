@@ -3,12 +3,12 @@
 > Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Phase 5 source-backed release archive candidate`
+- Stage: `Phase 5 source-backed release archive production release`
 - Meaning: The first complete release archive now gives `盗作` a source-backed
   overview, a clearly labelled personal listening path, the full 14-track order
   and separate verified video links. The server clone path is also hardened
-  against transient GitHub HTTP/2 failures. It has passed local automated and
-  browser acceptance but has not been committed, pushed or deployed.
+  against transient GitHub HTTP/2 failures. Commit `8119467` has passed local
+  automated acceptance and production browser/health verification.
 
 ## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
@@ -55,7 +55,7 @@
    acceptance passed with no console errors or horizontal overflow; the mobile
    navigation opens with the correct expanded state.
 
-## Phase 5 Release Candidate
+## Phase 5 Production Release
 1. Added `/releases/tousaku` as the first complete release archive rather than
    sending every album interaction directly to a flat track list.
 2. Kept official release facts and their three source links separate from the
@@ -71,6 +71,14 @@
 7. The full 57-test suite passes. Desktop light/dark and 390 px mobile browser
    acceptance passed with no console warnings, errors or horizontal overflow.
    Mobile navigation and 44 px controls were verified.
+8. Production commit `81194672d54778a9c227c49997a48aa6025386d2` was deployed
+   after a verified code snapshot and MySQL backup. The first health check reached
+   HLS before its playlist existed; a repeat after Radio startup passed all Web,
+   database, Nginx, Radio schedule and HLS checks, and the deployed-version state
+   was recorded with the exact commit.
+9. Production desktop and 390 px mobile acceptance confirmed 14 tracks, three
+   listening paths, the verified `思想犯` Bilibili link, zero browser warnings or
+   errors and no horizontal overflow. `https://yoruming.cn/` remained HTTP 200.
 
 ## Completed in This Round
 1. Performance
