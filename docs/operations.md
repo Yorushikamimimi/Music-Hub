@@ -1,9 +1,6 @@
 # Operations Guide
 
-## Target Runtime
-
-> This is the versioned target for the next controlled deployment. The live
-> server continues to use the previous root services until that deployment is accepted.
+## Current Runtime
 
 - Entry: `http://81.68.72.245/`
 - Access boundary: localhost and Tian's current public IPv4 only
@@ -36,17 +33,17 @@ The repository intentionally excludes the MP3 collection, generated HLS segments
 The stream is a private, IP-restricted personal listening tool. It does not
 autoplay, expose a download feature, provide public indexing, or reproduce full lyrics.
 
-## One-time Non-root Preparation
+## Runtime Preparation
 
 ```bash
 cd /var/www/My_Homepage
 sudo bash scripts/prepare_server_runtime.sh
 ```
 
-This creates locked service users, copies (without deleting) legacy audio into
-`/srv/media/yorushika-radio/music`, limits `.env` to `root:musichub` with mode
-`0640` without reading it, installs the target unit/Nginx files, runs `nginx -t`,
-and stops before restarting anything.
+This keeps the locked service users and Radio library permissions, creates dedicated
+backup/monitor directories, installs the versioned unit/Nginx files, runs
+`nginx -t` and `systemd-analyze verify`, and stops before restarting or enabling
+anything. It limits `.env` to `root:musichub` mode `0640` without printing it.
 
 Before activation, verify:
 
@@ -56,6 +53,11 @@ id musichub-radio
 sudo -u musichub-radio test -r /srv/media/yorushika-radio/music
 systemd-analyze verify deploy/systemd/musichub.service
 systemd-analyze verify deploy/systemd/yorushika-radio.service
+systemd-analyze verify deploy/systemd/music-hub-health.service
+systemd-analyze verify deploy/systemd/music-hub-health.timer
+systemd-analyze verify deploy/systemd/music-hub-backup.service
+systemd-analyze verify deploy/systemd/music-hub-backup.timer
+systemd-analyze verify deploy/systemd/music-hub-failure@.service
 ```
 
 When Tian's public IPv4 changes, update the `allow` line in the Nginx configuration before expecting remote access.
@@ -78,6 +80,7 @@ curl -I -H "Host: 81.68.72.245" http://127.0.0.1/
 curl -I -H "Host: 81.68.72.245" http://127.0.0.1/radio
 curl -I -H "Host: 81.68.72.245" http://127.0.0.1/hls/yorushika.m3u8
 curl -I -H "Host: 81.68.72.245" http://127.0.0.1/hls/radio-schedule.json
+python3 scripts/health_check.py
 ```
 
 Browser acceptance should additionally prove:
@@ -90,9 +93,11 @@ Browser acceptance should additionally prove:
 
 ## Deployment
 
-`scripts/deploy_music_hub.sh` keeps `.env` and `venv/`, installs hash-locked
-dependencies, compiles the app, applies the additive migration, synchronizes
-the catalog, restarts both services, and checks the local Nginx route.
+`scripts/deploy_music_hub.sh` keeps `.env`, `venv/`, uploads and the current
+avatar; creates a complete pre-deploy code snapshot; installs hash-locked
+dependencies; creates a verified pre-migration database backup; compiles the
+app; applies additive migrations; synchronizes the catalog; restarts both
+services; runs the full local health check; and records the commit that passed.
 
 Because the script writes the database and restarts services, it requires an
 explicit maintenance confirmation. Do not run it as a routine read-only check.
@@ -102,11 +107,111 @@ Do not delete the legacy audio directory until live Radio playback is accepted.
 The Git repository covers source and deployment configuration, not the MP3
 collection, database or complete server state.
 
+## Automated Health and Failure State
+
+`music-hub-health.timer` runs every five minutes. The oneshot check proves:
+
+1. `musichub.service`, `yorushika-radio.service` and `nginx.service` are active.
+2. `/healthz` can execute a database query through the live Flask process.
+3. The HLS playlist contains active media segments.
+4. The Radio schedule remains private and contains tracks.
+
+Run it manually before enabling the timer:
+
+```bash
+systemctl start music-hub-health.service
+systemctl status music-hub-health.service --no-pager
+journalctl -u music-hub-health.service -n 100 --no-pager
+```
+
+When the health or backup service fails, systemd starts
+`music-hub-failure@.service`. The failure remains in journal and the latest
+minimal status is written to:
+
+```text
+/var/lib/music-hub-monitor/last-failure.json
+```
+
+This is local error monitoring, not an off-server notification channel. It does
+not send email, SMS or chat messages.
+
+## MySQL Backup and Restore Proof
+
+systemd injects the existing protected application database variables into the
+backup process. The script passes them to MySQL through a mode-`0600` temporary
+option file inside the container, removes that file in `finally`, and never
+prints the values or places them in command-line arguments. The dump is
+compressed atomically, validated as a MySQL dump, hashed and stored with mode
+`0600` under:
+
+```text
+/var/backups/music-hub/mysql/
+```
+
+The managed prefix is `musichub-mysql-*.sql.gz`. Retention keeps the newest
+14 files and only deletes older files with that exact prefix in this dedicated
+directory. The older manual backup under `/var/backups/mysql/` is outside this
+scope and cannot be removed by the timer.
+
+Manual proof before timer activation:
+
+```bash
+python3 scripts/mysql_backup.py backup --keep 14 --prune report
+python3 scripts/mysql_backup.py verify \
+  /var/backups/music-hub/mysql/<managed-backup>.sql.gz
+```
+
+`verify` starts a temporary MySQL 8 container with no published port or volume,
+imports the dump, checks for `music_yorushika`, and removes the temporary
+container. After one real restore proof passes, activate the scheduled job:
+
+```bash
+systemctl enable --now music-hub-backup.timer
+systemctl list-timers music-hub-backup.timer --no-pager
+```
+
+The daily local backup is not an automatic off-server backup. Disk loss still
+requires the separately maintained Mac copy or another off-host destination.
+
+## Release Snapshots and Rollback
+
+Each controlled deployment creates a complete code snapshot under:
+
+```text
+/var/backups/music-hub/releases/
+```
+
+Snapshots exclude `.env`, virtual environments, runtime caches, uploads and
+avatar state. The newest five managed snapshots are retained. Each snapshot has
+a checksum manifest and the deployed commit is recorded only after health checks
+pass.
+
+Rollback is dry-run-first:
+
+```bash
+python3 scripts/release_snapshot.py rollback \
+  /var/backups/music-hub/releases/<snapshot>.tar.gz
+```
+
+The command above only prints the plan. Applying it requires an explicit flag:
+
+```bash
+python3 scripts/release_snapshot.py rollback \
+  /var/backups/music-hub/releases/<snapshot>.tar.gz \
+  --apply
+```
+
+An applied rollback first creates a safety snapshot, restores only application
+code, preserves `.env`, `venv/`, uploads and reliability control scripts,
+reinstalls locked dependencies, restarts Web and Radio, and checks the private
+IP routes. It does not reverse database migrations; current migrations must
+remain backward compatible or a separate confirmed database restore is needed.
+
 ## MySQL Network Boundary
 
-The current Docker port publication must not be described as localhost-only
-until live inspection proves it. The preferred end state is a container
-published as `127.0.0.1:3306:3306` plus no cloud firewall rule for 3306.
+The live MySQL container is published as `127.0.0.1:3306:3306`. The cloud
+firewall still retains a server-self source rule, but the host no longer listens
+for remote MySQL clients.
 
 Changing the port binding requires a controlled container recreation with the
 existing named volume and a user-supplied protected environment file. Do not

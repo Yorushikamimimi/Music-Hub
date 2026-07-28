@@ -1,0 +1,28 @@
+[Unit]
+Description=Record a Music Hub reliability failure for %i
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/var/www/My_Homepage
+ExecStart=/usr/bin/python3 /var/www/My_Homepage/scripts/record_unit_failure.py %i
+TimeoutStartSec=30
+UMask=0027
+
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/music-hub-monitor
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+SystemCallArchitectures=native

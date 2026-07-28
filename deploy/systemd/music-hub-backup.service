@@ -1,0 +1,32 @@
+[Unit]
+Description=Create a private Music Hub MySQL backup
+After=docker.service
+Requires=docker.service
+OnFailure=music-hub-failure@%n.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/var/www/My_Homepage
+EnvironmentFile=/var/www/My_Homepage/.env
+ExecStart=/usr/bin/python3 /var/www/My_Homepage/scripts/mysql_backup.py backup --keep 14 --prune apply
+TimeoutStartSec=10min
+UMask=0077
+
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+ReadWritePaths=/var/backups/music-hub/mysql /var/run/docker.sock
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+SystemCallArchitectures=native

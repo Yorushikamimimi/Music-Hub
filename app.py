@@ -2,6 +2,7 @@
 
 from flask import Flask, jsonify, request
 from flask_migrate import Migrate
+from sqlalchemy import text
 
 from commands import register_commands
 from config import load_runtime_config
@@ -29,6 +30,18 @@ def create_app(test_config=None):
     migrate.init_app(app, db)
     app.register_blueprint(main_bp)
     register_commands(app)
+
+    @app.get("/healthz")
+    def healthz():
+        """Report whether the web process can reach its database."""
+        try:
+            db.session.execute(text("SELECT 1"))
+        except Exception:
+            app.logger.exception("Music Hub database health check failed")
+            db.session.remove()
+            return jsonify(status="unhealthy"), 503
+
+        return jsonify(status="ok"), 200
 
     @app.after_request
     def set_security_headers(response):

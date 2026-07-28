@@ -15,10 +15,11 @@
 - Radio：24 首白名单曲目，手动播放、当前曲目、近似进度、下一首和 25% 初始音量。
 - 私密边界：禁止搜索引擎收录，Radio 不提供下载入口，只面向 Nginx 白名单。
 - 工程：图片和字体已减重；数据库使用可回滚迁移；依赖带哈希锁定；具备集成测试。
-- 运维目标：Web 与 Radio 使用独立非 root 用户，Unix socket 放在 `/run`。
+- 运维：Web 与 Radio 使用独立非 root 用户，Unix socket 放在 `/run`。
+- 可靠性目标：5 分钟健康检查、每日 MySQL 备份、失败记录、完整发布快照和显式回滚。
 
-> 本轮代码与配置已完成离线验证，但非 root 服务配置和数据库网络收口在服务器上
-> 仍需一次受控部署；不要把仓库中的目标配置误当成线上已生效事实。
+> 非 root 服务、MySQL 本机监听和当前页面版本已经在线。新增可靠性 timer
+> 仍需一次受控部署与真实恢复演练；不要把仓库中的 timer 配置误当成线上已启用。
 
 ## 快速开始
 详见 [docs/quick-start.md](./docs/quick-start.md)。
@@ -35,7 +36,7 @@ chmod +x scripts/deploy_music_hub.sh
 常用参数覆盖（按需）：
 
 ```bash
-BRANCH=main \
+BRANCH=codex/musichub-hardening \
 HOST_HEADER=81.68.72.245 \
 SERVICE_NAME=musichub.service \
 RADIO_SERVICE_NAME=yorushika-radio.service \
@@ -52,6 +53,9 @@ RADIO_SERVICE_NAME=yorushika-radio.service \
 
 - `deploy/systemd/musichub.service`
 - `deploy/systemd/yorushika-radio.service`
+- `deploy/systemd/music-hub-health.{service,timer}`
+- `deploy/systemd/music-hub-backup.{service,timer}`
+- `deploy/systemd/music-hub-failure@.service`
 - `deploy/nginx/musichub-ip.conf`
 
 音频文件不进入 Git。电台服务从 `/srv/media/yorushika-radio/music` 读取人工

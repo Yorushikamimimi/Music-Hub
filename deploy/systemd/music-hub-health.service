@@ -1,0 +1,30 @@
+[Unit]
+Description=Check Music Hub web, database, and Radio health
+After=network-online.target nginx.service musichub.service yorushika-radio.service
+Wants=network-online.target
+OnFailure=music-hub-failure@%n.service
+
+[Service]
+Type=oneshot
+User=musichub
+Group=www-data
+WorkingDirectory=/var/www/My_Homepage
+ExecStart=/usr/bin/python3 /var/www/My_Homepage/scripts/health_check.py
+TimeoutStartSec=45
+UMask=0027
+
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+SystemCallArchitectures=native

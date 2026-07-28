@@ -3,9 +3,10 @@
 > Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Hardening release candidate`
-- Meaning: Selected content, privacy, migration, performance and runtime work is
-  implemented locally. Production activation is pending a controlled maintenance step.
+- Stage: `Reliability hardening release candidate`
+- Meaning: The selected content, privacy, migration, performance and non-root runtime
+  work is live. Automated health, backup, failure recording and rollback tooling is
+  implemented locally and pending a controlled production activation.
 
 ## Completed in This Round
 1. Performance
@@ -25,8 +26,16 @@
 4. Operations and reliability
 - Added additive Flask/Alembic migrations that preserve legacy columns for rollback.
 - Added hash-locked runtime and development dependency sets.
-- Added non-root target units for Web and Radio plus a no-restart preparation script.
-- Added 21 automated tests covering routes, catalog, CSP, migrations and Radio schedule.
+- Activated non-root Web and Radio units and restricted MySQL to localhost.
+- Added a database-aware `/healthz` route and a five-minute full-path health timer.
+- Added daily compressed MySQL backup tooling with checksum validation and exact-prefix
+  retention that cannot remove the older manual full-server backup.
+- Added complete pre-deploy code snapshots, deployed-version state and an explicit
+  dry-run-first rollback command that preserves `.env`, uploads and the virtualenv.
+- Added local failure-state recording in systemd journal and
+  `/var/lib/music-hub-monitor/last-failure.json`.
+- Added 41 automated tests covering routes, catalog, CSP, migrations, Radio schedule
+  and reliability safety boundaries.
 
 ## Current Deliverables
 - Home page with daily recommendation.
@@ -36,10 +45,11 @@
 - About page and local favorites.
 
 ## Pending Production Proof
-1. Create the two system users and copy the Radio library to `/srv/media`.
-2. Apply the additive database migration and catalog sync.
-3. Install target systemd/Nginx configuration and restart both services.
-4. Complete real desktop/mobile browser regression and live audio progression checks.
-5. Recreate or otherwise firewall the MySQL container so port 3306 is not externally bound.
+1. Deploy the reliability scripts and install the new systemd units.
+2. Run the health service once and enable its five-minute timer.
+3. Create one live MySQL backup, restore it into an isolated temporary container,
+   and enable the daily timer only after that proof passes.
+4. Create one complete release snapshot and run rollback in plan-only mode.
+5. Re-run desktop/mobile and real Radio playback regression after the Web restart.
 
 The visual redesign remains intentionally deferred until a separate design version can be reviewed.

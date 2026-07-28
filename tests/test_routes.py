@@ -5,7 +5,16 @@ from models import MusicYorushika, db
 
 @pytest.mark.parametrize(
     "path",
-    ["/", "/search", "/lyrics", "/radio", "/about", "/robots.txt", "/favicon.ico"],
+    [
+        "/",
+        "/search",
+        "/lyrics",
+        "/radio",
+        "/about",
+        "/healthz",
+        "/robots.txt",
+        "/favicon.ico",
+    ],
 )
 def test_primary_routes_are_available(client, path):
     response = client.get(path)
@@ -65,6 +74,19 @@ def test_radio_is_marked_private_and_never_autoplays(client):
 def test_robots_disallows_all_crawlers(client):
     response = client.get("/robots.txt")
     assert response.get_data(as_text=True) == "User-agent: *\nDisallow: /\n"
+
+
+def test_health_endpoint_reports_database_failures(app, client, monkeypatch):
+    with app.app_context():
+        monkeypatch.setattr(
+            db.session,
+            "execute",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("offline")),
+        )
+        response = client.get("/healthz")
+
+    assert response.status_code == 503
+    assert response.get_json() == {"status": "unhealthy"}
 
 
 def test_uncurated_database_rows_remain_private(app, client):

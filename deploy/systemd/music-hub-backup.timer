@@ -1,0 +1,12 @@
+[Unit]
+Description=Create the daily Music Hub MySQL backup
+
+[Timer]
+OnCalendar=*-*-* 03:20:00
+AccuracySec=5min
+RandomizedDelaySec=10min
+Persistent=true
+Unit=music-hub-backup.service
+
+[Install]
+WantedBy=timers.target
