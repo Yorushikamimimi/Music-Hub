@@ -9,6 +9,7 @@ from models import MusicYorushika, db
         "/",
         "/discography",
         "/releases/tousaku",
+        "/releases/dakara-boku-wa-ongaku-wo-yameta",
         "/songs/spring-thief",
         "/search",
         "/lyrics",
@@ -46,6 +47,7 @@ def test_home_uses_archive_identity_and_internal_listening_paths(client):
     assert 'href="/songs/night-journey"' in page
     assert 'href="/search"' in page
     assert 'href="/releases/tousaku"' in page
+    assert 'href="/releases/dakara-boku-wa-ongaku-wo-yameta"' in page
     assert 'aria-label="搜索作品"' in page
 
 
@@ -121,6 +123,35 @@ def test_tousaku_release_archive_separates_sources_and_editorial_paths(client):
     assert "https://yorushika.com/news/detail/11126" in page
     assert "https://sp.universal-music.co.jp/yorushika/tousaku/" in page
     assert "完整歌词" in page
+
+
+def test_dakara_boku_release_archive_keeps_facts_and_notes_separate(client):
+    page = client.get(
+        "/releases/dakara-boku-wa-ongaku-wo-yameta"
+    ).get_data(as_text=True)
+
+    assert "作品档案" in page
+    assert "官方公开信息" in page
+    assert "本站聆听笔记" in page
+    assert "个人整理 · 非官方章节划分" in page
+    assert "首张 Full Album" in page
+    assert "写给エルマ的信" in page
+    assert "故事舞台设在瑞典" in page
+    assert "八月与出发" in page
+    assert "季节与创作" in page
+    assert "写给エルマ的告别" in page
+    assert "日期节点" in page
+    assert page.count('class="release-track-main"') == 14
+    assert page.count('class="release-track-video"') == 4
+    assert 'href="/songs/deep-indigo"' in page
+    assert (
+        'href="https://www.bilibili.com/video/BV1HA411973b/"'
+        in page
+    )
+    assert "https://yorushika.com/discography/detail/6/" in page
+    assert "https://store.universal-music.co.jp/products/dued1266" in page
+    assert "https://sp.universal-music.co.jp/yorushika/elma/" in page
+    assert "双作关系特设页" in page
 
 
 def test_unknown_release_archive_returns_404(client):

@@ -202,7 +202,7 @@ def release_detail(slug):
         release=release,
         songs=songs,
         chapters=chapters,
-        interlude_slugs=set(release["interlude_slugs"]),
+        track_badges=release["track_badges"],
         video_count=sum(bool(song.link) for song in songs),
     )
 

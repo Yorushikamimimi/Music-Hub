@@ -25,12 +25,13 @@ RELEASE_STORIES = {
             "器乐过场像章节页，把自白、闯入、复制、逃亡与回望分隔开来。"
             "下面的三段路径是夜鹿集的个人整理，不是官方章节划分。"
         ),
-        "interlude_slugs": (
-            "music-thief-confession",
-            "youth-burglary",
-            "midsummer-music-thief",
-            "childhood-in-memories",
-        ),
+        "track_badges": {
+            "music-thief-confession": "器乐过场",
+            "youth-burglary": "器乐过场",
+            "midsummer-music-thief": "器乐过场",
+            "childhood-in-memories": "器乐过场",
+        },
+        "secondary_source_label": "专辑特设页",
         "chapters": (
             {
                 "number": "01",
@@ -86,6 +87,97 @@ RELEASE_STORIES = {
             {
                 "label": "Universal Music《盗作》特设页",
                 "url": "https://sp.universal-music.co.jp/yorushika/tousaku/",
+            },
+        ),
+    },
+    "dakara-boku-wa-ongaku-wo-yameta": {
+        "album_title": "だから僕は音楽を辞めた",
+        "title_en": "That's Why I Gave Up on Music",
+        "sequence_number": "01",
+        "archive_label": "1st Full Album · Concept Album",
+        "source_checked_at": date(2026, 7, 28),
+        "official_summary": (
+            "官方发行页将本作列为 Yorushika 的首张 Full Album；"
+            "后续《エルマ》特设页进一步说明，两张作品以书信、旅行与"
+            "成对曲序连接，本作收录青年在瑞典旅途中写给エルマ的十四首作品。"
+        ),
+        "official_facts": (
+            "2019 年 4 月 10 日发行，是 Yorushika 的首张 Full Album，"
+            "全作收录十四首曲目。",
+            "初回生产限定盘采用“写给エルマ的信”复原盒装，"
+            "把音乐之外的书信也纳入作品体验。",
+            "官方访谈将故事舞台设在瑞典：青年一边旅行，"
+            "一边创作寄给エルマ的歌曲；后续《エルマ》沿着他的足迹展开。",
+            "《だから僕は音楽を辞めた》与《エルマ》各有十四首曲目，"
+            "标题顺序与叙事线索彼此成对。",
+        ),
+        "editorial_note": (
+            "本站把四个日期曲目视作旅途中的时间戳：八月打开书信，"
+            "七月到五月让创作与城市景象不断回返，四月则把故事送向最后的告别。"
+            "下面的三段路径是夜鹿集的个人整理，不是官方章节划分。"
+        ),
+        "track_badges": {
+            "august-31": "日期节点",
+            "july-13": "日期节点",
+            "may-6": "日期节点",
+            "april-10": "日期节点",
+        },
+        "secondary_source_label": "双作关系特设页",
+        "chapters": (
+            {
+                "number": "01",
+                "title": "八月与出发",
+                "description": (
+                    "从 8/31 进入青年写作的起点，再把月光、诗与咖啡留在旅途开篇。"
+                ),
+                "track_slugs": (
+                    "august-31",
+                    "deep-indigo",
+                    "august-a-certain-moonlight",
+                    "poet-and-coffee",
+                ),
+            },
+            {
+                "number": "02",
+                "title": "季节与创作",
+                "description": (
+                    "日期从七月走向五月，城市、雨后与写作的冲动在途中反复出现。"
+                ),
+                "track_slugs": (
+                    "july-13",
+                    "lets-dance",
+                    "june-writes-rain-cleared-city",
+                    "from-the-window-of-may",
+                    "night-imitation",
+                    "may-6",
+                ),
+            },
+            {
+                "number": "03",
+                "title": "写给エルマ的告别",
+                "description": (
+                    "最后四首把游行、名字、四月的时间点与放下音乐的决定连在一起。"
+                ),
+                "track_slugs": (
+                    "parade",
+                    "elma",
+                    "april-10",
+                    "thats-why-i-gave-up-on-music",
+                ),
+            },
+        ),
+        "sources": (
+            {
+                "label": "Yorushika 官方发行页",
+                "url": "https://yorushika.com/discography/detail/6/",
+            },
+            {
+                "label": "Universal Music 初回限定盘商品页",
+                "url": "https://store.universal-music.co.jp/products/dued1266",
+            },
+            {
+                "label": "Universal Music《エルマ》特设页",
+                "url": "https://sp.universal-music.co.jp/yorushika/elma/",
             },
         ),
     },
