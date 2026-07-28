@@ -15,6 +15,8 @@ BACKUP_SERVICE_NAME="${BACKUP_SERVICE_NAME:-music-hub-backup.service}"
 DEPLOY_STATE_FILE="${DEPLOY_STATE_FILE:-/var/lib/music-hub-monitor/deployed-version.json}"
 RELEASE_KEEP="${RELEASE_KEEP:-5}"
 MYSQL_KEEP="${MYSQL_KEEP:-14}"
+HEALTH_CHECK_ATTEMPTS="${HEALTH_CHECK_ATTEMPTS:-6}"
+HEALTH_CHECK_DELAY_SECONDS="${HEALTH_CHECK_DELAY_SECONDS:-3}"
 
 KEEP_ENV_FILE="${KEEP_ENV_FILE:-.env}"
 if [[ "$(id -u)" -eq 0 ]]; then
@@ -134,8 +136,22 @@ if ${SUDO} systemctl cat "${RADIO_SERVICE_NAME}" >/dev/null 2>&1; then
 fi
 
 log "Run local health check (Nginx -> Gunicorn)"
-${SUDO} python3 "${APP_DIR}/scripts/health_check.py" \
-  --host-header "${HOST_HEADER}"
+health_attempt=1
+while true; do
+  if ${SUDO} python3 "${APP_DIR}/scripts/health_check.py" \
+    --host-header "${HOST_HEADER}"; then
+    break
+  fi
+
+  if (( health_attempt >= HEALTH_CHECK_ATTEMPTS )); then
+    echo "Health check did not pass after ${HEALTH_CHECK_ATTEMPTS} attempts" >&2
+    exit 1
+  fi
+
+  log "Health check attempt ${health_attempt}/${HEALTH_CHECK_ATTEMPTS} failed; retry in ${HEALTH_CHECK_DELAY_SECONDS}s"
+  sleep "${HEALTH_CHECK_DELAY_SECONDS}"
+  ((health_attempt += 1))
+done
 
 log "Record the deployed commit after successful health checks"
 ${SUDO} python3 "${APP_DIR}/scripts/release_snapshot.py" record \

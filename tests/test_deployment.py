@@ -59,6 +59,14 @@ def test_deploy_creates_recovery_points_and_preserves_runtime_data():
     assert 'systemctl start "${BACKUP_SERVICE_NAME}"' in deploy
     assert "mysql_backup.py\" backup" in deploy
     assert "health_check.py" in deploy
+    assert 'HEALTH_CHECK_ATTEMPTS="${HEALTH_CHECK_ATTEMPTS:-6}"' in deploy
+    assert 'HEALTH_CHECK_DELAY_SECONDS="${HEALTH_CHECK_DELAY_SECONDS:-3}"' in deploy
+    assert "while true; do" in deploy
+    assert (
+        "Health check did not pass after ${HEALTH_CHECK_ATTEMPTS} attempts"
+        in deploy
+    )
+    assert 'sleep "${HEALTH_CHECK_DELAY_SECONDS}"' in deploy
     assert "release_snapshot.py\" record" in deploy
     assert '--exclude "static/uploads/"' in deploy
     assert '--exclude "current_avatar.txt"' in deploy
