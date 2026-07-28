@@ -8,7 +8,7 @@
     <header class="archive-page-header">
         <p class="archive-eyebrow">DISCOGRAPHY</p>
         <h1>作品集</h1>
-        <p>按 Yorushika 官方作品页的曲序整理。当前覆盖 8 个已核对作品集合；带播放标识的歌名可直达已核验的 B 站影像。</p>
+        <p>按 Yorushika 官方发行页的完整曲序整理，包含作品中的器乐过场；带播放标识的歌名可直达已核对的 B 站影像。</p>
     </header>
 
     <form class="discography-filter" action="{{ url_for('main.discography') }}" method="get">
@@ -56,11 +56,17 @@
             </div>
             <div class="album-entry-content">
                 <div class="album-entry-meta">
-                    <span>{{ album.release_year }}</span>
+                    <span>{{ album.release_date.strftime('%Y.%m.%d') }}</span>
                     <span>{{ album.release_type }}</span>
                     <span>{{ album.songs|length }} 首完整曲序</span>
                 </div>
                 <h2 id="album-{{ loop.index }}">{{ album.title }}</h2>
+                <div class="album-entry-source">
+                    <span>资料核对：{{ album.source_checked_at.strftime('%Y.%m.%d') }}</span>
+                    <a href="{{ album.source_url }}" target="_blank" rel="noopener noreferrer">
+                        官方发行页 <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                    </a>
+                </div>
                 <ol class="album-track-list">
                     {% for song in album.songs %}
                     <li class="album-track-item">

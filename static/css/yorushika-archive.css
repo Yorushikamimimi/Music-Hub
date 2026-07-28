@@ -656,10 +656,31 @@ a {
 }
 
 .album-entry-content h2 {
-    margin: 0.8rem 0 1.2rem;
+    margin: 0.8rem 0 0.5rem;
     color: var(--archive-ink);
     font-size: clamp(1.7rem, 3.3vw, 2.7rem);
     font-weight: 600;
+}
+
+.album-entry-source {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1rem;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    color: var(--archive-muted);
+    font-size: 0.76rem;
+}
+
+.album-entry-source a {
+    color: var(--archive-blue-deep);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.album-entry-source a:hover,
+.album-entry-source a:focus-visible {
+    text-decoration: underline;
 }
 
 .album-track-list {

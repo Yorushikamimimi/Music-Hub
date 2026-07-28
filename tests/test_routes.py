@@ -51,9 +51,12 @@ def test_discography_groups_tracks_and_supports_filters(client):
     page = client.get("/discography").get_data(as_text=True)
 
     assert "作品集" in page
-    assert "63 首已核对曲目" in page
+    assert "89 首已核对曲目" in page
     assert "盗作" in page
-    assert "10 首完整曲序" in page
+    assert "14 首完整曲序" in page
+    assert "音楽泥棒の自白" in page
+    assert "2020.07.29" in page
+    assert "资料核对：2026.07.28" in page
     assert 'href="https://www.bilibili.com/video/BV1gw411e7Dk/"' in page
     assert 'href="/songs/thoughtcrime"' in page
 
@@ -75,6 +78,10 @@ def test_song_detail_separates_facts_note_and_official_source(client):
     assert "收录作品" in page
     assert "个人整理" in page
     assert "在 B 站观看影像" in page
+    assert "发行日期" in page
+    assert "2021.01.27" in page
+    assert "第 2 首" in page
+    assert "最后核对于 2026.07.28" in page
     assert "https://www.bilibili.com/video/BV16k8bzGE31/" in page
     assert "https://yorushika.com/discography/detail/18/" in page
     assert 'rel="noopener noreferrer"' in page
@@ -83,7 +90,7 @@ def test_song_detail_separates_facts_note_and_official_source(client):
 def test_song_sequence_stays_inside_the_same_release(client):
     page = client.get("/songs/night-journey").get_data(as_text=True)
 
-    assert "逃亡" in page
+    assert "幼年期、思い出の中" in page
     assert "花に亡霊" in page
     assert "アルジャーノン" not in page
 

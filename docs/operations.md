@@ -135,13 +135,13 @@ minimal status is written to:
 This is local error monitoring, not an off-server notification channel. It does
 not send email, SMS or chat messages.
 
-Production activation evidence from 2026-07-28:
+Production activation evidence before the Phase 3 catalog release:
 
 - `music-hub-health.timer` and `music-hub-backup.timer` are enabled and waiting.
 - A transient non-production failure invoked `music-hub-failure@.service`,
   produced the expected unit result, and was then cleaned up.
-- The recorded deployed version is
-  `fd4fa94957c9d0103ca82691f64c52fd96ab2cc6`.
+- The last recorded version before the Phase 3 catalog release was
+  `04f9199a6bac071e2dfd372e11d0dd0392b118e2`.
 
 ## MySQL Backup and Restore Proof
 

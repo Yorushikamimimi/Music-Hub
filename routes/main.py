@@ -27,8 +27,11 @@ def _album_index(songs):
             albums[key] = {
                 "title": key,
                 "release_year": song.release_year,
+                "release_date": song.release_date,
                 "release_type": song.release_type,
                 "cover_path": song.cover_path,
+                "source_url": song.source_url,
+                "source_checked_at": song.source_checked_at,
                 "songs": [],
                 "first_order": song.display_order,
             }
@@ -38,11 +41,17 @@ def _album_index(songs):
             or song.release_year > albums[key]["release_year"]
         ):
             albums[key]["release_year"] = song.release_year
+        if song.release_date and (
+            albums[key]["release_date"] is None
+            or song.release_date > albums[key]["release_date"]
+        ):
+            albums[key]["release_date"] = song.release_date
 
     return sorted(
         albums.values(),
         key=lambda album: (
-            -(album["release_year"] or 0),
+            album["release_date"] is None,
+            -(album["release_date"].toordinal() if album["release_date"] else 0),
             album["first_order"],
         ),
     )

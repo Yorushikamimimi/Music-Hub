@@ -32,7 +32,7 @@
                     height="520"
                     decoding="async"
                 >
-                <span class="daily-listening-index">{{ "%02d"|format(daily_song.display_order) }}</span>
+                <span class="daily-listening-index">{{ "%02d"|format(daily_song.track_number) }}</span>
             </div>
             <div class="daily-listening-copy">
                 <p class="archive-eyebrow">TODAY'S LISTENING</p>
@@ -43,7 +43,7 @@
                     >{{ daily_song.title_ja }}</a>
                 </h2>
                 {% if daily_song.title_en %}<p class="daily-listening-en">{{ daily_song.title_en }}</p>{% endif %}
-                <p>{{ daily_note }} · {{ daily_song.release_year }}</p>
+                <p>{{ daily_note }} · {{ daily_song.release_date.strftime('%Y.%m.%d') }}</p>
                 <a class="archive-text-link" href="{{ url_for('main.song_detail', slug=daily_song.slug) }}">
                     打开作品笔记 <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
                 </a>

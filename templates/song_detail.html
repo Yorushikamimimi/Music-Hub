@@ -20,7 +20,7 @@
                 height="720"
                 decoding="async"
             >
-            <span>{{ "%02d"|format(song.display_order) }}</span>
+            <span>{{ "%02d"|format(song.track_number) }}</span>
         </div>
 
         <div class="song-detail-copy">
@@ -43,8 +43,12 @@
                     <dd>{{ song.release_type }}</dd>
                 </div>
                 <div>
-                    <dt>发行年份</dt>
-                    <dd>{{ song.release_year }}</dd>
+                    <dt>发行日期</dt>
+                    <dd>{{ song.release_date.strftime('%Y.%m.%d') }}</dd>
+                </div>
+                <div>
+                    <dt>官方曲序</dt>
+                    <dd>第 {{ song.track_number }} 首</dd>
                 </div>
             </dl>
             <div class="archive-actions">
@@ -82,7 +86,7 @@
             <i class="bi bi-shield-check" aria-hidden="true"></i>
             <div>
                 <h2>资料边界</h2>
-                <p>发行信息来自官方作品页；上方短文为本站的个人整理，不包含完整歌词或未经授权的译文。</p>
+                <p>发行信息来自官方作品页，最后核对于 {{ song.source_checked_at.strftime('%Y.%m.%d') }}；上方短文为本站的个人整理，不包含完整歌词或未经授权的译文。</p>
             </div>
         </aside>
     </section>

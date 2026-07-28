@@ -3,26 +3,41 @@
 > Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Phase 2 archive redesign ready for deployment`
-- Meaning: The reliability baseline remains live. The reviewed second-stage release
-  adds a source-backed 63-track discography, song detail routes and the approved
-  Yorushika archive visual direction. Production proof is recorded in the Vault
-  operations log after the confirmed deployment.
+- Stage: `Phase 3 complete-catalog release`
+- Meaning: The Phase 3 release completes
+  the official physical/art-book sequence for the same eight releases, adds exact
+  release dates and audit dates, and has passed local automated and browser acceptance.
 
-## Phase 2 Release Candidate
+## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
    `夜鹿集 / YORUSHIKA ARCHIVE` editorial identity.
 2. Rebuilt the home page around a daily selection, listening paths and release
    spotlights instead of chart-like song columns.
 3. Added `/discography` filters and `/songs/<slug>` detail pages with release-local
    previous/next navigation.
-4. Expanded the curated catalog from 20 tracks to 8 releases and 63 tracks while
+4. Expanded the curated catalog from 20 tracks to 8 releases and 63 lyric-listed
+   tracks while
    preserving official release order and source URLs.
 5. Restored 20 manually verified Bilibili video links; tracks without a verified
    video keep only the official release source.
 6. Added eight compressed release-cover assets and a permanent design-system record.
 7. Expanded the automated suite to 52 tests and completed desktop/mobile browser
    regression with no console errors or horizontal overflow.
+
+## Phase 3 Local Candidate
+1. Re-audited the same eight releases against their complete official release pages
+   instead of relying on lyric-only listings.
+2. Expanded the catalog from 63 to 89 tracks, including instrumental interludes and
+   the ten `第一夜` to `第十夜` chapters in `幻燈`.
+3. Added exact release dates, release-local track numbers and the `2026-07-28`
+   source-audit date to the data model, migration and pages.
+4. Increased manually checked Bilibili video entries from 20 to 24 without adding
+   uncertain covers or re-uploads.
+5. Fixed legacy synchronization so two tracks sharing one release cover cannot
+   overwrite an already curated row.
+6. The full automated suite passes with 54 tests. Desktop and 390 px mobile browser
+   acceptance passed with no console errors or horizontal overflow; a verified
+   Bilibili entry opened the expected video page in a separate tab.
 
 ## Completed in This Round
 1. Performance
@@ -63,7 +78,7 @@
 - About page and local favorites.
 
 ## Production Proof (2026-07-28)
-1. Deployed commit `fd4fa94957c9d0103ca82691f64c52fd96ab2cc6`; the server
+1. Deployed commit `04f9199a6bac071e2dfd372e11d0dd0392b118e2`; the server
    worktree is clean and the prior releases have checksum-protected snapshots.
 2. Ran the full Web/database/Radio health service successfully and enabled the
    five-minute timer. The daily backup timer is enabled for the 03:20 window.
@@ -81,5 +96,5 @@
 7. Confirmed `https://yoruming.cn/` still served the Personal Knowledge Hub after
    the Music Hub Web restart.
 
-The remaining content-design task is to replace the legacy About page with a
-source-aware archive introduction and to add deeper release notes over time.
+The Phase 3 release passed local acceptance and can be activated through the
+documented deployment and rollback workflow.

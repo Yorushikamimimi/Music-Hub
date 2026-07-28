@@ -2,6 +2,8 @@
 
 from urllib.parse import urlsplit, urlunsplit
 
+from sqlalchemy import or_
+
 from catalog_data import CATALOG_TRACKS
 from models import MusicYorushika, db
 
@@ -38,12 +40,19 @@ def sync_catalog(commit: bool = True) -> dict:
 
     for display_order, track in enumerate(CATALOG_TRACKS, start=1):
         song = MusicYorushika.query.filter_by(slug=track["slug"]).first()
+        unclaimed_legacy_row = or_(
+            MusicYorushika.slug.is_(None),
+            MusicYorushika.slug == "",
+        )
         if song is None:
-            song = MusicYorushika.query.filter_by(
-                cover_path=track["cover_path"].replace(".webp", ".jpg")
+            song = MusicYorushika.query.filter(
+                unclaimed_legacy_row,
+                MusicYorushika.cover_path
+                == track["cover_path"].replace(".webp", ".jpg"),
             ).first()
         if song is None and track["title_en"]:
             song = MusicYorushika.query.filter(
+                unclaimed_legacy_row,
                 MusicYorushika.title.contains(track["title_en"])
             ).first()
 
@@ -61,10 +70,13 @@ def sync_catalog(commit: bool = True) -> dict:
         song.album_title = track["album_title"]
         song.release_type = track["release_type"]
         song.release_year = track["release_year"]
+        song.release_date = track["release_date"]
+        song.track_number = track["track_number"]
         song.cover_path = track["cover_path"]
         song.link = _clean_bilibili_url(track.get("mv_url"))
         song.story_summary = track["story_summary"]
         song.source_url = _clean_external_url(track["source_url"])
+        song.source_checked_at = track["source_checked_at"]
         song.display_order = display_order
         song.is_featured = True
 

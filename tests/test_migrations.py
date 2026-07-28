@@ -29,14 +29,17 @@ def test_migration_creates_fresh_catalog_schema(tmp_path):
         assert {
             "slug",
             "album_title",
+            "release_date",
+            "track_number",
             "story_summary",
+            "source_checked_at",
             "display_order",
             "is_featured",
         }.issubset(columns)
 
         result = sync_catalog()
-        assert result["created"] == 63
-        assert MusicYorushika.query.count() == 63
+        assert result["created"] == 89
+        assert MusicYorushika.query.count() == 89
 
 
 def test_migration_preserves_legacy_row_and_columns(tmp_path):
@@ -75,12 +78,16 @@ def test_migration_preserves_legacy_row_and_columns(tmp_path):
         assert "album" in columns
         assert "rating" in columns
         assert "album_title" in columns
+        assert "release_date" in columns
+        assert "track_number" in columns
+        assert "source_checked_at" in columns
 
         result = sync_catalog()
-        assert result["created"] == 62
-        assert MusicYorushika.query.count() == 64
+        assert result["created"] == 88
+        assert MusicYorushika.query.count() == 90
         sunny = MusicYorushika.query.filter_by(slug="haru").one()
         assert sunny.id == 1
         assert sunny.album_title == "晴る"
+        assert sunny.track_number == 1
         extra = MusicYorushika.query.filter_by(title="Legacy extra").one()
         assert extra.is_featured is False

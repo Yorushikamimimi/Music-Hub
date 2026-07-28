@@ -5,6 +5,12 @@ discography pages. Bilibili links are optional, manually verified listening
 links retained from the original Music Hub catalog.
 """
 
+from datetime import date
+
+
+CATALOG_REVIEWED_ON = date(2026, 7, 28)
+
+
 VERIFIED_BILIBILI_VIDEOS = {
     "haru": "https://www.bilibili.com/video/BV1kQ4y1L77o/",
     "spring-thief": "https://www.bilibili.com/video/BV16k8bzGE31/",
@@ -26,6 +32,10 @@ VERIFIED_BILIBILI_VIDEOS = {
     "elma": "https://www.bilibili.com/video/BV1ypxuzUEpu/",
     "hole-in-the-heart": "https://www.bilibili.com/video/BV1Pa4y157fr/",
     "plagiarism": "https://www.bilibili.com/video/BV1UX8nzaEz8/",
+    "miyakoochi": "https://www.bilibili.com/video/BV1ZM4y1y7Yp/",
+    "howl-at-the-moon": "https://www.bilibili.com/video/BV1Cq4y1V7Kv/",
+    "matasaburo": "https://www.bilibili.com/video/BV16V411x7rA/",
+    "false-moon": "https://www.bilibili.com/video/BV1zh411h7bY/",
 }
 
 
@@ -60,7 +70,7 @@ CATALOG_RELEASES = (
     {
         "title": "晴る",
         "release_type": "Digital Single",
-        "release_year": 2024,
+        "release_date": date(2024, 1, 5),
         "cover_path": "release_haru.webp",
         "source_url": "https://yorushika.com/discography/detail/37/",
         "tracks": (("haru", "晴る"),),
@@ -68,9 +78,9 @@ CATALOG_RELEASES = (
     {
         "title": "幻燈",
         "release_type": "Music Art Book",
-        "release_year": 2023,
+        "release_date": date(2023, 4, 5),
         "cover_path": "release_gentou.webp",
-        "source_url": "https://yorushika.com/discography/artist/2/detail/45/",
+        "source_url": "https://yorushika.com/discography/detail/30/",
         "tracks": (
             ("summer-portrait", "夏の肖像"),
             ("miyakoochi", "都落ち"),
@@ -88,12 +98,21 @@ CATALOG_RELEASES = (
             ("left-right-confusion", "左右盲"),
             ("algernon", "アルジャーノン"),
             ("first-night", "第一夜"),
+            ("second-night", "第二夜"),
+            ("third-night", "第三夜"),
+            ("fourth-night", "第四夜"),
+            ("fifth-night", "第五夜"),
+            ("sixth-night", "第六夜"),
+            ("seventh-night", "第七夜"),
+            ("eighth-night", "第八夜"),
+            ("ninth-night", "第九夜"),
+            ("tenth-night", "第十夜"),
         ),
     },
     {
         "title": "創作",
         "release_type": "EP",
-        "release_year": 2021,
+        "release_date": date(2021, 1, 27),
         "cover_path": "release_sousaku.webp",
         "source_url": "https://yorushika.com/discography/detail/18/",
         "tracks": (
@@ -107,18 +126,22 @@ CATALOG_RELEASES = (
     {
         "title": "盗作",
         "release_type": "Full Album",
-        "release_year": 2020,
+        "release_date": date(2020, 7, 29),
         "cover_path": "release_tousaku.webp",
-        "source_url": "https://yorushika.com/discography/artist/2/detail/43/",
+        "source_url": "https://yorushika.com/discography/detail/15/",
         "tracks": (
+            ("music-thief-confession", "音楽泥棒の自白"),
             ("daytime-nighthawk", "昼鳶"),
             ("haruhisagi", "春ひさぎ"),
             ("bakudanma-tousaku", "爆弾魔"),
+            ("youth-burglary", "青年期、空き巣"),
             ("replicant", "レプリカント"),
             ("flower-and-badger-game", "花人局"),
+            ("midsummer-music-thief", "朱夏期、音楽泥棒"),
             ("plagiarism", "盗作"),
             ("thoughtcrime", "思想犯"),
             ("escape", "逃亡"),
+            ("childhood-in-memories", "幼年期、思い出の中"),
             ("night-journey", "夜行"),
             ("ghost-in-a-flower", "花に亡霊"),
         ),
@@ -126,66 +149,79 @@ CATALOG_RELEASES = (
     {
         "title": "エルマ",
         "release_type": "Full Album",
-        "release_year": 2019,
+        "release_date": date(2019, 8, 28),
         "cover_path": "release_elma.webp",
-        "source_url": "https://yorushika.com/discography/artist/2/detail/42/",
+        "source_url": "https://yorushika.com/discography/detail/2/",
         "tracks": (
+            ("train-window", "車窓"),
             ("only-sorrow", "憂一乗"),
             ("evening-calm-flower-confusion", "夕凪、某、花惑い"),
             ("rain-with-cappuccino", "雨とカプチーノ"),
+            ("lake-town", "湖の街"),
             ("dance-of-god", "神様のダンス"),
             ("rain-clears", "雨晴るる"),
             ("walking", "歩く"),
             ("hole-in-the-heart", "心に穴が空いた"),
+            ("forest-church", "森の教会"),
             ("voice", "声"),
             ("amy", "エイミー"),
+            ("seabed-moonlight", "海底、月明かり"),
             ("nautilus", "ノーチラス"),
         ),
     },
     {
         "title": "だから僕は音楽を辞めた",
         "release_type": "Full Album",
-        "release_year": 2019,
+        "release_date": date(2019, 4, 10),
         "cover_path": "release_dakara_boku.webp",
-        "source_url": "https://yorushika.com/discography/artist/2/detail/41/",
+        "source_url": "https://yorushika.com/discography/detail/6/",
         "tracks": (
+            ("august-31", "8/31"),
             ("deep-indigo", "藍二乗"),
             ("august-a-certain-moonlight", "八月、某、月明かり"),
             ("poet-and-coffee", "詩書きとコーヒー"),
+            ("july-13", "7/13"),
             ("lets-dance", "踊ろうぜ"),
             ("june-writes-rain-cleared-city", "六月は雨上がりの街を書く"),
             ("from-the-window-of-may", "五月は花緑青の窓辺から"),
             ("night-imitation", "夜紛い"),
+            ("may-6", "5/6"),
             ("parade", "パレード"),
             ("elma", "エルマ"),
+            ("april-10", "4/10"),
             ("thats-why-i-gave-up-on-music", "だから僕は音楽を辞めた"),
         ),
     },
     {
         "title": "負け犬にアンコールはいらない",
         "release_type": "Mini Album",
-        "release_year": 2018,
+        "release_date": date(2018, 5, 9),
         "cover_path": "release_makeinu.webp",
-        "source_url": "https://yorushika.com/discography/artist/2/detail/40/",
+        "source_url": "https://yorushika.com/discography/detail/7/",
         "tracks": (
+            ("previous-life", "前世"),
             ("makeinu-ni-encore-wa-iranai", "負け犬にアンコールはいらない"),
             ("bakudanma-makeinu", "爆弾魔"),
             ("hitchcock", "ヒッチコック"),
+            ("falling", "落下"),
             ("semi-transparent-boy", "準透明少年"),
             ("just-a-sunny-day-for-you", "ただ君に晴れ"),
             ("hibernation", "冬眠"),
+            ("summer-bus-stop-waiting-for-you", "夏、バス停、君を待つ"),
         ),
     },
     {
         "title": "夏草が邪魔をする",
         "release_type": "Mini Album",
-        "release_year": 2017,
+        "release_date": date(2017, 6, 28),
         "cover_path": "release_natsukusa.webp",
-        "source_url": "https://yorushika.com/discography/artist/2/detail/39/",
+        "source_url": "https://yorushika.com/discography/detail/8/",
         "tracks": (
+            ("summer-shadow-playing-piano", "夏陰、ピアノを弾く"),
             ("cattleya", "カトレア"),
             ("say-it", "言って。"),
             ("bloom-in-that-summer", "あの夏に咲け"),
+            ("flight", "飛行"),
             ("kutsu-no-hanabi-natsukusa", "靴の花火"),
             ("cloud-and-ghost", "雲と幽霊"),
         ),
@@ -211,7 +247,9 @@ def _build_catalog_tracks():
                     "title_en": title_en,
                     "album_title": release["title"],
                     "release_type": release["release_type"],
-                    "release_year": release["release_year"],
+                    "release_date": release["release_date"],
+                    "release_year": release["release_date"].year,
+                    "track_number": track_number,
                     "cover_path": release["cover_path"],
                     "story_summary": (
                         f"《{release['title']}》官方曲序第 {track_number} 首。"
@@ -219,6 +257,7 @@ def _build_catalog_tracks():
                         "当前仅记录官方收录信息，不转载完整歌词。"
                     ),
                     "source_url": release["source_url"],
+                    "source_checked_at": CATALOG_REVIEWED_ON,
                     "mv_url": VERIFIED_BILIBILI_VIDEOS.get(slug),
                 }
             )
