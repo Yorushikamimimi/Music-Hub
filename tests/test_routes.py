@@ -65,7 +65,7 @@ def test_discography_groups_tracks_and_supports_filters(client):
     page = client.get("/discography").get_data(as_text=True)
 
     assert "作品集" in page
-    assert "122 首已核对曲目" in page
+    assert "122 个已核对曲序位置" in page
     assert "22 个作品集合" in page
     assert "二人称" in page
     assert "20 首完整曲序" in page
@@ -73,7 +73,10 @@ def test_discography_groups_tracks_and_supports_filters(client):
     assert "14 首完整曲序" in page
     assert "音楽泥棒の自白" in page
     assert "2020.07.29" in page
-    assert "资料核对：2026.07.28" in page
+    assert "资料核对：2026.07.29" in page
+    assert "Yorushika 官方艺人目录中的音乐发行" in page
+    assert "不含 Live 影像制品、书简型小说" in page
+    assert "不代表官方授权" in page
     assert 'href="https://www.bilibili.com/video/BV1gw411e7Dk/"' in page
     assert 'href="/releases/tousaku"' in page
     assert 'href="/songs/thoughtcrime?release=tousaku"' in page
@@ -99,7 +102,9 @@ def test_song_detail_separates_facts_note_and_official_source(client):
     assert "发行日期" in page
     assert "2021.01.27" in page
     assert "第 2 首" in page
-    assert "最后核对于 2026.07.28" in page
+    assert "最后核对于 2026.07.29" in page
+    assert "仅确认页面可达且标题与曲目相符" in page
+    assert "不代表官方授权" in page
     assert "https://www.bilibili.com/video/BV16k8bzGE31/" in page
     assert "https://yorushika.com/discography/detail/18/" in page
     assert 'rel="noopener noreferrer"' in page
@@ -319,7 +324,10 @@ def test_about_explains_archive_identity_scope_and_boundaries(client):
     assert "24 <span>首</span>" in page
     assert "独立曲目" in page
     assert "曲序位置" in page
-    assert "当前已按官方发行页核对 22 部发行作品" in page
+    assert "Yorushika 官方艺人目录中的音乐发行" in page
+    assert "已核对 22 部作品" in page
+    assert "不含 Live 影像制品、书简型小说" in page
+    assert "不代表官方授权或长期可用" in page
     assert "当前只收录已经逐项核对的八部作品" not in page
     assert "资料有出处" in page
     assert "感受是个人笔记" in page

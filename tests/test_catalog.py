@@ -1,9 +1,12 @@
 from pathlib import Path
 
 from catalog_data import (
+    CATALOG_REVIEWED_ON,
     CATALOG_RELEASES,
     CATALOG_RELEASE_TRACKS,
+    CATALOG_SCOPE_URL,
     CATALOG_TRACKS,
+    VIDEO_LINKS_REVIEWED_ON,
 )
 from catalog_service import _clean_bilibili_url, _clean_external_url, sync_catalog
 from models import (
@@ -123,9 +126,58 @@ def test_release_dates_and_sources_follow_official_release_pages():
     assert releases["盗作"]["source_url"].endswith("/discography/detail/15/")
     assert all("/discography/" in release["source_url"] for release in CATALOG_RELEASES)
     assert all(
-        track["source_checked_at"].isoformat() == "2026-07-28"
+        track["source_checked_at"].isoformat() == "2026-07-29"
         for track in CATALOG_TRACKS
     )
+    assert CATALOG_REVIEWED_ON.isoformat() == "2026-07-29"
+    assert VIDEO_LINKS_REVIEWED_ON.isoformat() == "2026-07-29"
+    assert CATALOG_SCOPE_URL == "https://yorushika.com/discography/artist/2/"
+
+
+def test_catalog_matches_reviewed_official_artist_release_scope():
+    assert [
+        (
+            release["title"],
+            release["release_date"].isoformat(),
+            release["source_url"],
+        )
+        for release in CATALOG_RELEASES
+    ] == [
+        ("あぶく", "2026-04-22", "https://yorushika.com/discography/artist/2/detail/76/"),
+        ("二人称", "2026-03-04", "https://yorushika.com/discography/artist/2/detail/75/"),
+        ("茜", "2026-02-04", "https://yorushika.com/discography/artist/2/detail/74/"),
+        ("プレイシック", "2025-12-22", "https://yorushika.com/discography/artist/2/detail/73/"),
+        ("修羅", "2025-08-08", "https://yorushika.com/discography/artist/2/detail/65/"),
+        ("火星人", "2025-05-09", "https://yorushika.com/discography/artist/2/detail/63/"),
+        ("へび", "2025-01-17", "https://yorushika.com/discography/artist/2/detail/61/"),
+        ("太陽", "2024-11-22", "https://yorushika.com/discography/artist/2/detail/57/"),
+        ("アポリア", "2024-10-07", "https://yorushika.com/discography/artist/2/detail/56/"),
+        ("忘れてください", "2024-07-13", "https://yorushika.com/discography/artist/2/detail/52/"),
+        ("ルバート", "2024-05-29", "https://yorushika.com/discography/artist/2/detail/50/"),
+        ("晴る", "2024-01-05", "https://yorushika.com/discography/detail/37/"),
+        ("月光浴", "2023-10-13", "https://yorushika.com/discography/artist/2/detail/47/"),
+        ("斜陽", "2023-05-08", "https://yorushika.com/discography/artist/2/detail/48/"),
+        ("幻燈", "2023-04-05", "https://yorushika.com/discography/detail/30/"),
+        ("テレパス", "2023-01-12", "https://yorushika.com/discography/artist/2/detail/46/"),
+        ("創作", "2021-01-27", "https://yorushika.com/discography/detail/18/"),
+        ("盗作", "2020-07-29", "https://yorushika.com/discography/detail/15/"),
+        ("エルマ", "2019-08-28", "https://yorushika.com/discography/detail/2/"),
+        (
+            "だから僕は音楽を辞めた",
+            "2019-04-10",
+            "https://yorushika.com/discography/detail/6/",
+        ),
+        (
+            "負け犬にアンコールはいらない",
+            "2018-05-09",
+            "https://yorushika.com/discography/detail/7/",
+        ),
+        (
+            "夏草が邪魔をする",
+            "2017-06-28",
+            "https://yorushika.com/discography/detail/8/",
+        ),
+    ]
 
 
 def test_sync_never_reuses_a_curated_row_only_because_cover_matches(

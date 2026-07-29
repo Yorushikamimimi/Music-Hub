@@ -1,14 +1,18 @@
 """Source-backed Yorushika release and track metadata.
 
 Release membership and track order follow the linked Yorushika official
-discography pages. Bilibili links are optional, manually verified listening
-links retained from the original Music Hub catalog.
+discography pages. The catalog scope is the music releases listed under the
+official Yorushika artist tab; live video products, books, and solo works are
+outside that scope. Bilibili links are optional third-party references whose
+availability and matching titles were reviewed manually.
 """
 
 from datetime import date
 
 
-CATALOG_REVIEWED_ON = date(2026, 7, 28)
+CATALOG_SCOPE_URL = "https://yorushika.com/discography/artist/2/"
+CATALOG_REVIEWED_ON = date(2026, 7, 29)
+VIDEO_LINKS_REVIEWED_ON = date(2026, 7, 29)
 
 
 VERIFIED_BILIBILI_VIDEOS = {

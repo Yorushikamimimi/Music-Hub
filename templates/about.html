@@ -46,7 +46,7 @@
                     <dd>{{ placement_count }} <span>条</span></dd>
                 </div>
                 <div>
-                    <dt>已核验影像</dt>
+                    <dt>已核对影像</dt>
                     <dd>{{ video_count }} <span>首</span></dd>
                 </div>
             </dl>
@@ -101,9 +101,12 @@
                 最后把它收束成现在的“夜鹿集”。
             </p>
             <p>
-                当前已按官方发行页核对 {{ release_count }} 部发行作品，覆盖
+                当前以
+                <a href="{{ catalog_scope_url }}" target="_blank" rel="noopener noreferrer">Yorushika 官方艺人目录中的音乐发行</a>
+                为范围，已核对 {{ release_count }} 部作品，覆盖
                 {{ song_count }} 首独立曲目与 {{ placement_count }} 个曲序位置。
-                它仍不是 Yorushika 全时期的完整百科，也不会为了显得丰富而自动填入未经确认的资料。
+                目录不含 Live 影像制品、书简型小说及 suis / n-buna 个人作品；
+                它不是 Yorushika 全时期所有相关创作的完整百科，也不会为了显得丰富而自动填入未经确认的资料。
                 新的作品会在完成来源核验后再加入。
             </p>
         </div>
@@ -158,7 +161,7 @@
                     <li>可追溯的作品资料与官方来源</li>
                     <li>专辑内部的完整曲序和前后关系</li>
                     <li>明确标注为个人感受的聆听手记</li>
-                    <li>经人工确认的官方或可靠影像入口</li>
+                    <li>经人工确认页面可达、标题与曲目相符的第三方影像入口</li>
                 </ul>
             </article>
             <article>
@@ -173,7 +176,8 @@
         </div>
         <p class="about-source-note">
             夜鹿集与 Yorushika 官方无隶属关系。作品版权归原权利人所有；
-            本站仅作私人整理与个人聆听记录。
+            本站仅作私人整理与个人聆听记录。B 站影像链接最后核对于
+            {{ video_links_reviewed_on.strftime('%Y.%m.%d') }}，不代表官方授权或长期可用。
         </p>
     </section>
 

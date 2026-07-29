@@ -14,7 +14,11 @@ from flask import (
 )
 from sqlalchemy import or_
 
-from catalog_data import LEGACY_TRACK_SLUG_ALIASES
+from catalog_data import (
+    CATALOG_SCOPE_URL,
+    LEGACY_TRACK_SLUG_ALIASES,
+    VIDEO_LINKS_REVIEWED_ON,
+)
 from models import (
     db,
     MusicYorushika,
@@ -284,6 +288,8 @@ def discography():
         selected_year=selected_year,
         selected_type=selected_type,
         result_count=sum(len(album["songs"]) for album in albums),
+        catalog_scope_url=CATALOG_SCOPE_URL,
+        video_links_reviewed_on=VIDEO_LINKS_REVIEWED_ON,
     )
 
 
@@ -355,6 +361,7 @@ def song_detail(slug):
         previous_song=previous_song,
         next_song=next_song,
         related_songs=related_songs,
+        video_links_reviewed_on=VIDEO_LINKS_REVIEWED_ON,
     )
 
 
@@ -382,6 +389,7 @@ def release_detail(slug):
             release=catalog_release,
             songs=songs,
             video_count=sum(bool(song.link) for song in songs),
+            video_links_reviewed_on=VIDEO_LINKS_REVIEWED_ON,
         )
 
     songs_by_slug = {song.slug: song for song in songs}
@@ -419,6 +427,7 @@ def release_detail(slug):
         secondary_source=secondary_source,
         listening_path_title=listening_path_title,
         tracklist_title=f"{_chinese_count(len(songs))}首完整曲序",
+        video_links_reviewed_on=VIDEO_LINKS_REVIEWED_ON,
     )
 
 
@@ -501,6 +510,8 @@ def about():
         placement_count=sum(len(release.track_links) for release in releases),
         video_count=sum(bool(song.link) for song in songs),
         source_checked_at=max(source_checked_dates) if source_checked_dates else None,
+        catalog_scope_url=CATALOG_SCOPE_URL,
+        video_links_reviewed_on=VIDEO_LINKS_REVIEWED_ON,
     )
 
 

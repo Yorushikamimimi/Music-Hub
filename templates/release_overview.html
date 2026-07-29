@@ -47,7 +47,7 @@
                     <dd>{{ songs|length }} 首</dd>
                 </div>
                 <div>
-                    <dt>已核验影像</dt>
+                    <dt>已核对影像</dt>
                     <dd>{{ video_count }} 首</dd>
                 </div>
             </dl>
@@ -66,7 +66,7 @@
                 <p class="archive-eyebrow">COMPLETE TRACKLIST</p>
                 <h2 id="release-tracks-title">{{ songs|length }} 首完整曲序</h2>
             </div>
-            <p>点击曲名进入本站资料；已核验影像单独提供 B 站入口。</p>
+            <p>点击曲名进入本站资料；已核对影像单独提供 B 站入口。</p>
         </div>
 
         <ol class="release-track-list">
@@ -102,6 +102,10 @@
             <p>
                 发行日期、作品形态与曲序来自 Yorushika 官方发行页，最后核对：
                 {{ release.source_checked_at.strftime('%Y.%m.%d') }}。本站不转载完整歌词或未经授权的译文。
+                {% if video_count %}
+                B 站链接最后核对于 {{ video_links_reviewed_on.strftime('%Y.%m.%d') }}，
+                仅确认页面可达且标题与曲目相符，不代表官方授权。
+                {% endif %}
             </p>
         </div>
         <ul>

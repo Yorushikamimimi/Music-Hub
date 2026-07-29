@@ -1,13 +1,13 @@
 # Project Progress
 
-> Updated: 2026-07-28 (Asia/Shanghai)
+> Updated: 2026-07-29 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Phase 6 normalized full discography release candidate`
-- Meaning: The local release candidate now covers 22 official releases, 109 unique
-  tracks and 122 release positions. Shared tracks keep one canonical record while
-  preserving their position and navigation inside every release. This phase has
-  not been committed, pushed or deployed yet.
+- Stage: `Phase 7 source audit release candidate`
+- Meaning: Phase 6 commit `4ae5f5a` is the accepted production baseline. The local
+  candidate rechecks the 22-release music scope against the official Yorushika
+  artist discography and makes third-party video-link evidence limits explicit.
+  Phase 7 has not been committed, pushed or deployed yet.
 
 ## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
@@ -79,7 +79,7 @@
    listening paths, the verified `思想犯` Bilibili link, zero browser warnings or
    errors and no horizontal overflow. `https://yoruming.cn/` remained HTTP 200.
 
-## Phase 6 Release Candidate
+## Phase 6 Production Release
 1. Added all 22 releases listed by the official discography at the review date,
    including `二人称` and 13 previously missing digital singles.
 2. Normalized tracks, releases and release-track positions into separate models:
@@ -93,6 +93,28 @@
    redirects from four legacy duplicate track slugs.
 6. Added an additive migration with a data-preserving downgrade path and expanded
    catalog, route and migration coverage.
+7. Commit `4ae5f5a` was accepted, pushed and deployed after the complete release
+   catalog was reviewed in production.
+
+## Phase 7 Release Candidate
+1. Rechecked all 22 current music releases against the official Yorushika artist
+   discography on `2026-07-29`; titles, dates, official URLs and release order match.
+2. Rechecked complete legacy release pages where the current artist pages omit
+   instrumental interludes; the 122 stored positions remain the intended complete
+   physical/digital track order.
+3. Confirmed the two identical `二人称` and `プレイシック` cover files match two
+   distinct official image URLs that currently return the same official artwork.
+4. Confirmed all 24 stored Bilibili links are reachable and their page titles match
+   the intended tracks. This does not prove official authorization or future
+   availability.
+5. Defined the catalog scope as music releases under the official Yorushika artist
+   tab, excluding live video products, the letter-format novel and suis / n-buna
+   solo works.
+6. Updated page and document wording so official release facts, third-party link
+   checks and personal listening notes no longer share an ambiguous evidence label.
+7. The full 80-test suite passes. Desktop and 390 px mobile browser regression
+   passed for the discography, About, release archive and song detail pages with
+   no console warnings/errors or horizontal overflow.
 
 ## Completed in This Round
 1. Performance
@@ -152,5 +174,5 @@
 7. Confirmed `https://yoruming.cn/` still served the Personal Knowledge Hub after
    the Music Hub Web restart.
 
-The deployed Phase 5 release remains the production baseline. Phase 6 is local-only
-until final verification and explicit approval to commit, push and deploy.
+The deployed Phase 6 commit `4ae5f5a` remains the production baseline. Phase 7 is
+local-only until final verification and explicit approval to commit, push and deploy.

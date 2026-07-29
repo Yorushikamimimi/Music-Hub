@@ -9,6 +9,12 @@
         <p class="archive-eyebrow">DISCOGRAPHY</p>
         <h1>作品集</h1>
         <p>按 Yorushika 官方发行页的完整曲序整理，包含作品中的器乐过场；带播放标识的歌名可直达已核对的 B 站影像。</p>
+        <p class="about-source-note">
+            当前范围以
+            <a href="{{ catalog_scope_url }}" target="_blank" rel="noopener noreferrer">Yorushika 官方艺人目录中的音乐发行</a>
+            为准，不含 Live 影像制品、书简型小说及 suis / n-buna 个人作品。
+            B 站链接最后核对于 {{ video_links_reviewed_on.strftime('%Y.%m.%d') }}，仅确认页面可达且标题与曲目相符，不代表官方授权。
+        </p>
     </header>
 
     <form class="discography-filter" action="{{ url_for('main.discography') }}" method="get">
@@ -38,7 +44,7 @@
 
     <div class="discography-summary" aria-live="polite">
         <span>当前显示 {{ albums|length }} 个作品集合</span>
-        <span>{{ result_count }} 首已核对曲目</span>
+        <span>{{ result_count }} 个已核对曲序位置</span>
     </div>
 
     <div class="discography-list">

@@ -1,6 +1,6 @@
 """Source-backed release stories kept separate from database catalog facts."""
 
-from datetime import date
+from catalog_data import CATALOG_REVIEWED_ON
 
 
 RELEASE_STORIES = {
@@ -9,7 +9,7 @@ RELEASE_STORIES = {
         "title_en": "Plagiarism",
         "sequence_number": "03",
         "archive_label": "3rd Full Album · Concept Album",
-        "source_checked_at": date(2026, 7, 28),
+        "source_checked_at": CATALOG_REVIEWED_ON,
         "official_summary": (
             "官方将《盗作》介绍为一张以“盗取音乐的男人”为主人公、"
             "把他的破坏冲动写入十四首曲目的概念专辑。"
@@ -96,7 +96,7 @@ RELEASE_STORIES = {
         "title_en": "That's Why I Gave Up on Music",
         "sequence_number": "01",
         "archive_label": "1st Full Album · Concept Album",
-        "source_checked_at": date(2026, 7, 28),
+        "source_checked_at": CATALOG_REVIEWED_ON,
         "official_summary": (
             "官方发行页将本作列为 Yorushika 的首张 Full Album；"
             "后续《エルマ》特设页进一步说明，两张作品以书信、旅行与"
@@ -188,7 +188,7 @@ RELEASE_STORIES = {
         "title_en": "Elma",
         "sequence_number": "02",
         "archive_label": "2nd Full Album · Concept Album",
-        "source_checked_at": date(2026, 7, 28),
+        "source_checked_at": CATALOG_REVIEWED_ON,
         "official_summary": (
             "官方将《エルマ》介绍为《だから僕は音楽を辞めた》的续篇："
             "エルマ受到青年书信影响，沿着他在瑞典留下的足迹旅行，"
@@ -275,7 +275,7 @@ RELEASE_STORIES = {
         "title_en": "Magic Lantern",
         "sequence_number": "MA",
         "archive_label": "Music Art Book · 2 Chapters",
-        "source_checked_at": date(2026, 7, 28),
+        "source_checked_at": CATALOG_REVIEWED_ON,
         "official_summary": (
             "《幻燈》不是普通 CD 专辑，而是由 Yorushika 的音乐与"
             "加藤隆的绘画共同构成的“可聆听画集”；官方曲序分为"
@@ -366,7 +366,7 @@ RELEASE_STORIES = {
         "title_en": "Creation",
         "sequence_number": "EP",
         "archive_label": "EP · Spring Theme",
-        "source_checked_at": date(2026, 7, 28),
+        "source_checked_at": CATALOG_REVIEWED_ON,
         "official_summary": (
             "《創作》是一张以春为主题、与《盗作》保持概念联系的五曲 EP；"
             "它同时通过“有 CD”与“没有 CD”的两种同设计版本，"
@@ -430,7 +430,7 @@ RELEASE_STORIES = {
         "title_en": "Makeinu ni Encore wa Iranai",
         "sequence_number": "M2",
         "archive_label": "2nd Mini Album",
-        "source_checked_at": date(2026, 7, 28),
+        "source_checked_at": CATALOG_REVIEWED_ON,
         "official_summary": (
             "Yorushika 的第二张 Mini Album 于 2018 年发行，"
             "九首曲目从《前世》展开，在《冬眠》与夏日公交站之间"
@@ -505,7 +505,7 @@ RELEASE_STORIES = {
         "title_en": "Natsukusa ga Jama wo Suru",
         "sequence_number": "M1",
         "archive_label": "1st Mini Album",
-        "source_checked_at": date(2026, 7, 28),
+        "source_checked_at": CATALOG_REVIEWED_ON,
         "official_summary": (
             "《夏草が邪魔をする》是 Yorushika 的第一张 Mini Album。"
             "七首曲目从夏日阴影与钢琴出发，经过表达、飞行与花火，"
@@ -579,7 +579,7 @@ RELEASE_STORIES = {
         "title_en": "Sunny",
         "sequence_number": "DS",
         "archive_label": "Digital Single",
-        "source_checked_at": date(2026, 7, 28),
+        "source_checked_at": CATALOG_REVIEWED_ON,
         "official_summary": (
             "《晴る》于 2024 年 1 月以 Digital Single 发行，"
             "并作为电视动画《葬送的芙莉莲》首季第 2 cour 的片头主题曲；"
@@ -606,7 +606,7 @@ RELEASE_STORIES = {
                 "number": "01",
                 "title": "从阴云望向晴空",
                 "description": (
-                    "这一页只收录一首作品；点击曲名可查看发行资料与已核验影像入口。"
+                    "这一页只收录一首作品；点击曲名可查看发行资料与已核对影像入口。"
                 ),
                 "track_slugs": ("haru",),
             },

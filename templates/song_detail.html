@@ -94,7 +94,14 @@
             <i class="bi bi-shield-check" aria-hidden="true"></i>
             <div>
                 <h2>资料边界</h2>
-                <p>发行信息来自官方作品页，最后核对于 {{ release_context.release.source_checked_at.strftime('%Y.%m.%d') }}；上方短文为本站的个人整理，不包含完整歌词或未经授权的译文。</p>
+                <p>
+                    发行信息来自官方作品页，最后核对于 {{ release_context.release.source_checked_at.strftime('%Y.%m.%d') }}；
+                    上方短文为本站的个人整理，不包含完整歌词或未经授权的译文。
+                    {% if song.link %}
+                    B 站链接最后核对于 {{ video_links_reviewed_on.strftime('%Y.%m.%d') }}，
+                    仅确认页面可达且标题与曲目相符，不代表官方授权。
+                    {% endif %}
+                </p>
             </div>
         </aside>
     </section>
