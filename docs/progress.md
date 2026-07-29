@@ -3,11 +3,10 @@
 > Updated: 2026-07-29 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Phase 8 complete release archive candidate`
-- Meaning: Phase 7 commit `3bd67d8` is the accepted production baseline. The local
-  candidate upgrades the remaining 14 factual release overviews into complete
-  sourced archives, so all 22 releases now use the same evidence-bounded editorial
-  model. Phase 8 has not been committed, pushed or deployed yet.
+- Stage: `Phase 8 complete release archive production`
+- Meaning: Phase 8 commit `2a3ea91` is the accepted production baseline. The
+  remaining 14 factual release overviews are now complete sourced archives, so all
+  22 releases use the same evidence-bounded editorial model.
 
 ## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
@@ -119,7 +118,7 @@
 8. Commit `3bd67d87c132e8990ac0e5b44a77a7b45127bce3` was accepted, pushed
    and deployed as the current production baseline.
 
-## Phase 8 Release Candidate
+## Phase 8 Production Release
 1. Replaced the 14 factual-only release overviews with complete archives. Every one
    of the 22 releases now separates official facts, personal listening notes,
    non-official listening paths, the complete official sequence and source links.
@@ -137,8 +136,11 @@
    22-track album archive, a digital-single archive, song detail navigation and
    the expanded mobile menu. There were no console warnings/errors or horizontal
    overflow.
-7. The candidate remains local-only until user acceptance and explicit approval
-   to commit, push and deploy.
+7. Commit `2a3ea91522d7b94d6404d4bcb3577cabe197d534` was accepted,
+   pushed and deployed after a complete code snapshot and verified MySQL backup.
+   The Web/database/Radio health check passed, desktop and 390 px production
+   browser checks produced no console warnings/errors or horizontal overflow, and
+   the separate Personal Knowledge Hub remained HTTP 200.
 
 ## Completed in This Round
 1. Performance
@@ -198,5 +200,4 @@
 7. Confirmed `https://yoruming.cn/` still served the Personal Knowledge Hub after
    the Music Hub Web restart.
 
-The deployed Phase 7 commit `3bd67d8` remains the production baseline. Phase 8 is
-local-only until user acceptance and explicit approval to commit, push and deploy.
+The deployed Phase 8 application commit `2a3ea91` is the production baseline.
