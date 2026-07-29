@@ -39,6 +39,14 @@ VERIFIED_BILIBILI_VIDEOS = {
 }
 
 
+LEGACY_TRACK_SLUG_ALIASES = {
+    "bakudanma-makeinu": "bakudanma",
+    "bakudanma-tousaku": "bakudanma",
+    "kutsu-no-hanabi-natsukusa": "kutsu-no-hanabi",
+    "kutsu-no-hanabi-gentou": "kutsu-no-hanabi",
+}
+
+
 TRACK_DETAILS = {
     "haru": ("Sunny", "季节与前行"),
     "spring-thief": ("Spring Thief", "春日、短暂与留恋"),
@@ -66,8 +74,9 @@ TRACK_DETAILS = {
 }
 
 
-CATALOG_RELEASES = (
+LEGACY_RELEASES = (
     {
+        "slug": "haru",
         "title": "晴る",
         "release_type": "Digital Single",
         "release_date": date(2024, 1, 5),
@@ -76,6 +85,7 @@ CATALOG_RELEASES = (
         "tracks": (("haru", "晴る"),),
     },
     {
+        "slug": "gentou",
         "title": "幻燈",
         "release_type": "Music Art Book",
         "release_date": date(2023, 4, 5),
@@ -91,7 +101,7 @@ CATALOG_RELEASES = (
             ("four-fifty-one", "451"),
             ("pas-de-deux", "パドドゥ"),
             ("matasaburo", "又三郎"),
-            ("kutsu-no-hanabi-gentou", "靴の花火"),
+            ("kutsu-no-hanabi", "靴の花火"),
             ("old-man-and-the-sea", "老人と海"),
             ("goodbye-molten", "さよならモルテン"),
             ("isana", "いさな"),
@@ -110,6 +120,7 @@ CATALOG_RELEASES = (
         ),
     },
     {
+        "slug": "sousaku",
         "title": "創作",
         "release_type": "EP",
         "release_date": date(2021, 1, 27),
@@ -124,6 +135,7 @@ CATALOG_RELEASES = (
         ),
     },
     {
+        "slug": "tousaku",
         "title": "盗作",
         "release_type": "Full Album",
         "release_date": date(2020, 7, 29),
@@ -133,7 +145,7 @@ CATALOG_RELEASES = (
             ("music-thief-confession", "音楽泥棒の自白"),
             ("daytime-nighthawk", "昼鳶"),
             ("haruhisagi", "春ひさぎ"),
-            ("bakudanma-tousaku", "爆弾魔"),
+            ("bakudanma", "爆弾魔"),
             ("youth-burglary", "青年期、空き巣"),
             ("replicant", "レプリカント"),
             ("flower-and-badger-game", "花人局"),
@@ -147,6 +159,7 @@ CATALOG_RELEASES = (
         ),
     },
     {
+        "slug": "elma",
         "title": "エルマ",
         "release_type": "Full Album",
         "release_date": date(2019, 8, 28),
@@ -170,6 +183,7 @@ CATALOG_RELEASES = (
         ),
     },
     {
+        "slug": "dakara-boku-wa-ongaku-wo-yameta",
         "title": "だから僕は音楽を辞めた",
         "release_type": "Full Album",
         "release_date": date(2019, 4, 10),
@@ -193,6 +207,7 @@ CATALOG_RELEASES = (
         ),
     },
     {
+        "slug": "makeinu-ni-encore-wa-iranai",
         "title": "負け犬にアンコールはいらない",
         "release_type": "Mini Album",
         "release_date": date(2018, 5, 9),
@@ -201,7 +216,7 @@ CATALOG_RELEASES = (
         "tracks": (
             ("previous-life", "前世"),
             ("makeinu-ni-encore-wa-iranai", "負け犬にアンコールはいらない"),
-            ("bakudanma-makeinu", "爆弾魔"),
+            ("bakudanma", "爆弾魔"),
             ("hitchcock", "ヒッチコック"),
             ("falling", "落下"),
             ("semi-transparent-boy", "準透明少年"),
@@ -211,6 +226,7 @@ CATALOG_RELEASES = (
         ),
     },
     {
+        "slug": "natsukusa-ga-jama-wo-suru",
         "title": "夏草が邪魔をする",
         "release_type": "Mini Album",
         "release_date": date(2017, 6, 28),
@@ -222,21 +238,214 @@ CATALOG_RELEASES = (
             ("say-it", "言って。"),
             ("bloom-in-that-summer", "あの夏に咲け"),
             ("flight", "飛行"),
-            ("kutsu-no-hanabi-natsukusa", "靴の花火"),
+            ("kutsu-no-hanabi", "靴の花火"),
             ("cloud-and-ghost", "雲と幽霊"),
         ),
     },
 )
 
 
-def _build_catalog_tracks():
-    catalog = []
+NEW_RELEASES = (
+    {
+        "slug": "nininsyou",
+        "title": "二人称",
+        "release_type": "Digital Album",
+        "release_date": date(2026, 3, 4),
+        "cover_path": "release_nininsyou.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/75/",
+        "tracks": (
+            ("kumo-ni-naru", "雲になる"),
+            ("hana-mo-zawameku", "花も騒めく"),
+            ("mashou", "魔性"),
+            ("play-sick", "プレイシック"),
+            ("post-haru", "ポスト春"),
+            ("taiyou", "太陽"),
+            ("haru", "晴る"),
+            ("wasurete-kudasai", "忘れてください"),
+            ("shura", "修羅"),
+            ("kaseijin", "火星人"),
+            ("rubato", "ルバート"),
+            ("kasou", "火葬"),
+            ("aporia", "アポリア"),
+            ("hebi", "へび"),
+            ("umeki", "うめき"),
+            ("kitsutsuki", "啄木鳥"),
+            ("hitchcock", "ヒッチコック"),
+            ("gekkouyoku", "月光浴"),
+            ("chidori", "千鳥"),
+            ("kai", "櫂"),
+        ),
+    },
+    {
+        "slug": "abuku",
+        "title": "あぶく",
+        "release_type": "Digital Single",
+        "release_date": date(2026, 4, 22),
+        "cover_path": "release_abuku.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/76/",
+        "tracks": (("abuku", "あぶく"),),
+    },
+    {
+        "slug": "akane",
+        "title": "茜",
+        "release_type": "Digital Single",
+        "release_date": date(2026, 2, 4),
+        "cover_path": "release_akane.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/74/",
+        "tracks": (("akane", "茜"),),
+    },
+    {
+        "slug": "play-sick",
+        "title": "プレイシック",
+        "release_type": "Digital Single",
+        "release_date": date(2025, 12, 22),
+        "cover_path": "release_play_sick.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/73/",
+        "tracks": (("play-sick", "プレイシック"),),
+    },
+    {
+        "slug": "shura",
+        "title": "修羅",
+        "release_type": "Digital Single",
+        "release_date": date(2025, 8, 8),
+        "cover_path": "release_shura.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/65/",
+        "tracks": (("shura", "修羅"),),
+    },
+    {
+        "slug": "kaseijin",
+        "title": "火星人",
+        "release_type": "Digital Single",
+        "release_date": date(2025, 5, 9),
+        "cover_path": "release_kaseijin.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/63/",
+        "tracks": (("kaseijin", "火星人"),),
+    },
+    {
+        "slug": "hebi",
+        "title": "へび",
+        "release_type": "Digital Single",
+        "release_date": date(2025, 1, 17),
+        "cover_path": "release_hebi.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/61/",
+        "tracks": (("hebi", "へび"),),
+    },
+    {
+        "slug": "taiyou",
+        "title": "太陽",
+        "release_type": "Digital Single",
+        "release_date": date(2024, 11, 22),
+        "cover_path": "release_taiyou.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/57/",
+        "tracks": (("taiyou", "太陽"),),
+    },
+    {
+        "slug": "aporia",
+        "title": "アポリア",
+        "release_type": "Digital Single",
+        "release_date": date(2024, 10, 7),
+        "cover_path": "release_aporia.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/56/",
+        "tracks": (("aporia", "アポリア"),),
+    },
+    {
+        "slug": "wasurete-kudasai",
+        "title": "忘れてください",
+        "release_type": "Digital Single",
+        "release_date": date(2024, 7, 13),
+        "cover_path": "release_wasurete_kudasai.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/52/",
+        "tracks": (("wasurete-kudasai", "忘れてください"),),
+    },
+    {
+        "slug": "rubato",
+        "title": "ルバート",
+        "release_type": "Digital Single",
+        "release_date": date(2024, 5, 29),
+        "cover_path": "release_rubato.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/50/",
+        "tracks": (("rubato", "ルバート"),),
+    },
+    {
+        "slug": "gekkouyoku",
+        "title": "月光浴",
+        "release_type": "Digital Single",
+        "release_date": date(2023, 10, 13),
+        "cover_path": "release_gekkouyoku.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/47/",
+        "tracks": (("gekkouyoku", "月光浴"),),
+    },
+    {
+        "slug": "shayou",
+        "title": "斜陽",
+        "release_type": "Digital Single",
+        "release_date": date(2023, 5, 8),
+        "cover_path": "release_shayou.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/48/",
+        "tracks": (("shayou", "斜陽"),),
+    },
+    {
+        "slug": "telepath",
+        "title": "テレパス",
+        "release_type": "Digital Single",
+        "release_date": date(2023, 1, 12),
+        "cover_path": "release_telepath.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/46/",
+        "tracks": (("telepath", "テレパス"),),
+    },
+)
 
-    for release in CATALOG_RELEASES:
+
+CATALOG_RELEASES = tuple(
+    sorted(
+        LEGACY_RELEASES + NEW_RELEASES,
+        key=lambda release: release["release_date"],
+        reverse=True,
+    )
+)
+
+
+def _build_release_tracks():
+    return tuple(
+        {
+            "release_slug": release["slug"],
+            "track_slug": slug,
+            "track_number": track_number,
+        }
+        for release in CATALOG_RELEASES
+        for track_number, (slug, _title_ja) in enumerate(
+            release["tracks"],
+            start=1,
+        )
+    )
+
+
+CATALOG_RELEASE_TRACKS = _build_release_tracks()
+
+
+def _build_catalog_tracks():
+    primary_release_by_track = {}
+    title_by_track = {}
+    for release in LEGACY_RELEASES + NEW_RELEASES:
         for track_number, (slug, title_ja) in enumerate(
             release["tracks"],
             start=1,
         ):
+            primary_release_by_track.setdefault(
+                slug,
+                (release, track_number),
+            )
+            title_by_track.setdefault(slug, title_ja)
+
+    catalog = []
+    seen = set()
+    for release in CATALOG_RELEASES:
+        for slug, _title_ja in release["tracks"]:
+            if slug in seen:
+                continue
+            seen.add(slug)
+            primary_release, track_number = primary_release_by_track[slug]
+            title_ja = title_by_track[slug]
             title_en, note_theme = TRACK_DETAILS.get(slug, ("", "作品脉络"))
             title = f"{title_en} ({title_ja})" if title_en else title_ja
             catalog.append(
@@ -245,18 +454,18 @@ def _build_catalog_tracks():
                     "title": title,
                     "title_ja": title_ja,
                     "title_en": title_en,
-                    "album_title": release["title"],
-                    "release_type": release["release_type"],
-                    "release_date": release["release_date"],
-                    "release_year": release["release_date"].year,
+                    "album_title": primary_release["title"],
+                    "release_type": primary_release["release_type"],
+                    "release_date": primary_release["release_date"],
+                    "release_year": primary_release["release_date"].year,
                     "track_number": track_number,
-                    "cover_path": release["cover_path"],
+                    "cover_path": primary_release["cover_path"],
                     "story_summary": (
-                        f"《{release['title']}》官方曲序第 {track_number} 首。"
+                        f"《{primary_release['title']}》官方曲序第 {track_number} 首。"
                         f"本站把它放在“{note_theme}”的个人整理路径中；"
                         "当前仅记录官方收录信息，不转载完整歌词。"
                     ),
-                    "source_url": release["source_url"],
+                    "source_url": primary_release["source_url"],
                     "source_checked_at": CATALOG_REVIEWED_ON,
                     "mv_url": VERIFIED_BILIBILI_VIDEOS.get(slug),
                 }

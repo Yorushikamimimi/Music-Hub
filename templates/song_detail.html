@@ -8,27 +8,25 @@
     <nav class="archive-breadcrumb" aria-label="面包屑">
         <a href="{{ url_for('main.discography') }}">作品集</a>
         <i class="bi bi-chevron-right" aria-hidden="true"></i>
-        {% if release_detail_slug %}
-        <a href="{{ url_for('main.release_detail', slug=release_detail_slug) }}">{{ song.album_title }}</a>
+        <a href="{{ url_for('main.release_detail', slug=release_context.release.slug) }}">{{ release_context.release.title }}</a>
         <i class="bi bi-chevron-right" aria-hidden="true"></i>
-        {% endif %}
         <span aria-current="page">{{ song.title_ja }}</span>
     </nav>
 
     <article class="song-detail-hero">
         <div class="song-detail-cover">
             <img
-                src="{{ url_for('static', filename='images/' + song.cover_path) }}"
-                alt="《{{ song.album_title }}》官方发行封面"
+                src="{{ url_for('static', filename='images/' + release_context.release.cover_path) }}"
+                alt="《{{ release_context.release.title }}》官方发行封面"
                 width="720"
                 height="720"
                 decoding="async"
             >
-            <span>{{ "%02d"|format(song.track_number) }}</span>
+            <span>{{ "%02d"|format(release_context.track_number) }}</span>
         </div>
 
         <div class="song-detail-copy">
-            <p class="archive-eyebrow">SONG NOTE · {{ song.release_year }}</p>
+            <p class="archive-eyebrow">SONG NOTE · {{ release_context.release.release_year }}</p>
             <h1>
                 {% if song.link %}
                 <a href="{{ song.link }}" target="_blank" rel="noopener noreferrer" aria-label="在 B 站打开 {{ song.title_ja }} 影像">{{ song.title_ja }}</a>
@@ -40,19 +38,19 @@
             <dl class="song-fact-list">
                 <div>
                     <dt>收录作品</dt>
-                    <dd>《{{ song.album_title }}》</dd>
+                    <dd>《{{ release_context.release.title }}》</dd>
                 </div>
                 <div>
                     <dt>发行类型</dt>
-                    <dd>{{ song.release_type }}</dd>
+                    <dd>{{ release_context.release.release_type }}</dd>
                 </div>
                 <div>
                     <dt>发行日期</dt>
-                    <dd>{{ song.release_date.strftime('%Y.%m.%d') }}</dd>
+                    <dd>{{ release_context.release.release_date.strftime('%Y.%m.%d') }}</dd>
                 </div>
                 <div>
                     <dt>官方曲序</dt>
-                    <dd>第 {{ song.track_number }} 首</dd>
+                    <dd>第 {{ release_context.track_number }} 首</dd>
                 </div>
             </dl>
             <div class="archive-actions">
@@ -61,7 +59,7 @@
                     在 B 站观看影像 <i class="bi bi-play-circle" aria-hidden="true"></i>
                 </a>
                 {% endif %}
-                <a class="archive-button archive-button-secondary" href="{{ song.source_url }}" target="_blank" rel="noopener noreferrer">
+                <a class="archive-button archive-button-secondary" href="{{ release_context.release.source_url }}" target="_blank" rel="noopener noreferrer">
                     查看官方作品页 <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
                 </a>
                 <button
@@ -69,9 +67,9 @@
                     type="button"
                     data-song-id="{{ song.id }}"
                     data-song-title="{{ song.title }}"
-                    data-song-album="{{ song.album_title }}"
-                    data-song-link="{{ song.link or song.source_url }}"
-                    data-song-year="{{ song.release_year }}"
+                    data-song-album="{{ release_context.release.title }}"
+                    data-song-link="{{ song.link or url_for('main.song_detail', slug=song.slug) }}"
+                    data-song-year="{{ release_context.release.release_year }}"
                     aria-label="收藏 {{ song.title }}"
                 >
                     <i class="bi bi-heart" aria-hidden="true"></i> 收藏
@@ -84,13 +82,19 @@
         <div class="song-note-main">
             <p class="archive-eyebrow">LISTENING NOTE</p>
             <h2 id="note-title">这首歌在本站的路径</h2>
+            {% if release_context.release.title != song.album_title %}
+            <p>
+                当前按《{{ release_context.release.title }}》第 {{ release_context.track_number }} 首浏览；
+                下方笔记沿用这首歌的主资料语境。
+            </p>
+            {% endif %}
             <p>{{ song.story_summary }}</p>
         </div>
         <aside class="song-source-note">
             <i class="bi bi-shield-check" aria-hidden="true"></i>
             <div>
                 <h2>资料边界</h2>
-                <p>发行信息来自官方作品页，最后核对于 {{ song.source_checked_at.strftime('%Y.%m.%d') }}；上方短文为本站的个人整理，不包含完整歌词或未经授权的译文。</p>
+                <p>发行信息来自官方作品页，最后核对于 {{ release_context.release.source_checked_at.strftime('%Y.%m.%d') }}；上方短文为本站的个人整理，不包含完整歌词或未经授权的译文。</p>
             </div>
         </aside>
     </section>
@@ -105,9 +109,35 @@
         </div>
         <div class="related-track-list">
             {% for item in related_songs %}
-            <a href="{{ url_for('main.song_detail', slug=item.slug) }}">
-                <img src="{{ url_for('static', filename='images/' + item.cover_path) }}" alt="" width="72" height="72" loading="lazy">
+            <a href="{{ url_for('main.song_detail', slug=item.slug, release=release_context.release.slug) }}">
+                <img src="{{ url_for('static', filename='images/' + release_context.release.cover_path) }}" alt="" width="72" height="72" loading="lazy">
                 <span><strong>{{ item.title_ja }}</strong>{% if item.title_en %}<small>{{ item.title_en }}</small>{% endif %}</span>
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if release_appearances|length > 1 %}
+    <section class="archive-section" aria-labelledby="appearances-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">RELEASE APPEARANCES</p>
+                <h2 id="appearances-title">这首歌出现在哪些作品中</h2>
+            </div>
+            <p>同一首歌只保存一份资料，曲序按不同发行分别记录。</p>
+        </div>
+        <div class="album-thread-list">
+            {% for appearance in release_appearances %}
+            <a
+                class="album-thread-row"
+                href="{{ url_for('main.song_detail', slug=song.slug, release=appearance.release.slug) }}"
+                {% if appearance.release.slug == release_context.release.slug %}aria-current="page"{% endif %}
+            >
+                <span class="album-thread-year">{{ appearance.release.release_year }}</span>
+                <span class="album-thread-title">{{ appearance.release.title }}</span>
+                <span class="album-thread-count">第 {{ appearance.track_number }} 首</span>
                 <i class="bi bi-arrow-right" aria-hidden="true"></i>
             </a>
             {% endfor %}
@@ -117,13 +147,13 @@
 
     <nav class="song-sequence-nav" aria-label="上一首和下一首">
         {% if previous_song %}
-        <a href="{{ url_for('main.song_detail', slug=previous_song.slug) }}">
+        <a href="{{ url_for('main.song_detail', slug=previous_song.slug, release=release_context.release.slug) }}">
             <small><i class="bi bi-arrow-left" aria-hidden="true"></i> 上一首</small>
             <strong>{{ previous_song.title_ja }}</strong>
         </a>
         {% else %}<span></span>{% endif %}
         {% if next_song %}
-        <a class="text-end" href="{{ url_for('main.song_detail', slug=next_song.slug) }}">
+        <a class="text-end" href="{{ url_for('main.song_detail', slug=next_song.slug, release=release_context.release.slug) }}">
             <small>下一首 <i class="bi bi-arrow-right" aria-hidden="true"></i></small>
             <strong>{{ next_song.title_ja }}</strong>
         </a>

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}{{ release.title }} · 作品资料 · 夜鹿集{% endblock %}
+{% block description %}{{ release.title }} 的官方发行信息与完整曲序。{% endblock %}
+
+{% block content %}
+<div class="container archive-shell py-4 py-lg-5">
+    <nav class="archive-breadcrumb" aria-label="面包屑">
+        <a href="{{ url_for('main.discography') }}">作品集</a>
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        <span aria-current="page">{{ release.title }}</span>
+    </nav>
+
+    <article class="release-archive-hero">
+        <div class="release-archive-cover">
+            <img
+                src="{{ url_for('static', filename='images/' + release.cover_path) }}"
+                alt="《{{ release.title }}》官方发行封面"
+                width="760"
+                height="760"
+                decoding="async"
+            >
+            <span>{{ "%02d"|format(songs|length) }}</span>
+        </div>
+
+        <div class="release-archive-copy">
+            <p class="archive-eyebrow">OFFICIAL RELEASE · {{ release.release_type }}</p>
+            <h1 class="release-archive-title{% if release.title|length >= 12 %} release-archive-title-xlong{% elif release.title|length >= 8 %} release-archive-title-long{% endif %}">
+                {{ release.title }}
+            </h1>
+            <p class="release-archive-summary">
+                本页按 Yorushika 官方发行资料整理日期、作品形态与完整曲序。
+                尚未加入没有可靠来源的背景解读。
+            </p>
+
+            <dl class="release-archive-facts">
+                <div>
+                    <dt>发行日期</dt>
+                    <dd>{{ release.release_date.strftime('%Y.%m.%d') }}</dd>
+                </div>
+                <div>
+                    <dt>作品类型</dt>
+                    <dd>{{ release.release_type }}</dd>
+                </div>
+                <div>
+                    <dt>完整曲序</dt>
+                    <dd>{{ songs|length }} 首</dd>
+                </div>
+                <div>
+                    <dt>已核验影像</dt>
+                    <dd>{{ video_count }} 首</dd>
+                </div>
+            </dl>
+
+            <div class="archive-actions">
+                <a class="archive-button archive-button-primary" href="{{ release.source_url }}" target="_blank" rel="noopener noreferrer">
+                    官方发行页 <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </article>
+
+    <section class="archive-section release-track-section" aria-labelledby="release-tracks-title">
+        <div class="archive-section-heading">
+            <div>
+                <p class="archive-eyebrow">COMPLETE TRACKLIST</p>
+                <h2 id="release-tracks-title">{{ songs|length }} 首完整曲序</h2>
+            </div>
+            <p>点击曲名进入本站资料；已核验影像单独提供 B 站入口。</p>
+        </div>
+
+        <ol class="release-track-list">
+            {% for song in songs %}
+            <li>
+                <a class="release-track-main" href="{{ url_for('main.song_detail', slug=song.slug, release=release.slug) }}">
+                    <span>{{ "%02d"|format(song.track_number) }}</span>
+                    <strong>{{ song.title_ja }}</strong>
+                    <small>{{ song.title_en or "本站曲目资料" }}</small>
+                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
+                {% if song.link %}
+                <a
+                    class="release-track-video"
+                    href="{{ song.link }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="在 B 站打开 {{ song.title_ja }} 影像"
+                >
+                    <i class="bi bi-play-circle" aria-hidden="true"></i>
+                    影像
+                </a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ol>
+    </section>
+
+    <section class="release-source-panel" aria-labelledby="release-sources-title">
+        <div>
+            <p class="archive-eyebrow">SOURCE & BOUNDARY</p>
+            <h2 id="release-sources-title">资料来源与边界</h2>
+            <p>
+                发行日期、作品形态与曲序来自 Yorushika 官方发行页，最后核对：
+                {{ release.source_checked_at.strftime('%Y.%m.%d') }}。本站不转载完整歌词或未经授权的译文。
+            </p>
+        </div>
+        <ul>
+            <li>
+                <a href="{{ release.source_url }}" target="_blank" rel="noopener noreferrer">
+                    Yorushika 官方发行页 <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </section>
+</div>
+{% endblock %}

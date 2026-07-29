@@ -44,7 +44,7 @@ RELEASE_STORIES = {
                     "music-thief-confession",
                     "daytime-nighthawk",
                     "haruhisagi",
-                    "bakudanma-tousaku",
+                    "bakudanma",
                 ),
             },
             {
@@ -317,7 +317,7 @@ RELEASE_STORIES = {
                     "four-fifty-one",
                     "pas-de-deux",
                     "matasaburo",
-                    "kutsu-no-hanabi-gentou",
+                    "kutsu-no-hanabi",
                     "old-man-and-the-sea",
                     "goodbye-molten",
                     "isana",
@@ -461,7 +461,7 @@ RELEASE_STORIES = {
                 "track_slugs": (
                     "previous-life",
                     "makeinu-ni-encore-wa-iranai",
-                    "bakudanma-makeinu",
+                    "bakudanma",
                 ),
             },
             {
@@ -558,7 +558,7 @@ RELEASE_STORIES = {
                     "结尾两首把视线抬向夜空与云层，为整张作品留下悬而未决的余韵。"
                 ),
                 "track_slugs": (
-                    "kutsu-no-hanabi-natsukusa",
+                    "kutsu-no-hanabi",
                     "cloud-and-ghost",
                 ),
             },
@@ -632,10 +632,4 @@ RELEASE_STORIES = {
             },
         ),
     },
-}
-
-
-RELEASE_SLUGS_BY_TITLE = {
-    release["album_title"]: slug
-    for slug, release in RELEASE_STORIES.items()
 }

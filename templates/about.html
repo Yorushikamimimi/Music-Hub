@@ -38,8 +38,12 @@
                     <dd>{{ release_count }} <span>部</span></dd>
                 </div>
                 <div>
-                    <dt>完整曲序</dt>
+                    <dt>独立曲目</dt>
                     <dd>{{ song_count }} <span>首</span></dd>
+                </div>
+                <div>
+                    <dt>曲序位置</dt>
+                    <dd>{{ placement_count }} <span>条</span></dd>
                 </div>
                 <div>
                     <dt>已核验影像</dt>
@@ -97,8 +101,10 @@
                 最后把它收束成现在的“夜鹿集”。
             </p>
             <p>
-                当前只收录已经逐项核对的八部作品。这不是 Yorushika 全时期的完整百科，
-                也不会为了显得丰富而自动填入未经确认的资料。新的作品会在完成来源核验后再加入。
+                当前已按官方发行页核对 {{ release_count }} 部发行作品，覆盖
+                {{ song_count }} 首独立曲目与 {{ placement_count }} 个曲序位置。
+                它仍不是 Yorushika 全时期的完整百科，也不会为了显得丰富而自动填入未经确认的资料。
+                新的作品会在完成来源核验后再加入。
             </p>
         </div>
 
@@ -114,7 +120,10 @@
                 <span>02</span>
                 <div>
                     <h3>重建作品目录</h3>
-                    <p>按官方发行页整理 {{ release_count }} 部作品与 {{ song_count }} 首完整曲序。</p>
+                    <p>
+                        按官方发行页整理 {{ release_count }} 部作品、
+                        {{ song_count }} 首独立曲目与 {{ placement_count }} 个曲序位置。
+                    </p>
                 </div>
             </li>
             <li>

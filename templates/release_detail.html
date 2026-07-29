@@ -104,7 +104,7 @@
                 <ol>
                     {% for song in chapter.songs %}
                     <li>
-                        <a href="{{ url_for('main.song_detail', slug=song.slug) }}">
+                        <a href="{{ url_for('main.song_detail', slug=song.slug, release=catalog_release.slug) }}">
                             <span>{{ "%02d"|format(song.track_number) }}</span>
                             <strong>{{ song.title_ja }}</strong>
                             {% if track_badges.get(song.slug) %}<small>{{ track_badges[song.slug] }}</small>{% endif %}
@@ -129,7 +129,7 @@
         <ol class="release-track-list">
             {% for song in songs %}
             <li>
-                <a class="release-track-main" href="{{ url_for('main.song_detail', slug=song.slug) }}">
+                <a class="release-track-main" href="{{ url_for('main.song_detail', slug=song.slug, release=catalog_release.slug) }}">
                     <span>{{ "%02d"|format(song.track_number) }}</span>
                     <strong>{{ song.title_ja }}</strong>
                     <small>

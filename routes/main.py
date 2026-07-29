@@ -2,11 +2,26 @@ import os
 import random
 import datetime
 
-from flask import Blueprint, Response, abort, current_app, render_template, request
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from sqlalchemy import or_
 
-from models import db, MusicYorushika
-from release_data import RELEASE_SLUGS_BY_TITLE, RELEASE_STORIES
+from catalog_data import LEGACY_TRACK_SLUG_ALIASES
+from models import (
+    db,
+    MusicYorushika,
+    YorushikaRelease,
+    YorushikaReleaseTrack,
+)
+from release_data import RELEASE_STORIES
 
 main_bp = Blueprint('main', __name__)
 
@@ -35,48 +50,163 @@ def _featured_songs():
     )
 
 
-def _album_index(songs):
-    albums = {}
-    for song in songs:
-        key = song.album_title or "未整理作品"
-        if key not in albums:
-            albums[key] = {
-                "title": key,
-                "release_year": song.release_year,
-                "release_date": song.release_date,
-                "release_type": song.release_type,
-                "cover_path": song.cover_path,
-                "source_url": song.source_url,
-                "source_checked_at": song.source_checked_at,
-                "detail_slug": RELEASE_SLUGS_BY_TITLE.get(key),
-                "songs": [],
-                "first_order": song.display_order,
-            }
-        albums[key]["songs"].append(song)
-        if song.release_year and (
-            albums[key]["release_year"] is None
-            or song.release_year > albums[key]["release_year"]
-        ):
-            albums[key]["release_year"] = song.release_year
-        if song.release_date and (
-            albums[key]["release_date"] is None
-            or song.release_date > albums[key]["release_date"]
-        ):
-            albums[key]["release_date"] = song.release_date
-
-    return sorted(
-        albums.values(),
-        key=lambda album: (
-            album["release_date"] is None,
-            -(album["release_date"].toordinal() if album["release_date"] else 0),
-            album["first_order"],
-        ),
+def _featured_releases():
+    return (
+        YorushikaRelease.query
+        .filter_by(is_featured=True)
+        .order_by(
+            YorushikaRelease.release_date.desc(),
+            YorushikaRelease.display_order.asc(),
+        )
+        .all()
     )
+
+
+class ReleaseTrackView:
+    """Expose a track with its position inside one specific release."""
+
+    def __init__(self, membership, include_release_context=False):
+        self.membership = membership
+        self.track = membership.track
+        self.release = membership.release
+        self.track_number = membership.track_number
+        self.include_release_context = include_release_context
+
+    def __getattr__(self, name):
+        return getattr(self.track, name)
+
+    @property
+    def album_title(self):
+        return self.release.title
+
+    @property
+    def release_type(self):
+        return self.release.release_type
+
+    @property
+    def release_year(self):
+        return self.release.release_year
+
+    @property
+    def release_date(self):
+        return self.release.release_date
+
+    @property
+    def cover_path(self):
+        return self.release.cover_path
+
+    @property
+    def source_url(self):
+        return self.release.source_url
+
+    @property
+    def source_checked_at(self):
+        return self.release.source_checked_at
+
+
+def _release_index(releases):
+    return [
+        {
+            "slug": release.slug,
+            "title": release.title,
+            "release_year": release.release_year,
+            "release_date": release.release_date,
+            "release_type": release.release_type,
+            "cover_path": release.cover_path,
+            "source_url": release.source_url,
+            "source_checked_at": release.source_checked_at,
+            "detail_slug": release.slug,
+            "songs": [
+                ReleaseTrackView(membership)
+                for membership in release.track_links
+                if membership.track.is_featured
+            ],
+            "first_order": release.display_order,
+        }
+        for release in releases
+    ]
+
+
+def _release_context(song, requested_slug=None):
+    links = [
+        membership
+        for membership in song.release_links
+        if membership.release.is_featured
+    ]
+    if requested_slug:
+        requested = next(
+            (
+                membership
+                for membership in links
+                if membership.release.slug == requested_slug
+            ),
+            None,
+        )
+        if requested is not None:
+            return ReleaseTrackView(requested)
+
+    primary = next(
+        (
+            membership
+            for membership in links
+            if membership.release.title == song.album_title
+        ),
+        None,
+    )
+    if primary is not None:
+        return ReleaseTrackView(primary)
+    if links:
+        return ReleaseTrackView(
+            max(links, key=lambda membership: membership.release.release_date)
+        )
+    return None
+
+
+def _search_context(song, query="", selected_year=None):
+    """Keep a release-title/year search result inside the matched release."""
+    links = [
+        membership
+        for membership in song.release_links
+        if membership.release.is_featured
+    ]
+    normalized_query = query.strip().casefold()
+    if normalized_query:
+        release_match = next(
+            (
+                membership
+                for membership in links
+                if normalized_query in membership.release.title.casefold()
+            ),
+            None,
+        )
+        if release_match is not None:
+            return ReleaseTrackView(
+                release_match,
+                include_release_context=True,
+            )
+
+    if selected_year is not None:
+        year_match = next(
+            (
+                membership
+                for membership in links
+                if membership.release.release_year == selected_year
+            ),
+            None,
+        )
+        if year_match is not None:
+            return ReleaseTrackView(
+                year_match,
+                include_release_context=True,
+            )
+
+    return _release_context(song)
 
 
 @main_bp.route('/')
 def index():
     songs = _featured_songs()
+    releases = _featured_releases()
 
     daily_song = None
     daily_note = ''
@@ -108,7 +238,7 @@ def index():
         },
     ]
 
-    albums = _album_index(songs)
+    albums = _release_index(releases)
     album_spotlights = sorted(
         albums,
         key=lambda album: (-len(album["songs"]), -(album["release_year"] or 0)),
@@ -127,77 +257,132 @@ def index():
 
 @main_bp.route('/discography')
 def discography():
-    songs = _featured_songs()
+    releases = _featured_releases()
     selected_year = request.args.get('year', '').strip()
     selected_type = request.args.get('type', '').strip()
 
     years = sorted(
-        {song.release_year for song in songs if song.release_year is not None},
+        {release.release_year for release in releases},
         reverse=True,
     )
     release_types = sorted(
-        {song.release_type for song in songs if song.release_type}
+        {release.release_type for release in releases}
     )
 
-    filtered_songs = [
-        song for song in songs
-        if (not selected_year or str(song.release_year) == selected_year)
-        and (not selected_type or song.release_type == selected_type)
+    filtered_releases = [
+        release for release in releases
+        if (not selected_year or str(release.release_year) == selected_year)
+        and (not selected_type or release.release_type == selected_type)
     ]
+    albums = _release_index(filtered_releases)
 
     return render_template(
         'discography.html',
-        albums=_album_index(filtered_songs),
+        albums=albums,
         years=years,
         release_types=release_types,
         selected_year=selected_year,
         selected_type=selected_type,
-        result_count=len(filtered_songs),
+        result_count=sum(len(album["songs"]) for album in albums),
     )
 
 
 @main_bp.route('/songs/<slug>')
 def song_detail(slug):
-    songs = _featured_songs()
-    song = next((item for item in songs if item.slug == slug), None)
+    canonical_slug = LEGACY_TRACK_SLUG_ALIASES.get(slug)
+    if canonical_slug:
+        return redirect(
+            url_for(
+                'main.song_detail',
+                slug=canonical_slug,
+                release=request.args.get('release'),
+            ),
+            code=301,
+        )
+
+    song = MusicYorushika.query.filter_by(
+        slug=slug,
+        is_featured=True,
+    ).first()
     if song is None:
         abort(404)
 
-    album_songs = [
-        item for item in songs
-        if item.album_title == song.album_title
+    release_context = _release_context(
+        song,
+        requested_slug=request.args.get('release', '').strip(),
+    )
+    if release_context is None:
+        abort(404)
+
+    release_songs = [
+        ReleaseTrackView(membership)
+        for membership in release_context.release.track_links
+        if membership.track.is_featured
     ]
-    current_index = album_songs.index(song)
-    previous_song = album_songs[current_index - 1] if current_index > 0 else None
-    next_song = (
-        album_songs[current_index + 1]
-        if current_index + 1 < len(album_songs)
+    current_index = next(
+        index
+        for index, item in enumerate(release_songs)
+        if item.id == song.id
+    )
+    previous_song = (
+        release_songs[current_index - 1]
+        if current_index > 0
         else None
     )
-    related_songs = [item for item in album_songs if item.id != song.id][:4]
+    next_song = (
+        release_songs[current_index + 1]
+        if current_index + 1 < len(release_songs)
+        else None
+    )
+    related_songs = [
+        item for item in release_songs if item.id != song.id
+    ][:4]
+    release_appearances = sorted(
+        [
+            ReleaseTrackView(membership)
+            for membership in song.release_links
+            if membership.release.is_featured
+        ],
+        key=lambda item: item.release.release_date,
+        reverse=True,
+    )
 
     return render_template(
         'song_detail.html',
         song=song,
+        release_context=release_context,
+        release_appearances=release_appearances,
         previous_song=previous_song,
         next_song=next_song,
         related_songs=related_songs,
-        release_detail_slug=RELEASE_SLUGS_BY_TITLE.get(song.album_title),
     )
 
 
 @main_bp.route('/releases/<slug>')
 def release_detail(slug):
-    release = RELEASE_STORIES.get(slug)
-    if release is None:
+    catalog_release = YorushikaRelease.query.filter_by(
+        slug=slug,
+        is_featured=True,
+    ).first()
+    if catalog_release is None:
         abort(404)
 
     songs = [
-        song for song in _featured_songs()
-        if song.album_title == release["album_title"]
+        ReleaseTrackView(membership)
+        for membership in catalog_release.track_links
+        if membership.track.is_featured
     ]
     if not songs:
         abort(404)
+
+    release = RELEASE_STORIES.get(slug)
+    if release is None:
+        return render_template(
+            'release_overview.html',
+            release=catalog_release,
+            songs=songs,
+            video_count=sum(bool(song.link) for song in songs),
+        )
 
     songs_by_slug = {song.slug: song for song in songs}
     chapters = [
@@ -226,6 +411,7 @@ def release_detail(slug):
     return render_template(
         'release_detail.html',
         release=release,
+        catalog_release=catalog_release,
         songs=songs,
         chapters=chapters,
         track_badges=release["track_badges"],
@@ -238,9 +424,10 @@ def release_detail(slug):
 
 @main_bp.route('/search')
 def search():
-    query = request.args.get('q', '')
+    query = request.args.get('q', '').strip()
     year = request.args.get('year')
     sort_by = request.args.get('sort', 'editorial')
+    selected_year = int(year) if year and year.isdigit() else None
 
     sql_query = MusicYorushika.query.filter_by(is_featured=True)
 
@@ -251,11 +438,25 @@ def search():
                 MusicYorushika.title_ja.contains(query),
                 MusicYorushika.title_en.contains(query),
                 MusicYorushika.album_title.contains(query),
+                MusicYorushika.release_links.any(
+                    YorushikaReleaseTrack.release.has(
+                        YorushikaRelease.title.contains(query)
+                    )
+                ),
             )
         )
 
-    if year and year.isdigit():
-        sql_query = sql_query.filter_by(release_year=int(year))
+    if selected_year is not None:
+        release_ids = [
+            release.id
+            for release in _featured_releases()
+            if release.release_year == selected_year
+        ]
+        sql_query = sql_query.filter(
+            MusicYorushika.release_links.any(
+                YorushikaReleaseTrack.release_id.in_(release_ids)
+            )
+        )
 
     if sort_by == 'date_desc':
         sql_query = sql_query.order_by(
@@ -270,14 +471,15 @@ def search():
             MusicYorushika.id.asc(),
         )
 
-    songs = sql_query.all()
-    all_dates = (
-        db.session.query(MusicYorushika.release_year)
-        .distinct()
-        .order_by(MusicYorushika.release_year.desc())
-        .all()
+    songs = [
+        context
+        for song in sql_query.all()
+        if (context := _search_context(song, query, selected_year)) is not None
+    ]
+    years = sorted(
+        {release.release_year for release in _featured_releases()},
+        reverse=True,
     )
-    years = [r[0] for r in all_dates if r[0] is not None]
 
     return render_template('search.html', songs=songs, years=years)
 
@@ -285,17 +487,18 @@ def search():
 @main_bp.route('/about')
 def about():
     songs = _featured_songs()
-    albums = _album_index(songs)
+    releases = _featured_releases()
     source_checked_dates = [
-        song.source_checked_at
-        for song in songs
-        if song.source_checked_at is not None
+        release.source_checked_at
+        for release in releases
+        if release.source_checked_at is not None
     ]
 
     return render_template(
         'about.html',
-        release_count=len(albums),
+        release_count=len(releases),
         song_count=len(songs),
+        placement_count=sum(len(release.track_links) for release in releases),
         video_count=sum(bool(song.link) for song in songs),
         source_checked_at=max(source_checked_dates) if source_checked_dates else None,
     )
@@ -313,6 +516,11 @@ def lyrics():
                 MusicYorushika.title_ja.contains(keyword),
                 MusicYorushika.title_en.contains(keyword),
                 MusicYorushika.album_title.contains(keyword),
+                MusicYorushika.release_links.any(
+                    YorushikaReleaseTrack.release.has(
+                        YorushikaRelease.title.contains(keyword)
+                    )
+                ),
             )
         )
 

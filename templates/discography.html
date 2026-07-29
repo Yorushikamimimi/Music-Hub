@@ -89,17 +89,17 @@
                     <li class="album-track-item">
                         <a
                             class="album-track-main"
-                            href="{{ song.link or url_for('main.song_detail', slug=song.slug) }}"
+                            href="{{ song.link or url_for('main.song_detail', slug=song.slug, release=album.slug) }}"
                             {% if song.link %}target="_blank" rel="noopener noreferrer" aria-label="在 B 站打开 {{ song.title_ja }} 影像"{% endif %}
                         >
-                            <span>{{ "%02d"|format(loop.index) }}</span>
+                            <span>{{ "%02d"|format(song.track_number) }}</span>
                             <strong>{{ song.title_ja }}</strong>
                             <small>{{ song.title_en or "官方曲序收录" }}</small>
                             <i class="bi {% if song.link %}bi-play-circle{% else %}bi-arrow-up-right{% endif %}" aria-hidden="true"></i>
                         </a>
                         <a
                             class="album-track-note"
-                            href="{{ url_for('main.song_detail', slug=song.slug) }}"
+                            href="{{ url_for('main.song_detail', slug=song.slug, release=album.slug) }}"
                             aria-label="查看 {{ song.title_ja }} 的本站资料"
                         >资料</a>
                     </li>

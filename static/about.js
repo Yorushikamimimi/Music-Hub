@@ -5,7 +5,7 @@
 
     const safeExternalUrl = (value) => {
         try {
-            const url = new URL(value);
+            const url = new URL(value, window.location.origin);
             return ['https:', 'http:'].includes(url.protocol) ? url.href : '#';
         } catch {
             return '#';

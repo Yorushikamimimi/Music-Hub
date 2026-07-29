@@ -3,12 +3,11 @@
 > Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Phase 5 source-backed release archive production release`
-- Meaning: The first complete release archive now gives `盗作` a source-backed
-  overview, a clearly labelled personal listening path, the full 14-track order
-  and separate verified video links. The server clone path is also hardened
-  against transient GitHub HTTP/2 failures. Commit `8119467` has passed local
-  automated acceptance and production browser/health verification.
+- Stage: `Phase 6 normalized full discography release candidate`
+- Meaning: The local release candidate now covers 22 official releases, 109 unique
+  tracks and 122 release positions. Shared tracks keep one canonical record while
+  preserving their position and navigation inside every release. This phase has
+  not been committed, pushed or deployed yet.
 
 ## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
@@ -80,6 +79,21 @@
    listening paths, the verified `思想犯` Bilibili link, zero browser warnings or
    errors and no horizontal overflow. `https://yoruming.cn/` remained HTTP 200.
 
+## Phase 6 Release Candidate
+1. Added all 22 releases listed by the official discography at the review date,
+   including `二人称` and 13 previously missing digital singles.
+2. Normalized tracks, releases and release-track positions into separate models:
+   109 canonical tracks now produce 122 ordered placements without duplicated song
+   records.
+3. Added official release dates, source links and compressed local covers for the
+   14 newly represented releases.
+4. Kept the eight editorial release archives and added a factual overview template
+   for the other 14 releases without inventing background interpretation.
+5. Added release-context song navigation, all-release appearances and permanent
+   redirects from four legacy duplicate track slugs.
+6. Added an additive migration with a data-preserving downgrade path and expanded
+   catalog, route and migration coverage.
+
 ## Completed in This Round
 1. Performance
 - Re-encoded 20 covers as WebP and removed roughly 20 MB of redundant CJK font files.
@@ -111,9 +125,9 @@
 
 ## Current Deliverables
 - Archive home page with daily recommendation and listening paths.
-- Discography page (`/discography`) with release filters and complete track order.
-- Source-backed release archive sample (`/releases/tousaku`).
-- Song detail pages (`/songs/<slug>`) with sources and adjacent tracks.
+- Discography page (`/discography`) with 22 release filters and complete track order.
+- Eight editorial release archives plus 14 source-backed release overviews.
+- Song detail pages (`/songs/<slug>`) with release context, sources and adjacent tracks.
 - Search page (`/search`).
 - Song stories page (`/lyrics`).
 - Radio page (`/radio`, optional `RADIO_STREAM_URL`).
@@ -138,5 +152,5 @@
 7. Confirmed `https://yoruming.cn/` still served the Personal Knowledge Hub after
    the Music Hub Web restart.
 
-The Phase 3 release passed local acceptance and can be activated through the
-documented deployment and rollback workflow.
+The deployed Phase 5 release remains the production baseline. Phase 6 is local-only
+until final verification and explicit approval to commit, push and deploy.

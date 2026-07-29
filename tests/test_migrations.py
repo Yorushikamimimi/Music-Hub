@@ -1,9 +1,14 @@
 import sqlalchemy as sa
-from flask_migrate import upgrade
+from flask_migrate import downgrade, upgrade
 
 from app import create_app
 from catalog_service import sync_catalog
-from models import MusicYorushika, db
+from models import (
+    MusicYorushika,
+    YorushikaRelease,
+    YorushikaReleaseTrack,
+    db,
+)
 
 
 def _migration_app(database_path):
@@ -36,10 +41,17 @@ def test_migration_creates_fresh_catalog_schema(tmp_path):
             "display_order",
             "is_featured",
         }.issubset(columns)
+        assert {
+            "music_yorushika",
+            "yorushika_release",
+            "yorushika_release_track",
+        }.issubset(sa.inspect(db.engine).get_table_names())
 
         result = sync_catalog()
-        assert result["created"] == 89
-        assert MusicYorushika.query.count() == 89
+        assert result["created"] == 109
+        assert MusicYorushika.query.count() == 109
+        assert YorushikaRelease.query.count() == 22
+        assert YorushikaReleaseTrack.query.count() == 122
 
 
 def test_migration_preserves_legacy_row_and_columns(tmp_path):
@@ -81,13 +93,33 @@ def test_migration_preserves_legacy_row_and_columns(tmp_path):
         assert "release_date" in columns
         assert "track_number" in columns
         assert "source_checked_at" in columns
+        assert "yorushika_release" in sa.inspect(db.engine).get_table_names()
+        assert "yorushika_release_track" in sa.inspect(db.engine).get_table_names()
 
         result = sync_catalog()
-        assert result["created"] == 88
-        assert MusicYorushika.query.count() == 90
+        assert result["created"] == 108
+        assert MusicYorushika.query.count() == 110
+        assert YorushikaRelease.query.count() == 22
+        assert YorushikaReleaseTrack.query.count() == 122
         sunny = MusicYorushika.query.filter_by(slug="haru").one()
         assert sunny.id == 1
         assert sunny.album_title == "晴る"
         assert sunny.track_number == 1
         extra = MusicYorushika.query.filter_by(title="Legacy extra").one()
         assert extra.is_featured is False
+
+
+def test_release_normalization_downgrade_keeps_legacy_track_data(tmp_path):
+    application = _migration_app(tmp_path / "downgrade.sqlite3")
+
+    with application.app_context():
+        upgrade(directory="migrations")
+        sync_catalog()
+        track_count = MusicYorushika.query.count()
+
+        downgrade(revision="20260728_0002", directory="migrations")
+
+        tables = set(sa.inspect(db.engine).get_table_names())
+        assert "yorushika_release" not in tables
+        assert "yorushika_release_track" not in tables
+        assert MusicYorushika.query.count() == track_count == 109
