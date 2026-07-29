@@ -3,6 +3,53 @@
 from catalog_data import CATALOG_REVIEWED_ON
 
 
+def _single_release_story(
+    *,
+    album_title,
+    title_en,
+    track_slug,
+    official_summary,
+    official_facts,
+    editorial_note,
+    chapter_title,
+    chapter_description,
+    official_release_url,
+    context_sources=(),
+    secondary_source_label=None,
+    track_badge="Digital Single",
+):
+    """Build the shared archive shape without inventing album-style chapters."""
+    story = {
+        "album_title": album_title,
+        "title_en": title_en,
+        "sequence_number": "DS",
+        "archive_label": "Digital Single",
+        "source_checked_at": CATALOG_REVIEWED_ON,
+        "official_summary": official_summary,
+        "official_facts": official_facts,
+        "editorial_note": editorial_note,
+        "track_badges": {track_slug: track_badge},
+        "chapters": (
+            {
+                "number": "01",
+                "title": chapter_title,
+                "description": chapter_description,
+                "track_slugs": (track_slug,),
+            },
+        ),
+        "sources": (
+            {
+                "label": "Yorushika 官方发行页",
+                "url": official_release_url,
+            },
+            *context_sources,
+        ),
+    }
+    if secondary_source_label:
+        story["secondary_source_label"] = secondary_source_label
+    return story
+
+
 RELEASE_STORIES = {
     "tousaku": {
         "album_title": "盗作",
@@ -632,4 +679,579 @@ RELEASE_STORIES = {
             },
         ),
     },
+    "nininsyou": {
+        "album_title": "二人称",
+        "title_en": "Second Person",
+        "sequence_number": "DA",
+        "archive_label": "Digital Album · 22 Tracks",
+        "source_checked_at": CATALOG_REVIEWED_ON,
+        "official_summary": (
+            "《二人称》是与同名书简型小说联动的 Digital Album。"
+            "官方发售公告列出二十二首完整曲序：两首器乐作品分别位于"
+            "开头与结尾，其间收录二十首歌曲。"
+        ),
+        "official_facts": (
+            "2026 年 3 月 4 日以 Digital Album 形式发行。",
+            "官方发售公告列出二十二首曲目，并说明作品与"
+            "2026 年 2 月 26 日发行的书简型小说《二人称》联动。",
+            "《早朝、郵便受け》与《海へ》是专辑开头和结尾的器乐作品；"
+            "官方乐谱公告也明确区分这两首器乐与中间二十首歌曲。",
+            "《プレイシック》在专辑发行前于 2025 年 12 月 22 日先行配信。",
+        ),
+        "editorial_note": (
+            "本站把二十二首曲序完整保留，不把两首器乐从专辑中删掉。"
+            "下面四段只是一条个人聆听路径：从投递与来信进入，"
+            "经过明亮和冲撞，再沿着犹疑、动物与旧作回声走向海边。"
+        ),
+        "track_badges": {
+            "early-morning-mailbox": "器乐序章",
+            "play-sick": "先行单曲",
+            "hitchcock": "再录音版",
+            "to-the-sea": "器乐尾声",
+        },
+        "secondary_source_label": "完整曲序公告",
+        "secondary_source_index": 1,
+        "chapters": (
+            {
+                "number": "01",
+                "title": "投递、云与春后",
+                "description": (
+                    "从清晨的邮筒声景进入，以云、花、魔性与春后的空气"
+                    "建立这部作品最初的距离。"
+                ),
+                "track_slugs": (
+                    "early-morning-mailbox",
+                    "kumo-ni-naru",
+                    "hana-mo-zawameku",
+                    "mashou",
+                    "play-sick",
+                    "post-haru",
+                ),
+            },
+            {
+                "number": "02",
+                "title": "太阳、遗忘与修罗",
+                "description": (
+                    "第二段把明亮、遗忘、紧张推进与陌生视角放在一起，"
+                    "让情绪从晴朗表面转向更锋利的位置。"
+                ),
+                "track_slugs": (
+                    "taiyou",
+                    "haru",
+                    "wasurete-kudasai",
+                    "shura",
+                    "kaseijin",
+                ),
+            },
+            {
+                "number": "03",
+                "title": "速度、火与未解",
+                "description": (
+                    "从自由速度走向火葬、无解与蛇的形象，"
+                    "最后在一声低沉的《うめき》中停顿。"
+                ),
+                "track_slugs": (
+                    "rubato",
+                    "kasou",
+                    "aporia",
+                    "hebi",
+                    "umeki",
+                ),
+            },
+            {
+                "number": "04",
+                "title": "旧歌、月光与海",
+                "description": (
+                    "尾段经过啄木鸟、再录音版《ヒッチコック》与月光，"
+                    "再由《千鳥》《櫂》把专辑送向器乐尾声《海へ》。"
+                ),
+                "track_slugs": (
+                    "kitsutsuki",
+                    "hitchcock",
+                    "gekkouyoku",
+                    "chidori",
+                    "kai",
+                    "to-the-sea",
+                ),
+            },
+        ),
+        "sources": (
+            {
+                "label": "Yorushika 官方发行页",
+                "url": "https://yorushika.com/discography/artist/2/detail/75/",
+            },
+            {
+                "label": "Yorushika 二十二首完整曲序公告",
+                "url": "https://yorushika.com/news/detail/11729",
+            },
+            {
+                "label": "Yorushika 官方乐谱公告",
+                "url": "https://yorushika.com/news/detail/11816",
+            },
+            {
+                "label": "Universal Music《二人称》特设页",
+                "url": "https://sp.universal-music.co.jp/yorushika/nininshou/",
+            },
+        ),
+    },
+    "abuku": _single_release_story(
+        album_title="あぶく",
+        title_en="Abuku",
+        track_slug="abuku",
+        official_summary=(
+            "《あぶく》于 2026 年 4 月 22 日以 Digital Single 发行，"
+            "并被采用为电视动画《LIAR GAME》的片头主题曲。"
+        ),
+        official_facts=(
+            "2026 年 4 月 22 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是电视动画"
+            "《LIAR GAME》的片头主题曲。",
+            "官方发行页只列出同名单曲一首。",
+        ),
+        editorial_note=(
+            "本站把“浮起又消散”的轻盈感作为进入这首歌的个人入口，"
+            "但不把曲名联想扩写成官方剧情。页面只保留公开发行信息、"
+            "主题曲关系与一条聆听路径。"
+        ),
+        chapter_title="从浮起与消散之间进入",
+        chapter_description=(
+            "这一页只收录一首作品；点击曲名可继续查看发行资料与"
+            "已经核对的影像入口。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/76/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 动画主题曲公告",
+                "url": "https://yorushika.com/news/detail/11771",
+            },
+        ),
+        secondary_source_label="动画主题曲公告",
+    ),
+    "akane": _single_release_story(
+        album_title="茜",
+        title_en="Akane",
+        track_slug="akane",
+        official_summary=(
+            "《茜》于 2026 年 2 月 4 日以 Digital Single 发行，"
+            "并作为剧场版《僕の心のヤバイやつ》的主题曲。"
+        ),
+        official_facts=(
+            "2026 年 2 月 4 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是剧场版"
+            "《僕の心のヤバイやつ》的主题曲。",
+            "官方发行页只列出同名单曲一首。",
+        ),
+        editorial_note=(
+            "个人聆听时，可以把《茜》放在暮色刚刚改变颜色的时刻。"
+            "本站只把这种色温感作为入口，不为电影或歌词补写"
+            "未经官方公开的情节解释。"
+        ),
+        chapter_title="从暮色的色温进入",
+        chapter_description=(
+            "这一页只收录一首作品；官方主题曲关系与本站个人感受"
+            "分别呈现。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/74/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 剧场版主题曲公告",
+                "url": "https://yorushika.com/news/detail/11734",
+            },
+        ),
+        secondary_source_label="剧场版主题曲公告",
+    ),
+    "play-sick": _single_release_story(
+        album_title="プレイシック",
+        title_en="Play Sick",
+        track_slug="play-sick",
+        official_summary=(
+            "《プレイシック》于 2025 年 12 月 22 日先行配信，"
+            "之后收录于 Digital Album《二人称》；"
+            "官方公告同时标注其为 Daihatsu Move Canbus Stripes 的电视广告曲。"
+        ),
+        official_facts=(
+            "2025 年 12 月 22 日以 Digital Single 形式先行发行。",
+            "本曲后来收录于 2026 年 3 月 4 日发行的《二人称》。",
+            "Yorushika 官方公告将其标注为 Daihatsu Move Canbus "
+            "Stripes 的电视广告曲。",
+        ),
+        editorial_note=(
+            "这首歌既可以作为单曲进入，也可以回到《二人称》的完整曲序。"
+            "本站在单曲页只保留它作为先行入口的身份，"
+            "不让广告合作信息取代作品本身。"
+        ),
+        chapter_title="从先行单曲回到整张作品",
+        chapter_description=(
+            "先单独听这一首，再从“收录作品”入口进入《二人称》的"
+            "二十二首完整曲序。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/73/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika《二人称》与先行配信公告",
+                "url": "https://yorushika.com/news/detail/11729",
+            },
+        ),
+        secondary_source_label="先行配信公告",
+        track_badge="《二人称》先行单曲",
+    ),
+    "shura": _single_release_story(
+        album_title="修羅",
+        title_en="Shura",
+        track_slug="shura",
+        official_summary=(
+            "《修羅》于 2025 年 8 月 8 日以 Digital Single 发行，"
+            "并作为关西电视台月十剧《僕達はまだその星の校則を知らない》"
+            "的主题曲。"
+        ),
+        official_facts=(
+            "2025 年 8 月 8 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是电视剧"
+            "《僕達はまだその星の校則を知らない》的主题曲。",
+            "官方发行页只列出同名单曲一首。",
+        ),
+        editorial_note=(
+            "个人聆听时，这是一首适合从紧张推进感进入的作品。"
+            "本站不借电视剧背景替歌曲下结论，只把合作信息"
+            "作为可核对的公开事实。"
+        ),
+        chapter_title="从紧张推进的位置进入",
+        chapter_description=(
+            "这一页只收录一首作品；先听完整首歌，再回看它的"
+            "电视剧主题曲背景。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/65/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 电视剧主题曲与配信公告",
+                "url": "https://yorushika.com/news/detail/11697",
+            },
+        ),
+        secondary_source_label="电视剧主题曲公告",
+    ),
+    "kaseijin": _single_release_story(
+        album_title="火星人",
+        title_en="Kaseijin",
+        track_slug="kaseijin",
+        official_summary=(
+            "《火星人》于 2025 年 5 月 9 日以 Digital Single 发行，"
+            "并被采用为电视动画《小市民シリーズ》第 2 季的片头主题曲。"
+        ),
+        official_facts=(
+            "2025 年 5 月 9 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是电视动画"
+            "《小市民シリーズ》第 2 季的片头主题曲。",
+            "官方发行页只列出同名单曲一首。",
+        ),
+        editorial_note=(
+            "本站把“陌生人如何观看熟悉世界”当作一个个人聆听问题，"
+            "而不是官方给出的答案。动画合作与发行日期仍单独列在"
+            "可核对的事实区。"
+        ),
+        chapter_title="从陌生视角进入",
+        chapter_description=(
+            "这一页只收录一首作品；先从曲名带来的距离感开始，"
+            "再查看官方动画合作信息。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/63/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 动画片头主题曲公告",
+                "url": "https://yorushika.com/news/detail/11670",
+            },
+        ),
+        secondary_source_label="动画片头主题曲公告",
+    ),
+    "hebi": _single_release_story(
+        album_title="へび",
+        title_en="Hebi",
+        track_slug="hebi",
+        official_summary=(
+            "《へび》于 2025 年 1 月 17 日以 Digital Single 发行，"
+            "并作为电视动画《チ。―地球の運動について―》的片尾曲。"
+        ),
+        official_facts=(
+            "2025 年 1 月 17 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是电视动画"
+            "《チ。―地球の運動について―》的片尾曲。",
+            "官方发行页只列出同名单曲一首。",
+        ),
+        editorial_note=(
+            "个人聆听时，可以先注意歌曲留下的蜿蜒与悬置感。"
+            "本站不把这种感受解释成动画剧情，只保留一条"
+            "与《アポリア》并置聆听的入口。"
+        ),
+        chapter_title="沿着悬置感进入",
+        chapter_description=(
+            "这一页只收录一首作品；它也可以与同为该动画片尾曲的"
+            "《アポリア》前后对照。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/61/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 动画片尾曲与配信公告",
+                "url": "https://yorushika.com/news/detail/11659",
+            },
+        ),
+        secondary_source_label="动画片尾曲公告",
+    ),
+    "taiyou": _single_release_story(
+        album_title="太陽",
+        title_en="Sun",
+        track_slug="taiyou",
+        official_summary=(
+            "《太陽》于 2024 年 11 月 22 日以 Digital Single 发行，"
+            "是电影《正体》的主题曲；其视觉企划与艺术总监永戸鉄也"
+            "围绕同一主题分别创作，再在完成后汇合。"
+        ),
+        official_facts=(
+            "2024 年 11 月 22 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是电影《正体》的主题曲。",
+            "官方展览说明记载，永戸鉄也与 Yorushika 先共享“太陽”主题，"
+            "在不提前观看对方成品的情况下分别完成图像与音乐。",
+        ),
+        editorial_note=(
+            "这首歌适合把“同一个主题如何生成不同作品”当作入口。"
+            "本站把电影合作和联合视觉企划视作官方背景，"
+            "而对声音明暗的感受仍明确属于个人笔记。"
+        ),
+        chapter_title="从同一主题的两种创作进入",
+        chapter_description=(
+            "先听歌曲，再查看官方展览记录中音乐与视觉各自生成、"
+            "最后汇合的创作方式。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/57/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 电影主题曲与配信公告",
+                "url": "https://yorushika.com/news/detail/11642",
+            },
+            {
+                "label": "永戸鉄也 + Yorushika《太陽》官方特设页",
+                "url": "https://yorushika.com/feature/exhibition_sun",
+            },
+        ),
+        secondary_source_label="电影主题曲公告",
+    ),
+    "aporia": _single_release_story(
+        album_title="アポリア",
+        title_en="Aporia",
+        track_slug="aporia",
+        official_summary=(
+            "《アポリア》于 2024 年 10 月 7 日以 Digital Single 发行，"
+            "并作为电视动画《チ。―地球の運動について―》的片尾曲。"
+        ),
+        official_facts=(
+            "2024 年 10 月 7 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是电视动画"
+            "《チ。―地球の運動について―》的片尾曲。",
+            "官方发行页只列出同名单曲一首。",
+        ),
+        editorial_note=(
+            "“Aporia”指向一个难以直接解开的困境。本站把这种"
+            "悬而未决的状态当作个人聆听入口，不延伸为"
+            "动画设定或歌词的唯一解释。"
+        ),
+        chapter_title="从未解的停顿进入",
+        chapter_description=(
+            "这一页只收录一首作品；可以继续与后来的片尾曲"
+            "《へび》并置聆听。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/56/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 动画片尾曲公告",
+                "url": "https://yorushika.com/news/detail/11625",
+            },
+        ),
+        secondary_source_label="动画片尾曲公告",
+    ),
+    "wasurete-kudasai": _single_release_story(
+        album_title="忘れてください",
+        title_en="Wasurete Kudasai",
+        track_slug="wasurete-kudasai",
+        official_summary=(
+            "《忘れてください》于 2024 年 7 月 13 日以 Digital Single "
+            "形式发行；官方发行页只列出同名单曲一首。"
+        ),
+        official_facts=(
+            "2024 年 7 月 13 日以 Digital Single 形式发行。",
+            "Yorushika 官方发行页只列出同名单曲一首。",
+            "当前官方发行资料没有为本曲附加专辑式章节或故事说明，"
+            "本站因此不补写未经公开的背景设定。",
+        ),
+        editorial_note=(
+            "本站把这首歌放在“如何面对被要求遗忘”这一私人问题旁边，"
+            "而不把个人理解冒充成官方故事。它也可以回到"
+            "《二人称》的完整曲序中重新聆听。"
+        ),
+        chapter_title="从克制的告别进入",
+        chapter_description=(
+            "这一页只收录一首作品；先保留一句标题的空白，"
+            "再从收录作品入口回到《二人称》。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/52/"
+        ),
+        track_badge="后收录于《二人称》",
+    ),
+    "rubato": _single_release_story(
+        album_title="ルバート",
+        title_en="Rubato",
+        track_slug="rubato",
+        official_summary=(
+            "《ルバート》于 2024 年 5 月 29 日以 Digital Single 发行；"
+            "官方配信公告与发行页均把它作为同名单曲单独列出。"
+        ),
+        official_facts=(
+            "2024 年 5 月 29 日以 Digital Single 形式发行。",
+            "Yorushika 官方配信公告提供了 Apple Music 与 Spotify "
+            "的预存入口。",
+            "官方发行页只列出同名单曲一首。",
+        ),
+        editorial_note=(
+            "Rubato 是速度可以自由伸缩的音乐术语。本站只把"
+            "“速度如何呼吸”当作个人聆听入口，不据此断言"
+            "歌曲存在官方概念设定。"
+        ),
+        chapter_title="从速度的伸缩进入",
+        chapter_description=(
+            "这一页只收录一首作品；先注意推进与停顿，"
+            "再回到公开发行资料。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/50/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 官方配信公告",
+                "url": "https://yorushika.com/news/detail/11598",
+            },
+        ),
+        secondary_source_label="官方配信公告",
+        track_badge="后收录于《二人称》",
+    ),
+    "gekkouyoku": _single_release_story(
+        album_title="月光浴",
+        title_en="Moonbath",
+        track_slug="gekkouyoku",
+        official_summary=(
+            "《月光浴》于 2023 年 10 月 13 日以 Digital Single 发行，"
+            "并作为剧场动画《大雪海のカイナ ほしのけんじゃ》的主题曲。"
+        ),
+        official_facts=(
+            "2023 年 10 月 13 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是剧场动画"
+            "《大雪海のカイナ ほしのけんじゃ》的主题曲。",
+            "本曲延续了 Yorushika 与《大雪海のカイナ》"
+            "电视动画阶段的合作。",
+        ),
+        editorial_note=(
+            "个人聆听时，可以把月光理解成一种照亮而不刺眼的距离。"
+            "本站保留这一感受，同时把电影主题曲关系"
+            "清楚放在官方事实区。"
+        ),
+        chapter_title="从月光照亮的距离进入",
+        chapter_description=(
+            "这一页只收录一首作品；也可以先听电视动画片头曲"
+            "《テレパス》，再回到这首剧场版主题曲。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/47/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 剧场动画主题曲与配信公告",
+                "url": "https://yorushika.com/news/detail/11552",
+            },
+        ),
+        secondary_source_label="剧场动画主题曲公告",
+        track_badge="剧场动画主题曲",
+    ),
+    "shayou": _single_release_story(
+        album_title="斜陽",
+        title_en="Shayou",
+        track_slug="shayou",
+        official_summary=(
+            "《斜陽》于 2023 年 5 月 8 日以 Digital Single 发行，"
+            "并作为电视动画《僕の心のヤバイやつ》的片头主题曲。"
+        ),
+        official_facts=(
+            "2023 年 5 月 8 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是电视动画"
+            "《僕の心のヤバイやつ》的片头主题曲。",
+            "官方发行页只列出同名单曲一首。",
+        ),
+        editorial_note=(
+            "个人聆听时，斜阳既是明确的时间与光线，也会留下"
+            "快要结束的感觉。本站只把这种暮色感作为入口，"
+            "不把它写成动画剧情的标准答案。"
+        ),
+        chapter_title="从倾斜的暮光进入",
+        chapter_description=(
+            "这一页只收录一首作品；可以继续与剧场版主题曲"
+            "《茜》形成前后对照。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/48/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 动画片头主题曲与配信公告",
+                "url": "https://yorushika.com/news/detail/11520",
+            },
+        ),
+        secondary_source_label="动画片头主题曲公告",
+    ),
+    "telepath": _single_release_story(
+        album_title="テレパス",
+        title_en="Telepath",
+        track_slug="telepath",
+        official_summary=(
+            "《テレパス》于 2023 年 1 月 12 日以 Digital Single 发行，"
+            "并作为电视动画《大雪海のカイナ》的片头主题曲。"
+        ),
+        official_facts=(
+            "2023 年 1 月 12 日以 Digital Single 形式发行。",
+            "Yorushika 官方公告确认，本曲是电视动画"
+            "《大雪海のカイナ》的片头主题曲。",
+            "官方发行页只列出同名单曲一首。",
+        ),
+        editorial_note=(
+            "本站把“无法直接说出，却仍想传达到”的距离"
+            "作为个人聆听入口。动画主题曲身份是公开事实，"
+            "而这条理解路径不代表官方对歌曲的唯一说明。"
+        ),
+        chapter_title="从无法直说的距离进入",
+        chapter_description=(
+            "这一页只收录一首作品；之后可以继续进入"
+            "同系列剧场动画主题曲《月光浴》。"
+        ),
+        official_release_url=(
+            "https://yorushika.com/discography/artist/2/detail/46/"
+        ),
+        context_sources=(
+            {
+                "label": "Yorushika 动画片头主题曲与配信公告",
+                "url": "https://yorushika.com/news/detail/11440",
+            },
+        ),
+        secondary_source_label="动画片头主题曲公告",
+    ),
 }

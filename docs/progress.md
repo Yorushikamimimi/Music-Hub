@@ -3,11 +3,11 @@
 > Updated: 2026-07-29 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Phase 7 source audit release candidate`
-- Meaning: Phase 6 commit `4ae5f5a` is the accepted production baseline. The local
-  candidate rechecks the 22-release music scope against the official Yorushika
-  artist discography and makes third-party video-link evidence limits explicit.
-  Phase 7 has not been committed, pushed or deployed yet.
+- Stage: `Phase 8 complete release archive candidate`
+- Meaning: Phase 7 commit `3bd67d8` is the accepted production baseline. The local
+  candidate upgrades the remaining 14 factual release overviews into complete
+  sourced archives, so all 22 releases now use the same evidence-bounded editorial
+  model. Phase 8 has not been committed, pushed or deployed yet.
 
 ## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
@@ -96,12 +96,13 @@
 7. Commit `4ae5f5a` was accepted, pushed and deployed after the complete release
    catalog was reviewed in production.
 
-## Phase 7 Release Candidate
+## Phase 7 Production Release
 1. Rechecked all 22 current music releases against the official Yorushika artist
    discography on `2026-07-29`; titles, dates, official URLs and release order match.
 2. Rechecked complete legacy release pages where the current artist pages omit
-   instrumental interludes; the 122 stored positions remain the intended complete
-   physical/digital track order.
+   instrumental interludes. At this stage, the 122 stored positions were treated
+   as complete; Phase 8 later superseded that conclusion for `二人称` with stronger
+   official release and score evidence.
 3. Confirmed the two identical `二人称` and `プレイシック` cover files match two
    distinct official image URLs that currently return the same official artwork.
 4. Confirmed all 24 stored Bilibili links are reachable and their page titles match
@@ -115,6 +116,29 @@
 7. The full 80-test suite passes. Desktop and 390 px mobile browser regression
    passed for the discography, About, release archive and song detail pages with
    no console warnings/errors or horizontal overflow.
+8. Commit `3bd67d87c132e8990ac0e5b44a77a7b45127bce3` was accepted, pushed
+   and deployed as the current production baseline.
+
+## Phase 8 Release Candidate
+1. Replaced the 14 factual-only release overviews with complete archives. Every one
+   of the 22 releases now separates official facts, personal listening notes,
+   non-official listening paths, the complete official sequence and source links.
+2. Used official release and news pages for every new archive. Unsupported
+   interpretation remains explicitly labelled as a personal note rather than an
+   official production fact.
+3. Corrected `二人称` from 20 to 22 tracks after its official release announcement
+   identified the opening `早朝、郵便受け` and closing `海へ`; the official score
+   announcement independently distinguishes these two as instrumental pieces.
+4. The normalized catalog now contains 111 canonical tracks and 124 ordered
+   placements. All release-story chapter sequences are checked against the stored
+   official sequence.
+5. Expanded archive, catalog, route and migration coverage to 94 passing tests.
+6. Desktop and 390 px mobile browser regression covered the discography, the
+   22-track album archive, a digital-single archive, song detail navigation and
+   the expanded mobile menu. There were no console warnings/errors or horizontal
+   overflow.
+7. The candidate remains local-only until user acceptance and explicit approval
+   to commit, push and deploy.
 
 ## Completed in This Round
 1. Performance
@@ -148,7 +172,7 @@
 ## Current Deliverables
 - Archive home page with daily recommendation and listening paths.
 - Discography page (`/discography`) with 22 release filters and complete track order.
-- Eight editorial release archives plus 14 source-backed release overviews.
+- Twenty-two evidence-bounded editorial release archives.
 - Song detail pages (`/songs/<slug>`) with release context, sources and adjacent tracks.
 - Search page (`/search`).
 - Song stories page (`/lyrics`).
@@ -174,5 +198,5 @@
 7. Confirmed `https://yoruming.cn/` still served the Personal Knowledge Hub after
    the Music Hub Web restart.
 
-The deployed Phase 6 commit `4ae5f5a` remains the production baseline. Phase 7 is
-local-only until final verification and explicit approval to commit, push and deploy.
+The deployed Phase 7 commit `3bd67d8` remains the production baseline. Phase 8 is
+local-only until user acceptance and explicit approval to commit, push and deploy.

@@ -21,8 +21,8 @@ def test_catalog_contains_curated_official_records(app):
     with app.app_context():
         songs = MusicYorushika.query.order_by(MusicYorushika.display_order).all()
 
-        assert len(songs) == 109
-        assert [song.display_order for song in songs] == list(range(1, 110))
+        assert len(songs) == 111
+        assert [song.display_order for song in songs] == list(range(1, 112))
         assert all(song.cover_path.endswith(".webp") for song in songs)
         assert all(
             (Path(app.root_path) / "static" / "images" / song.cover_path).is_file()
@@ -47,29 +47,29 @@ def test_catalog_sync_is_idempotent(app):
         result = sync_catalog()
         second_count = db.session.query(MusicYorushika).count()
 
-        assert first_count == second_count == 109
+        assert first_count == second_count == 111
         assert result == {
             "created": 0,
-            "updated": 109,
-            "total": 109,
+            "updated": 111,
+            "total": 111,
             "releases_created": 0,
             "releases_updated": 22,
             "releases_total": 22,
-            "placements_total": 122,
+            "placements_total": 124,
         }
 
 
 def test_release_track_order_matches_curated_official_catalog():
-    assert len(CATALOG_TRACKS) == 109
+    assert len(CATALOG_TRACKS) == 111
     assert len(CATALOG_RELEASES) == 22
-    assert len(CATALOG_RELEASE_TRACKS) == 122
+    assert len(CATALOG_RELEASE_TRACKS) == 124
     assert sum(bool(track["mv_url"]) for track in CATALOG_TRACKS) == 24
 
     release_lengths = {
         release["title"]: len(release["tracks"])
         for release in CATALOG_RELEASES
     }
-    assert release_lengths["二人称"] == 20
+    assert release_lengths["二人称"] == 22
     assert release_lengths["幻燈"] == 25
     assert release_lengths["盗作"] == 14
     assert release_lengths["あぶく"] == 1
@@ -201,9 +201,9 @@ def test_sync_never_reuses_a_curated_row_only_because_cover_matches(
 
         result = sync_catalog()
 
-        assert result["created"] == 108
+        assert result["created"] == 110
         assert result["updated"] == 1
-        assert result["total"] == 109
+        assert result["total"] == 111
         assert {
             song.slug for song in MusicYorushika.query.order_by(MusicYorushika.id)
         } == {track["slug"] for track in CATALOG_TRACKS}
@@ -222,10 +222,10 @@ def test_shared_tracks_keep_one_song_and_multiple_release_positions(app):
             for membership in hitchcock.release_links
         }
 
-        assert sunny_positions == {"haru": 1, "nininsyou": 7}
+        assert sunny_positions == {"haru": 1, "nininsyou": 8}
         assert hitchcock_positions == {
             "makeinu-ni-encore-wa-iranai": 4,
-            "nininsyou": 17,
+            "nininsyou": 18,
         }
 
 

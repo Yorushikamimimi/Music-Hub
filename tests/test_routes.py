@@ -65,10 +65,10 @@ def test_discography_groups_tracks_and_supports_filters(client):
     page = client.get("/discography").get_data(as_text=True)
 
     assert "作品集" in page
-    assert "122 个已核对曲序位置" in page
+    assert "124 个已核对曲序位置" in page
     assert "22 个作品集合" in page
     assert "二人称" in page
-    assert "20 首完整曲序" in page
+    assert "22 首完整曲序" in page
     assert "盗作" in page
     assert "14 首完整曲序" in page
     assert "音楽泥棒の自白" in page
@@ -126,7 +126,7 @@ def test_shared_song_uses_requested_release_context(client):
     single_page = client.get("/songs/haru").get_data(as_text=True)
 
     assert "《二人称》" in album_page
-    assert "第 7 首" in album_page
+    assert "第 8 首" in album_page
     assert "这首歌出现在哪些作品中" in album_page
     assert "《晴る》" in single_page
     assert "第 1 首" in single_page
@@ -151,7 +151,7 @@ def test_search_matches_release_title_across_shared_memberships(client):
     assert "雲になる" in page
     assert "Sunny (晴る)" in page
     assert "Hitchcock (ヒッチコック)" in page
-    assert page.count('data-song-album="二人称"') == 20
+    assert page.count('data-song-album="二人称"') == 22
     assert 'href="/songs/haru?release=nininsyou"' in page
     assert 'href="/songs/hitchcock?release=nininsyou"' in page
 
@@ -232,18 +232,18 @@ def test_every_catalog_release_has_a_complete_archive(client):
             f'href="/songs/{track_slug}?release={slug}"' in page
             for track_slug in catalog_track_slugs
         )
-        if slug in RELEASE_STORIES:
-            story = RELEASE_STORIES[slug]
-            chapter_track_slugs = [
-                track_slug
-                for chapter in story["chapters"]
-                for track_slug in chapter["track_slugs"]
-            ]
-            assert story["official_summary"] in page
-            assert chapter_track_slugs == catalog_track_slugs
-        else:
-            assert "尚未加入没有可靠来源的背景解读" in page
-            assert "资料来源与边界" in page
+        story = RELEASE_STORIES[slug]
+        chapter_track_slugs = [
+            track_slug
+            for chapter in story["chapters"]
+            for track_slug in chapter["track_slugs"]
+        ]
+        assert story["official_summary"] in page
+        assert chapter_track_slugs == catalog_track_slugs
+        assert "官方公开信息" in page
+        assert "本站聆听笔记" in page
+        assert "个人整理 · 非官方章节划分" in page
+        assert "资料来源与边界" in page
 
 
 @pytest.mark.parametrize(
@@ -265,6 +265,20 @@ def test_every_catalog_release_has_a_complete_archive(client):
             "沿着三段路径",
         ),
         ("haru", 1, "《葬送的芙莉莲》", "从一条路径进入"),
+        ("nininsyou", 22, "书简型小说《二人称》", "沿着四段路径"),
+        ("abuku", 1, "电视动画《LIAR GAME》", "从一条路径进入"),
+        ("akane", 1, "剧场版", "从一条路径进入"),
+        ("play-sick", 1, "电视广告曲", "从一条路径进入"),
+        ("shura", 1, "电视剧", "从一条路径进入"),
+        ("kaseijin", 1, "《小市民シリーズ》", "从一条路径进入"),
+        ("hebi", 1, "片尾曲", "从一条路径进入"),
+        ("taiyou", 1, "电影《正体》", "从一条路径进入"),
+        ("aporia", 1, "片尾曲", "从一条路径进入"),
+        ("wasurete-kudasai", 1, "没有为本曲附加", "从一条路径进入"),
+        ("rubato", 1, "Spotify", "从一条路径进入"),
+        ("gekkouyoku", 1, "剧场动画", "从一条路径进入"),
+        ("shayou", 1, "片头主题曲", "从一条路径进入"),
+        ("telepath", 1, "《大雪海のカイナ》", "从一条路径进入"),
     ],
 )
 def test_new_release_archives_keep_source_facts_and_full_tracklists(
@@ -319,8 +333,8 @@ def test_about_explains_archive_identity_scope_and_boundaries(client):
     assert "关于夜鹿集" in page
     assert "它不是一份热度榜" in page
     assert "22 <span>部</span>" in page
-    assert "109 <span>首</span>" in page
-    assert "122 <span>条</span>" in page
+    assert "111 <span>首</span>" in page
+    assert "124 <span>条</span>" in page
     assert "24 <span>首</span>" in page
     assert "独立曲目" in page
     assert "曲序位置" in page

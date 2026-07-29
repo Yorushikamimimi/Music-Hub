@@ -48,10 +48,10 @@ def test_migration_creates_fresh_catalog_schema(tmp_path):
         }.issubset(sa.inspect(db.engine).get_table_names())
 
         result = sync_catalog()
-        assert result["created"] == 109
-        assert MusicYorushika.query.count() == 109
+        assert result["created"] == 111
+        assert MusicYorushika.query.count() == 111
         assert YorushikaRelease.query.count() == 22
-        assert YorushikaReleaseTrack.query.count() == 122
+        assert YorushikaReleaseTrack.query.count() == 124
 
 
 def test_migration_preserves_legacy_row_and_columns(tmp_path):
@@ -97,10 +97,10 @@ def test_migration_preserves_legacy_row_and_columns(tmp_path):
         assert "yorushika_release_track" in sa.inspect(db.engine).get_table_names()
 
         result = sync_catalog()
-        assert result["created"] == 108
-        assert MusicYorushika.query.count() == 110
+        assert result["created"] == 110
+        assert MusicYorushika.query.count() == 112
         assert YorushikaRelease.query.count() == 22
-        assert YorushikaReleaseTrack.query.count() == 122
+        assert YorushikaReleaseTrack.query.count() == 124
         sunny = MusicYorushika.query.filter_by(slug="haru").one()
         assert sunny.id == 1
         assert sunny.album_title == "晴る"
@@ -122,4 +122,4 @@ def test_release_normalization_downgrade_keeps_legacy_track_data(tmp_path):
         tables = set(sa.inspect(db.engine).get_table_names())
         assert "yorushika_release" not in tables
         assert "yorushika_release_track" not in tables
-        assert MusicYorushika.query.count() == track_count == 109
+        assert MusicYorushika.query.count() == track_count == 111

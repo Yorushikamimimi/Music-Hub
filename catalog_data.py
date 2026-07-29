@@ -52,6 +52,8 @@ LEGACY_TRACK_SLUG_ALIASES = {
 
 
 TRACK_DETAILS = {
+    "early-morning-mailbox": ("", "器乐、序章与来信"),
+    "to-the-sea": ("", "器乐、尾声与远行"),
     "haru": ("Sunny", "季节与前行"),
     "spring-thief": ("Spring Thief", "春日、短暂与留恋"),
     "just-a-sunny-day-for-you": ("Just a Sunny Day for You", "夏日与回望"),
@@ -258,6 +260,7 @@ NEW_RELEASES = (
         "cover_path": "release_nininsyou.webp",
         "source_url": "https://yorushika.com/discography/artist/2/detail/75/",
         "tracks": (
+            ("early-morning-mailbox", "早朝、郵便受け"),
             ("kumo-ni-naru", "雲になる"),
             ("hana-mo-zawameku", "花も騒めく"),
             ("mashou", "魔性"),
@@ -278,6 +281,7 @@ NEW_RELEASES = (
             ("gekkouyoku", "月光浴"),
             ("chidori", "千鳥"),
             ("kai", "櫂"),
+            ("to-the-sea", "海へ"),
         ),
     },
     {
