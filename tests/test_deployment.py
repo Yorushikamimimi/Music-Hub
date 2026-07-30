@@ -18,6 +18,7 @@ def test_radio_restarts_after_a_clean_playlist_completion():
     assert "Restart=always" in unit
     assert "Restart=on-failure" not in unit
     assert "-stream_loop" not in unit
+    assert "-c:a aac -b:a 192k -ar 44100 -ac 2" in unit
 
 
 def test_reliability_units_have_timers_failure_recording_and_narrow_paths():
