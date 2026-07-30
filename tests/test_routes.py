@@ -1,5 +1,7 @@
 import pytest
 
+from sqlalchemy import event
+
 from catalog_data import CATALOG_RELEASES
 from models import MusicYorushika, db
 from release_data import RELEASE_STORIES
@@ -89,6 +91,32 @@ def test_discography_groups_tracks_and_supports_filters(client):
     assert "創作" in filtered
     assert "春泥棒" in filtered
     assert "盗作" not in filtered
+
+
+def test_catalog_pages_keep_database_queries_bounded(app):
+    query_counts = {}
+
+    with app.app_context():
+        engine = db.engine
+
+        for path in ("/discography", "/search"):
+            statements = []
+
+            def record_statement(*_args, **_kwargs):
+                statements.append(1)
+
+            db.session.remove()
+            event.listen(engine, "before_cursor_execute", record_statement)
+            try:
+                response = app.test_client().get(path)
+            finally:
+                event.remove(engine, "before_cursor_execute", record_statement)
+
+            assert response.status_code == 200
+            query_counts[path] = len(statements)
+
+    assert query_counts["/discography"] <= 3
+    assert query_counts["/search"] <= 6
 
 
 def test_song_detail_separates_facts_note_and_official_source(client):

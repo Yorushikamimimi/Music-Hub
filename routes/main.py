@@ -12,6 +12,7 @@ from flask import (
     url_for,
 )
 from sqlalchemy import or_
+from sqlalchemy.orm import selectinload
 
 from catalog_data import (
     CATALOG_SCOPE_URL,
@@ -59,6 +60,10 @@ def _featured_songs():
 def _featured_releases():
     return (
         YorushikaRelease.query
+        .options(
+            selectinload(YorushikaRelease.track_links)
+            .selectinload(YorushikaReleaseTrack.track)
+        )
         .filter_by(is_featured=True)
         .order_by(
             YorushikaRelease.release_date.desc(),
@@ -440,7 +445,14 @@ def search():
     sort_by = request.args.get('sort', 'editorial')
     selected_year = int(year) if year and year.isdigit() else None
 
-    sql_query = MusicYorushika.query.filter_by(is_featured=True)
+    sql_query = (
+        MusicYorushika.query
+        .options(
+            selectinload(MusicYorushika.release_links)
+            .selectinload(YorushikaReleaseTrack.release)
+        )
+        .filter_by(is_featured=True)
+    )
 
     if query:
         sql_query = sql_query.filter(
