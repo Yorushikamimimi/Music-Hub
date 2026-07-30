@@ -1,5 +1,7 @@
 """Flask application factory for Music Hub."""
 
+import os
+
 from flask import Flask, jsonify, request
 from flask_migrate import Migrate
 from sqlalchemy import text
@@ -25,11 +27,28 @@ def create_app(test_config=None):
         app.config.setdefault("SQLALCHEMY_TRACK_MODIFICATIONS", False)
         app.config.setdefault("MAX_CONTENT_LENGTH", 2 * 1024 * 1024)
         app.config.setdefault("SEND_FILE_MAX_AGE_DEFAULT", 0)
+    app.config.setdefault(
+        "RADIO_STATION_NAME",
+        os.getenv("RADIO_STATION_NAME", "夜鹿电台"),
+    )
+    app.config.setdefault(
+        "RADIO_STREAM_URL",
+        os.getenv("RADIO_STREAM_URL", "").strip(),
+    )
 
     db.init_app(app)
     migrate.init_app(app, db)
     app.register_blueprint(main_bp)
     register_commands(app)
+
+    @app.context_processor
+    def inject_global_radio():
+        """Expose one persistent private radio player to every page."""
+        return {
+            "global_radio_station_name": app.config["RADIO_STATION_NAME"],
+            "global_radio_stream_url": app.config["RADIO_STREAM_URL"],
+            "global_radio_private_mode": True,
+        }
 
     @app.get("/healthz")
     def healthz():

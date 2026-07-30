@@ -7,21 +7,29 @@
     <title>{% block title %}夜鹿集 · Yorushika 私人作品索引{% endblock %}</title>
     <meta name="description" content="{% block description %}按专辑、季节与个人聆听路径整理的 Yorushika 私人作品索引。{% endblock %}">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" href="{{ url_for('static', filename='images/avatar-placeholder.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ url_for('static', filename='images/yorushika-eye.svg') }}" type="image/svg+xml">
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/fonts.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/yorushika-archive.css') }}">
     <script src="{{ url_for('static', filename='site.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='favorites.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='about.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='radio.js') }}" defer></script>
 </head>
 
-<body>
+<body{% if global_radio_stream_url %} class="has-global-radio"{% endif %}>
     <a class="skip-link" href="#main-content">跳到主要内容</a>
     <nav class="navbar navbar-expand-lg fixed-top navbar-glass">
         <div class="container site-nav-shell">
             <a class="navbar-brand archive-brand d-flex align-items-center" href="{{ url_for('main.index') }}" aria-label="夜鹿集首页">
-                <span class="archive-brand-mark" aria-hidden="true">ヨ</span>
+                <span class="archive-brand-mark" aria-hidden="true">
+                    <img
+                        src="{{ url_for('static', filename='images/yorushika-eye.svg') }}"
+                        alt=""
+                    >
+                </span>
                 <span class="archive-brand-copy">
                     <strong>夜鹿集</strong>
                     <small>YORUSHIKA ARCHIVE</small>
@@ -108,6 +116,91 @@
             <a href="{{ url_for('main.discography') }}">浏览作品集 <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
         </div>
     </footer>
+
+    {% if global_radio_stream_url %}
+    <aside
+        class="global-radio-dock"
+        id="global-radio-dock"
+        data-radio-schedule="/hls/radio-schedule.json"
+        data-station-name="{{ global_radio_station_name }}"
+        aria-label="夜鹿电台全站播放器"
+    >
+        <audio
+            id="global-radio-audio"
+            src="{{ global_radio_stream_url }}"
+            preload="none"
+            controlslist="nodownload noplaybackrate"
+        ></audio>
+        <a
+            class="global-radio-record"
+            id="global-radio-record"
+            href="{{ url_for('main.radio') }}"
+            aria-label="打开私人电台完整页面"
+        >
+            <span class="global-radio-record-groove" aria-hidden="true"></span>
+            <span class="global-radio-record-logo" aria-hidden="true">
+                <img
+                    src="{{ url_for('static', filename='images/yorushika-eye.svg') }}"
+                    alt=""
+                >
+            </span>
+        </a>
+        <div class="global-radio-copy" aria-live="polite">
+            <span class="global-radio-kicker">夜鹿电台</span>
+            <strong id="global-radio-title">点击播放，继续夜里的声音</strong>
+            <span id="global-radio-artist">Yorushika</span>
+        </div>
+        <div
+            class="global-radio-progress"
+            id="global-radio-progress"
+            role="progressbar"
+            aria-label="当前曲目播放进度"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+        >
+            <span id="global-radio-progress-fill"></span>
+        </div>
+        <span class="global-radio-time" id="global-radio-time">0:00 / 0:00</span>
+        <div class="global-radio-controls">
+            <button
+                class="global-radio-control global-radio-play"
+                id="global-radio-toggle"
+                type="button"
+                aria-label="播放夜鹿电台"
+            >
+                <i class="bi bi-play-fill" aria-hidden="true"></i>
+            </button>
+            <button
+                class="global-radio-control"
+                id="global-radio-mute"
+                type="button"
+                aria-label="静音"
+            >
+                <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+            </button>
+            <label class="global-radio-volume-label" for="global-radio-volume">
+                <span class="visually-hidden">电台音量</span>
+                <input
+                    id="global-radio-volume"
+                    class="global-radio-volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value="0.25"
+                >
+            </label>
+            <a
+                class="global-radio-expand"
+                href="{{ url_for('main.radio') }}"
+                aria-label="打开私人电台完整页面"
+            >
+                <i class="bi bi-arrows-angle-expand" aria-hidden="true"></i>
+            </a>
+        </div>
+    </aside>
+    {% endif %}
 
     {% block scripts %}{% endblock %}
 </body>

@@ -95,3 +95,4 @@ function showToast(msg) {
 }
 
 document.addEventListener('DOMContentLoaded', initFavButtons);
+document.addEventListener('music-hub:page-load', initFavButtons);

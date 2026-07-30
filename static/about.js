@@ -1,4 +1,4 @@
-(() => {
+const initAboutWishlist = () => {
     const body = document.getElementById('wishlist-body');
     const clearButton = document.getElementById('clear-favs-btn');
     if (!body || !clearButton || typeof getFavorites !== 'function') return;
@@ -85,13 +85,19 @@
         initFavButtons();
     };
 
-    clearButton.addEventListener('click', () => {
-        if (window.confirm('确认清空全部收藏吗？')) {
-            localStorage.removeItem(FAV_KEY);
-            window.renderWishlist();
-            showToast('收藏已清空。');
-        }
-    });
+    if (clearButton.dataset.wishlistBound !== 'true') {
+        clearButton.dataset.wishlistBound = 'true';
+        clearButton.addEventListener('click', () => {
+            if (window.confirm('确认清空全部收藏吗？')) {
+                localStorage.removeItem(FAV_KEY);
+                window.renderWishlist();
+                showToast('收藏已清空。');
+            }
+        });
+    }
 
     window.renderWishlist();
-})();
+};
+
+document.addEventListener('DOMContentLoaded', initAboutWishlist);
+document.addEventListener('music-hub:page-load', initAboutWishlist);

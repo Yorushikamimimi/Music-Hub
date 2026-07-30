@@ -12,7 +12,8 @@ from datetime import date
 
 CATALOG_SCOPE_URL = "https://yorushika.com/discography/artist/2/"
 CATALOG_REVIEWED_ON = date(2026, 7, 29)
-VIDEO_LINKS_REVIEWED_ON = date(2026, 7, 29)
+VIDEO_LINKS_REVIEWED_ON = date(2026, 7, 30)
+VIDEO_CANDIDATES_RESEARCHED_ON = date(2026, 7, 30)
 
 
 VERIFIED_BILIBILI_VIDEOS = {
@@ -40,6 +41,293 @@ VERIFIED_BILIBILI_VIDEOS = {
     "howl-at-the-moon": "https://www.bilibili.com/video/BV1Cq4y1V7Kv/",
     "matasaburo": "https://www.bilibili.com/video/BV16V411x7rA/",
     "false-moon": "https://www.bilibili.com/video/BV1zh411h7bY/",
+}
+
+# These links are available in the local preview for Tian's manual review.
+# Promote an entry to VERIFIED_BILIBILI_VIDEOS only after its visual quality,
+# song match, and preferred upload have been accepted.
+PENDING_REVIEW_BILIBILI_VIDEO_CANDIDATES = {
+    "abuku": {
+        "url": "https://www.bilibili.com/video/BV1gTo5BPEbV/",
+        "reference_url": "https://www.youtube.com/watch?v=OHAjc-ayhus",
+        "kind": "official_mv_repost_with_bilingual_subtitles",
+    },
+    "akane": {
+        "url": "https://www.bilibili.com/video/BV1rL9cBzEaP/",
+        "reference_url": "https://www.youtube.com/watch?v=VD_ztcqWBAY",
+        "kind": "official_mv_repost",
+    },
+    "kai": {
+        "url": "https://www.bilibili.com/video/BV1N9wFzPECt/",
+        "reference_url": "https://www.youtube.com/watch?v=SIwfXPESJ8k",
+        "kind": "authorized_official_mv_repost",
+    },
+    "chidori": {
+        "url": "https://www.bilibili.com/video/BV18UPNzfEJH/",
+        "reference_url": "https://www.youtube.com/watch?v=t75qlQPXJGw",
+        "kind": "authorized_official_mv_repost",
+    },
+    "august-a-certain-moonlight": {
+        "url": "https://www.bilibili.com/video/BV1mYqWBBERB/",
+        "reference_url": "https://www.youtube.com/watch?v=Vs5NViM8TSY",
+        "kind": "official_mv_repost_with_subtitles",
+    },
+    "shura": {
+        "url": "https://www.bilibili.com/video/BV1pMtozHEsn/",
+        "reference_url": "https://www.youtube.com/watch?v=h4F-q-R67H0",
+        "kind": "authorized_official_mv_repost",
+    },
+    "kaseijin": {
+        "url": "https://www.bilibili.com/video/BV1Vs5LzpEb3/",
+        "reference_url": "https://www.youtube.com/watch?v=OLRbIc8KZ_8",
+        "kind": "authorized_official_mv_repost",
+    },
+    "hebi": {
+        "url": "https://www.bilibili.com/video/BV1upPveSEhr/",
+        "reference_url": "https://www.youtube.com/watch?v=sf0QFJTvOLM",
+        "kind": "authorized_official_mv_repost",
+    },
+    "taiyou": {
+        "url": "https://www.bilibili.com/video/BV1WFUrB5EUc/",
+        "reference_url": "https://www.youtube.com/watch?v=Qgj3xHRlGr8",
+        "kind": "official_mv_repost",
+    },
+    "aporia": {
+        "url": "https://www.bilibili.com/video/BV1Pp2JYXEBQ/",
+        "reference_url": "https://www.youtube.com/watch?v=fhTFysCtF6g",
+        "kind": "authorized_official_mv_repost",
+    },
+    "wasurete-kudasai": {
+        "url": "https://www.bilibili.com/video/BV1QZ421T78c/",
+        "reference_url": "https://www.youtube.com/watch?v=J_DE2d1F9wU",
+        "kind": "authorized_official_mv_repost",
+    },
+    "gekkouyoku": {
+        "url": "https://www.bilibili.com/video/BV13w411X7Ai/",
+        "reference_url": "https://www.youtube.com/watch?v=wUzvF5xm2C0",
+        "kind": "authorized_official_mv_repost",
+    },
+    "first-night": {
+        "url": "https://www.bilibili.com/video/BV1Yh411P7uY/",
+        "reference_url": "https://www.youtube.com/watch?v=-R8UiY_44Y0",
+        "kind": "authorized_official_mv_repost",
+    },
+    "shayou": {
+        "url": "https://www.bilibili.com/video/BV1c24y1M7yF/",
+        "reference_url": "https://www.youtube.com/watch?v=bqigIHMComE",
+        "kind": "authorized_official_mv_repost",
+    },
+    "four-fifty-one": {
+        "url": "https://www.bilibili.com/video/BV1p24y1b7mK/",
+        "reference_url": "https://www.youtube.com/watch?v=RmYdZZLOYA8",
+        "kind": "authorized_official_mv_repost",
+    },
+    "telepath": {
+        "url": "https://www.bilibili.com/video/BV1jy4y1X7bV/",
+        "reference_url": "https://www.youtube.com/watch?v=LTeROfwwtnA",
+        "kind": "official_mv_repost_4k60_with_subtitles",
+    },
+    "chinokate": {
+        "url": "https://www.bilibili.com/video/BV1kg411S7y7/",
+        "reference_url": "https://www.youtube.com/watch?v=Fq55MMfHoJg",
+        "kind": "official_mv_repost",
+    },
+    "bremen": {
+        "url": "https://www.bilibili.com/video/BV1x3CjBwEjy/",
+        "reference_url": "https://www.youtube.com/watch?v=oy6MDr6I6rM",
+        "kind": "official_mv_repost",
+    },
+    "eat-the-wind": {
+        "url": "https://www.bilibili.com/video/BV1ki4y1L75R/",
+        "reference_url": "https://www.youtube.com/watch?v=GVrRXhS0mLs",
+        "kind": "official_label_upload",
+    },
+    "haruhisagi": {
+        "url": "https://www.bilibili.com/video/BV1hV411r7xG/",
+        "reference_url": "https://www.youtube.com/watch?v=F3cXxqgbx9Y",
+        "kind": "official_mv_repost",
+    },
+    "semi-transparent-boy": {
+        "url": "https://www.bilibili.com/video/BV1dW411W7iq/",
+        "reference_url": "https://www.youtube.com/watch?v=9ypEFXTakV8",
+        "kind": "authorized_official_mv_repost",
+    },
+    "cloud-and-ghost": {
+        "url": "https://www.bilibili.com/video/BV1zs411T7ot/",
+        "reference_url": "https://www.youtube.com/watch?v=JJaCwW4HyVs",
+        "kind": "authorized_official_mv_repost",
+    },
+    "kutsu-no-hanabi": {
+        "url": "https://www.bilibili.com/video/BV1Ax411U7RV/",
+        "reference_url": "https://www.youtube.com/watch?v=BCt9lS_Uv_Y",
+        "kind": "authorized_official_mv_repost",
+    },
+}
+
+# Many album tracks do not have a standalone official music video. These
+# candidates point to the exact part of a high-resolution full-album upload,
+# so every link still opens the reviewed song instead of the album's first
+# track. Standalone verified/video candidates keep higher priority below.
+BILIBILI_ALBUM_VIDEO_SOURCES = {
+    "nininsyou": {
+        "url": "https://www.bilibili.com/video/BV1uDQBBWE54/",
+        "release_title": "二人称",
+        "reference_url": "https://yorushika.com/discography/artist/2/detail/75/",
+        "uploader": "荒牧-Aramaki",
+    },
+    "gentou": {
+        "url": "https://www.bilibili.com/video/BV1XTC1B4E16/",
+        "release_title": "幻燈",
+        "reference_url": "https://yorushika.com/discography/detail/30/",
+        "uploader": "荒牧-Aramaki",
+    },
+    "sousaku": {
+        "url": "https://www.bilibili.com/video/BV1sAUaBHEQ3/",
+        "release_title": "創作",
+        "reference_url": "https://yorushika.com/discography/detail/18/",
+        "uploader": "荒牧-Aramaki",
+    },
+    "tousaku": {
+        "url": "https://www.bilibili.com/video/BV1RH1eBNEbN/",
+        "release_title": "盗作",
+        "reference_url": "https://yorushika.com/discography/detail/15/",
+        "uploader": "荒牧-Aramaki",
+    },
+    "elma": {
+        "url": "https://www.bilibili.com/video/BV1HRWRzqE73/",
+        "release_title": "エルマ",
+        "reference_url": "https://yorushika.com/discography/detail/2/",
+        "uploader": "荒牧-Aramaki",
+    },
+    "dakara-boku-wa-ongaku-wo-yameta": {
+        "url": "https://www.bilibili.com/video/BV1gtWtz3ELo/",
+        "release_title": "だから僕は音楽を辞めた",
+        "reference_url": "https://yorushika.com/discography/detail/6/",
+        "uploader": "荒牧-Aramaki",
+    },
+    "makeinu-ni-encore-wa-iranai": {
+        "url": "https://www.bilibili.com/video/BV1x3Wmz9ESk/",
+        "release_title": "負け犬にアンコールはいらない",
+        "reference_url": "https://yorushika.com/discography/detail/7/",
+        "uploader": "荒牧-Aramaki",
+    },
+    "natsukusa-ga-jama-wo-suru": {
+        "url": "https://www.bilibili.com/video/BV1G2sZzeE6Z/",
+        "release_title": "夏草が邪魔をする",
+        "reference_url": "https://yorushika.com/discography/detail/8/",
+        "uploader": "荒牧-Aramaki",
+    },
+}
+
+_ALBUM_TRACK_PARTS_PENDING_REVIEW = {
+    "early-morning-mailbox": ("nininsyou", 1),
+    "kumo-ni-naru": ("nininsyou", 2),
+    "hana-mo-zawameku": ("nininsyou", 3),
+    "mashou": ("nininsyou", 4),
+    "play-sick": ("nininsyou", 5),
+    "post-haru": ("nininsyou", 6),
+    "rubato": ("nininsyou", 12),
+    "kasou": ("nininsyou", 13),
+    "umeki": ("nininsyou", 16),
+    "kitsutsuki": ("nininsyou", 17),
+    "to-the-sea": ("nininsyou", 22),
+    "summer-portrait": ("gentou", 1),
+    "snow-country": ("gentou", 5),
+    "pas-de-deux": ("gentou", 8),
+    "old-man-and-the-sea": ("gentou", 11),
+    "goodbye-molten": ("gentou", 12),
+    "isana": ("gentou", 13),
+    "second-night": ("gentou", 17),
+    "third-night": ("gentou", 18),
+    "fourth-night": ("gentou", 19),
+    "fifth-night": ("gentou", 20),
+    "sixth-night": ("gentou", 21),
+    "seventh-night": ("gentou", 22),
+    "eighth-night": ("gentou", 23),
+    "ninth-night": ("gentou", 24),
+    "tenth-night": ("gentou", 25),
+    "robbery-and-bouquet": ("sousaku", 1),
+    "creation": ("sousaku", 3),
+    "music-thief-confession": ("tousaku", 1),
+    "daytime-nighthawk": ("tousaku", 2),
+    "bakudanma": ("tousaku", 4),
+    "youth-burglary": ("tousaku", 5),
+    "replicant": ("tousaku", 6),
+    "midsummer-music-thief": ("tousaku", 8),
+    "escape": ("tousaku", 11),
+    "childhood-in-memories": ("tousaku", 12),
+    "train-window": ("elma", 1),
+    "only-sorrow": ("elma", 2),
+    "evening-calm-flower-confusion": ("elma", 3),
+    "lake-town": ("elma", 5),
+    "dance-of-god": ("elma", 6),
+    "rain-clears": ("elma", 7),
+    "forest-church": ("elma", 10),
+    "voice": ("elma", 11),
+    "amy": ("elma", 12),
+    "seabed-moonlight": ("elma", 13),
+    "august-31": ("dakara-boku-wa-ongaku-wo-yameta", 1),
+    "poet-and-coffee": ("dakara-boku-wa-ongaku-wo-yameta", 4),
+    "july-13": ("dakara-boku-wa-ongaku-wo-yameta", 5),
+    "lets-dance": ("dakara-boku-wa-ongaku-wo-yameta", 6),
+    "june-writes-rain-cleared-city": (
+        "dakara-boku-wa-ongaku-wo-yameta",
+        7,
+    ),
+    "from-the-window-of-may": ("dakara-boku-wa-ongaku-wo-yameta", 8),
+    "night-imitation": ("dakara-boku-wa-ongaku-wo-yameta", 9),
+    "may-6": ("dakara-boku-wa-ongaku-wo-yameta", 10),
+    "april-10": ("dakara-boku-wa-ongaku-wo-yameta", 13),
+    "previous-life": ("makeinu-ni-encore-wa-iranai", 1),
+    "makeinu-ni-encore-wa-iranai": (
+        "makeinu-ni-encore-wa-iranai",
+        2,
+    ),
+    "falling": ("makeinu-ni-encore-wa-iranai", 5),
+    "hibernation": ("makeinu-ni-encore-wa-iranai", 8),
+    "summer-bus-stop-waiting-for-you": (
+        "makeinu-ni-encore-wa-iranai",
+        9,
+    ),
+    "summer-shadow-playing-piano": ("natsukusa-ga-jama-wo-suru", 1),
+    "cattleya": ("natsukusa-ga-jama-wo-suru", 2),
+    "bloom-in-that-summer": ("natsukusa-ga-jama-wo-suru", 4),
+    "flight": ("natsukusa-ga-jama-wo-suru", 5),
+}
+
+PENDING_REVIEW_BILIBILI_ALBUM_TRACK_CANDIDATES = {
+    slug: {
+        "url": (
+            f"{BILIBILI_ALBUM_VIDEO_SOURCES[source_slug]['url']}"
+            f"?p={part_number}"
+        ),
+        "reference_url": BILIBILI_ALBUM_VIDEO_SOURCES[source_slug][
+            "reference_url"
+        ],
+        "kind": "hi_res_album_track",
+        "release_title": BILIBILI_ALBUM_VIDEO_SOURCES[source_slug][
+            "release_title"
+        ],
+        "uploader": BILIBILI_ALBUM_VIDEO_SOURCES[source_slug]["uploader"],
+        "part": part_number,
+    }
+    for slug, (source_slug, part_number) in (
+        _ALBUM_TRACK_PARTS_PENDING_REVIEW.items()
+    )
+}
+
+BILIBILI_VIDEO_LINKS = {
+    **{
+        slug: candidate["url"]
+        for slug, candidate in (
+            PENDING_REVIEW_BILIBILI_ALBUM_TRACK_CANDIDATES.items()
+        )
+    },
+    **VERIFIED_BILIBILI_VIDEOS,
+    **{
+        slug: candidate["url"]
+        for slug, candidate in PENDING_REVIEW_BILIBILI_VIDEO_CANDIDATES.items()
+    },
 }
 
 
@@ -475,7 +763,7 @@ def _build_catalog_tracks():
                     ),
                     "source_url": primary_release["source_url"],
                     "source_checked_at": CATALOG_REVIEWED_ON,
-                    "mv_url": VERIFIED_BILIBILI_VIDEOS.get(slug),
+                    "mv_url": BILIBILI_VIDEO_LINKS.get(slug),
                 }
             )
 

@@ -1,4 +1,3 @@
-import os
 import random
 import datetime
 
@@ -559,12 +558,10 @@ def lyrics():
 
 @main_bp.route('/radio')
 def radio():
-    station_name = os.getenv('RADIO_STATION_NAME', 'Yorushika Radio')
-    stream_url = os.getenv('RADIO_STREAM_URL', '').strip()
     return render_template(
         'radio.html',
-        station_name=station_name,
-        stream_url=stream_url,
+        station_name=current_app.config['RADIO_STATION_NAME'],
+        stream_url=current_app.config['RADIO_STREAM_URL'],
         private_mode=True,
     )
 

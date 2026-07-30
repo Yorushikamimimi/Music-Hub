@@ -59,6 +59,7 @@ def test_home_uses_archive_identity_and_internal_listening_paths(client):
     assert 'href="/releases/tousaku"' in page
     assert 'href="/releases/nininsyou"' in page
     assert 'aria-label="搜索作品"' in page
+    assert "images/yorushika-eye.svg" in page
 
 
 def test_discography_groups_tracks_and_supports_filters(client):
@@ -198,7 +199,7 @@ def test_dakara_boku_release_archive_keeps_facts_and_notes_separate(client):
     assert "写给エルマ的告别" in page
     assert "日期节点" in page
     assert page.count('class="release-track-main"') == 14
-    assert page.count('class="release-track-video"') == 4
+    assert page.count('class="release-track-video"') == 14
     assert (
         'href="/songs/deep-indigo?release='
         'dakara-boku-wa-ongaku-wo-yameta"'
@@ -335,7 +336,7 @@ def test_about_explains_archive_identity_scope_and_boundaries(client):
     assert "22 <span>部</span>" in page
     assert "111 <span>首</span>" in page
     assert "124 <span>条</span>" in page
-    assert "24 <span>首</span>" in page
+    assert "111 <span>首</span>" in page
     assert "独立曲目" in page
     assert "曲序位置" in page
     assert "Yorushika 官方艺人目录中的音乐发行" in page
@@ -358,7 +359,27 @@ def test_radio_is_marked_private_and_never_autoplays(client):
     assert "私人聆听入口" in page
     assert "autoplay" not in page
     assert 'preload="none"' in page
-    assert "Initial volume 25%" in page
+    assert "初始音量 25%" in page
+    assert "正在播放" in page
+    assert "当前曲目" in page
+    assert "下一首" in page
+    assert "Now playing" not in page
+    assert "Current track" not in page
+
+
+def test_radio_player_is_global_and_radio_page_reuses_it(client):
+    home_page = client.get("/").get_data(as_text=True)
+    radio_page = client.get("/radio").get_data(as_text=True)
+
+    assert home_page.count('id="global-radio-audio"') == 1
+    assert 'id="global-radio-dock"' in home_page
+    assert 'id="global-radio-toggle"' in home_page
+    assert 'href="/radio"' in home_page
+    assert "images/yorushika-eye.svg" in home_page
+    assert radio_page.count('id="global-radio-audio"') == 1
+    assert 'id="radio-page-toggle"' in radio_page
+    assert 'id="radio-page-volume"' in radio_page
+    assert "images/yorushika-eye.svg" in radio_page
 
 
 def test_robots_disallows_all_crawlers(client):

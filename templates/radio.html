@@ -1,17 +1,19 @@
 {% extends "base.html" %}
+{% block title %}私人电台 · 夜鹿集{% endblock %}
+{% block description %}夜鹿集的私人 Yorushika 连续聆听入口，支持全站常驻播放与当前曲目信息。{% endblock %}
 
 {% block content %}
 <div class="container py-4 radio-page">
     <div class="glass-card p-4 radio-hero mb-4">
         <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3">
             <div>
-                <p class="radio-kicker mb-2">MUSIC HUB LIVE</p>
-                <h1 class="fw-bold mb-2">Radio</h1>
-                <p class="text-muted mb-0">A continuous mix from the local Yorushika collection. Playback always starts manually.</p>
+                <p class="radio-kicker mb-2">私人聆听</p>
+                <h1 class="fw-bold mb-2">夜鹿电台</h1>
+                <p class="text-muted mb-0">从本地 Yorushika 收藏中连续播放。首次进入始终由你手动开始。</p>
             </div>
             <div class="radio-station-chip">
                 <i class="bi bi-broadcast-pin" aria-hidden="true"></i>
-                <span>{{ station_name }}</span>
+                <span>夜鹿电台</span>
             </div>
         </div>
     </div>
@@ -25,19 +27,25 @@
         {% if stream_url %}
         <div class="radio-player-heading">
             <div>
-                <p class="radio-kicker mb-1">ON AIR NOW</p>
-                <h3 id="radio-now-playing-title" class="mb-0">Now playing</h3>
+                <p class="radio-kicker mb-1">正在播出</p>
+                <h2 id="radio-now-playing-title" class="mb-0">正在播放</h2>
             </div>
             <span class="radio-live-badge" id="radio-live-badge">
                 <span class="radio-live-dot" aria-hidden="true"></span>
-                LIVE
+                直播
             </span>
         </div>
 
         <div class="radio-now-playing">
-            <div class="radio-cover" aria-hidden="true">
+            <div class="radio-cover" id="radio-cover" aria-hidden="true">
                 <div class="radio-disc">
-                    <i class="bi bi-music-note-beamed"></i>
+                    <span class="radio-disc-groove"></span>
+                    <span class="radio-disc-logo">
+                        <img
+                            src="{{ url_for('static', filename='images/yorushika-eye.svg') }}"
+                            alt=""
+                        >
+                    </span>
                 </div>
                 <div class="radio-equalizer" id="radio-equalizer">
                     <span></span>
@@ -48,15 +56,15 @@
             </div>
 
             <div class="radio-track-panel" aria-live="polite">
-                <p class="radio-track-label mb-2">CURRENT TRACK</p>
-                <h4 class="radio-track-title mb-1" id="radio-track-title">Synchronizing live playlist…</h4>
-                <p class="radio-track-artist mb-4" id="radio-track-artist">{{ station_name }}</p>
+                <p class="radio-track-label mb-2">当前曲目</p>
+                <h3 class="radio-track-title mb-1" id="radio-track-title">正在同步播放列表…</h3>
+                <p class="radio-track-artist mb-4" id="radio-track-artist">Yorushika</p>
 
                 <div
                     class="radio-progress-track"
                     id="radio-progress-track"
                     role="progressbar"
-                    aria-label="Approximate broadcast track progress"
+                    aria-label="当前曲目的大致播放进度"
                     aria-valuemin="0"
                     aria-valuemax="100"
                     aria-valuenow="0"
@@ -69,26 +77,51 @@
                 </div>
 
                 <div class="radio-next-track">
-                    <span class="radio-next-label">UP NEXT</span>
-                    <span class="radio-next-title" id="radio-next-title">Loading playlist…</span>
+                    <span class="radio-next-label">下一首</span>
+                    <span class="radio-next-title" id="radio-next-title">正在读取播放列表…</span>
                 </div>
             </div>
         </div>
 
-        <div class="radio-native-player">
-            <audio id="radio-audio" controls controlslist="nodownload noplaybackrate" preload="none">
-                <source src="{{ stream_url }}">
-                Your browser does not support audio playback.
-            </audio>
+        <div class="radio-native-player radio-custom-controls">
+            <button
+                class="radio-page-play"
+                id="radio-page-toggle"
+                type="button"
+                aria-label="播放夜鹿电台"
+            >
+                <i class="bi bi-play-fill" aria-hidden="true"></i>
+                <span>开始收听</span>
+            </button>
+            <button
+                class="radio-page-mute"
+                id="radio-page-mute"
+                type="button"
+                aria-label="静音"
+            >
+                <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+            </button>
+            <label class="radio-page-volume-label" for="radio-page-volume">
+                <span>音量</span>
+                <input
+                    id="radio-page-volume"
+                    class="radio-page-volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value="0.25"
+                >
+            </label>
             <div class="radio-player-note">
-                <span id="radio-playback-status">Click Play when you are ready.</span>
-                <span>Initial volume 25%</span>
+                <span id="radio-playback-status">准备好后，点击“开始收听”。</span>
+                <span>初始音量 25%</span>
             </div>
         </div>
 
         <p class="radio-sync-note mb-0">
             <i class="bi bi-info-circle" aria-hidden="true"></i>
-            Track details follow the live broadcast timeline and may lead the buffered audio by a few seconds.
+            曲目信息跟随直播时间线，可能比浏览器缓冲后的声音快几秒。
         </p>
         {% if private_mode %}
         <p class="radio-private-note mb-0">
@@ -98,15 +131,9 @@
         {% endif %}
         {% else %}
         <div class="alert alert-warning mb-0" role="alert">
-            The radio stream is not configured. Playback is currently unavailable.
+            电台尚未配置播放地址，当前无法收听。
         </div>
         {% endif %}
     </section>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{% if stream_url %}
-<script src="{{ url_for('static', filename='radio.js') }}" defer></script>
-{% endif %}
 {% endblock %}

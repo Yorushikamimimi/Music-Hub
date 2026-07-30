@@ -1,11 +1,16 @@
 from pathlib import Path
 
 from catalog_data import (
+    BILIBILI_ALBUM_VIDEO_SOURCES,
     CATALOG_REVIEWED_ON,
     CATALOG_RELEASES,
     CATALOG_RELEASE_TRACKS,
     CATALOG_SCOPE_URL,
     CATALOG_TRACKS,
+    PENDING_REVIEW_BILIBILI_ALBUM_TRACK_CANDIDATES,
+    PENDING_REVIEW_BILIBILI_VIDEO_CANDIDATES,
+    VERIFIED_BILIBILI_VIDEOS,
+    VIDEO_CANDIDATES_RESEARCHED_ON,
     VIDEO_LINKS_REVIEWED_ON,
 )
 from catalog_service import _clean_bilibili_url, _clean_external_url, sync_catalog
@@ -63,7 +68,33 @@ def test_release_track_order_matches_curated_official_catalog():
     assert len(CATALOG_TRACKS) == 111
     assert len(CATALOG_RELEASES) == 22
     assert len(CATALOG_RELEASE_TRACKS) == 124
-    assert sum(bool(track["mv_url"]) for track in CATALOG_TRACKS) == 24
+    assert sum(bool(track["mv_url"]) for track in CATALOG_TRACKS) == 111
+    assert len(PENDING_REVIEW_BILIBILI_VIDEO_CANDIDATES) == 23
+    assert len(PENDING_REVIEW_BILIBILI_ALBUM_TRACK_CANDIDATES) == 64
+    assert len(BILIBILI_ALBUM_VIDEO_SOURCES) == 8
+    assert all(
+        candidate["url"].startswith("https://www.bilibili.com/video/BV")
+        for candidate in PENDING_REVIEW_BILIBILI_VIDEO_CANDIDATES.values()
+    )
+    assert all(
+        candidate["reference_url"].startswith("https://www.youtube.com/watch?v=")
+        for candidate in PENDING_REVIEW_BILIBILI_VIDEO_CANDIDATES.values()
+    )
+    assert all(
+        candidate["kind"] == "hi_res_album_track"
+        and candidate["url"].startswith("https://www.bilibili.com/video/BV")
+        and "?p=" in candidate["url"]
+        and candidate["part"] > 0
+        and candidate["uploader"] == "荒牧-Aramaki"
+        for candidate in PENDING_REVIEW_BILIBILI_ALBUM_TRACK_CANDIDATES.values()
+    )
+    assert not (
+        PENDING_REVIEW_BILIBILI_ALBUM_TRACK_CANDIDATES.keys()
+        & (
+            PENDING_REVIEW_BILIBILI_VIDEO_CANDIDATES.keys()
+            | VERIFIED_BILIBILI_VIDEOS.keys()
+        )
+    )
 
     release_lengths = {
         release["title"]: len(release["tracks"])
@@ -130,7 +161,8 @@ def test_release_dates_and_sources_follow_official_release_pages():
         for track in CATALOG_TRACKS
     )
     assert CATALOG_REVIEWED_ON.isoformat() == "2026-07-29"
-    assert VIDEO_LINKS_REVIEWED_ON.isoformat() == "2026-07-29"
+    assert VIDEO_LINKS_REVIEWED_ON.isoformat() == "2026-07-30"
+    assert VIDEO_CANDIDATES_RESEARCHED_ON.isoformat() == "2026-07-30"
     assert CATALOG_SCOPE_URL == "https://yorushika.com/discography/artist/2/"
 
 
@@ -247,3 +279,15 @@ def test_bilibili_url_is_restricted_to_video_pages():
     )
     assert _clean_bilibili_url("https://www.bilibili.com/account/history") is None
     assert _clean_bilibili_url("https://example.com/video/BV1dW41137on/") is None
+    assert (
+        _clean_bilibili_url(
+            "https://www.bilibili.com/video/BV1uDQBBWE54/?p=12&spm_id_from=333"
+        )
+        == "https://www.bilibili.com/video/BV1uDQBBWE54/?p=12"
+    )
+    assert (
+        _clean_bilibili_url(
+            "https://www.bilibili.com/video/BV1uDQBBWE54/?p=0"
+        )
+        == "https://www.bilibili.com/video/BV1uDQBBWE54/"
+    )

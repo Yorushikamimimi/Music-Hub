@@ -1,6 +1,7 @@
 """Catalog synchronization helpers used by deployment and tests."""
 
-from urllib.parse import urlsplit, urlunsplit
+import re
+from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from sqlalchemy import or_
 
@@ -38,10 +39,21 @@ def _clean_bilibili_url(url: str | None) -> str | None:
     if (
         parts.scheme != "https"
         or parts.hostname not in {"bilibili.com", "www.bilibili.com"}
-        or not parts.path.startswith("/video/BV")
+        or re.fullmatch(r"/video/BV[A-Za-z0-9]+/?", parts.path) is None
     ):
         return None
-    return urlunsplit(("https", "www.bilibili.com", parts.path, "", ""))
+    query = parse_qs(parts.query)
+    part_values = query.get("p", ())
+    safe_query = ""
+    if (
+        len(part_values) == 1
+        and part_values[0].isdigit()
+        and int(part_values[0]) > 0
+    ):
+        safe_query = urlencode({"p": int(part_values[0])})
+    return urlunsplit(
+        ("https", "www.bilibili.com", parts.path, safe_query, "")
+    )
 
 
 def sync_catalog(commit: bool = True) -> dict:
