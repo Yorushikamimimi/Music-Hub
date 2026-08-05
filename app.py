@@ -2,11 +2,12 @@
 
 import os
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, url_for
 from flask_migrate import Migrate
 from sqlalchemy import text
 
 from commands import register_commands
+from catalog_data import CATALOG_TRACKS
 from config import load_runtime_config
 from models import db
 from routes.main import main_bp
@@ -48,6 +49,13 @@ def create_app(test_config=None):
             "global_radio_station_name": app.config["RADIO_STATION_NAME"],
             "global_radio_stream_url": app.config["RADIO_STREAM_URL"],
             "global_radio_private_mode": True,
+            "global_radio_artwork_map": {
+                track["title_ja"]: url_for(
+                    "static",
+                    filename=f"images/{track['cover_path']}",
+                )
+                for track in CATALOG_TRACKS
+            },
         }
 
     @app.get("/healthz")

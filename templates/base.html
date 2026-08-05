@@ -118,6 +118,11 @@
     </footer>
 
     {% if global_radio_stream_url %}
+    <div
+        id="global-radio-artwork-map"
+        data-artwork-map='{{ global_radio_artwork_map | tojson }}'
+        hidden
+    ></div>
     <aside
         class="global-radio-dock"
         id="global-radio-dock"
@@ -140,6 +145,7 @@
             <span class="global-radio-record-groove" aria-hidden="true"></span>
             <span class="global-radio-record-logo" aria-hidden="true">
                 <img
+                    id="global-radio-artwork"
                     src="{{ url_for('static', filename='images/yorushika-eye.svg') }}"
                     alt=""
                 >

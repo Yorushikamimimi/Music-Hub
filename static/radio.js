@@ -13,11 +13,27 @@
     const dockToggle = document.getElementById('global-radio-toggle');
     const dockMute = document.getElementById('global-radio-mute');
     const dockVolume = document.getElementById('global-radio-volume');
+    const dockArtwork = document.getElementById('global-radio-artwork');
+    const artworkMapElement = document.getElementById(
+        'global-radio-artwork-map'
+    );
     const stationName = dock.dataset.stationName || '夜鹿电台';
+    const fallbackArtwork = (
+        dockArtwork?.getAttribute('src') || '/static/images/yorushika-eye.svg'
+    );
+    let artworkByTitle = {};
     let schedule = null;
     let scheduleUnavailable = false;
     let serverClockOffset = 0;
     let renderedTrackKey = '';
+
+    try {
+        artworkByTitle = JSON.parse(
+            artworkMapElement?.dataset.artworkMap || '{}'
+        );
+    } catch (error) {
+        console.warn('Radio artwork map is invalid:', error);
+    }
 
     const formatTime = (seconds) => {
         const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
@@ -28,6 +44,7 @@
     const pageControls = () => ({
         page: document.querySelector('.radio-player-card'),
         cover: document.getElementById('radio-cover'),
+        artwork: document.getElementById('radio-disc-artwork'),
         equalizer: document.getElementById('radio-equalizer'),
         title: document.getElementById('radio-track-title'),
         artist: document.getElementById('radio-track-artist'),
@@ -42,6 +59,21 @@
         volume: document.getElementById('radio-page-volume'),
     });
 
+    const normalizeTrackTitle = (title) => String(title || '')
+        .replace(/\s*[（(]Live[）)]\s*$/i, '')
+        .trim();
+
+    const artworkForTrack = (track) => (
+        artworkByTitle[normalizeTrackTitle(track?.title)] || fallbackArtwork
+    );
+
+    const renderArtwork = (track) => {
+        const artwork = artworkForTrack(track);
+        if (dockArtwork) dockArtwork.src = artwork;
+        const pageArtwork = pageControls().artwork;
+        if (pageArtwork) pageArtwork.src = artwork;
+    };
+
     const updateMediaMetadata = (track) => {
         if (!('mediaSession' in navigator) || !('MediaMetadata' in window)) {
             return;
@@ -49,15 +81,18 @@
         const trackKey = `${track.title || ''}:${track.artist || ''}`;
         if (trackKey === renderedTrackKey) return;
         renderedTrackKey = trackKey;
+        const artwork = artworkForTrack(track);
         navigator.mediaSession.metadata = new MediaMetadata({
             title: track.title || '夜鹿电台',
             artist: track.artist || 'Yorushika',
             album: '夜鹿集 · 私人电台',
             artwork: [
                 {
-                    src: '/static/images/yorushika-eye.svg',
+                    src: artwork,
                     sizes: '512x512',
-                    type: 'image/svg+xml',
+                    type: artwork.endsWith('.webp')
+                        ? 'image/webp'
+                        : 'image/svg+xml',
                 },
             ],
         });
@@ -168,6 +203,7 @@
             );
         }
         setProgress(percentage, position, trackDuration, currentTitle);
+        renderArtwork(currentTrack);
         updateMediaMetadata(currentTrack);
     };
 
@@ -185,6 +221,7 @@
         if (page.nextTitle) {
             page.nextTitle.textContent = '曲目信息暂时不可用';
         }
+        renderArtwork(null);
     };
 
     const updatePlaybackControls = () => {

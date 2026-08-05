@@ -1,3 +1,6 @@
+import json
+import re
+
 import pytest
 
 from sqlalchemy import event
@@ -408,6 +411,23 @@ def test_radio_player_is_global_and_radio_page_reuses_it(client):
     assert 'id="radio-page-toggle"' in radio_page
     assert 'id="radio-page-volume"' in radio_page
     assert "images/yorushika-eye.svg" in radio_page
+
+
+def test_radio_player_exposes_release_artwork_for_live_tracks(client):
+    page = client.get("/radio").get_data(as_text=True)
+    artwork_payload = re.search(
+        r'id="global-radio-artwork-map"\s+'
+        r"data-artwork-map='(.*?)'",
+        page,
+        re.DOTALL,
+    )
+
+    assert artwork_payload is not None
+    artwork_map = json.loads(artwork_payload.group(1))
+    assert artwork_map["冬眠"].endswith("/static/images/release_makeinu.webp")
+    assert artwork_map["春泥棒"].endswith("/static/images/release_sousaku.webp")
+    assert 'id="global-radio-artwork"' in page
+    assert 'id="radio-disc-artwork"' in page
 
 
 def test_robots_disallows_all_crawlers(client):
