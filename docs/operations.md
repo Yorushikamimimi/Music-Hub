@@ -22,13 +22,17 @@ The retired `music.yoruming.cn` DNS and HTTPS entry are not part of the current 
 
 1. Creates `/run/yorushika-radio/` through systemd `RuntimeDirectory`.
 2. Runs `scripts/generate_radio_schedule.py`.
-3. Builds a deterministic FFmpeg concat playlist from 24 reviewed Yorushika files.
+3. Builds a deterministic FFmpeg concat playlist from 13 reviewed 2021 `Live「前世」` files.
 4. Probes the real duration of each track and writes `radio-schedule.json`.
 5. Starts an audio-only FFmpeg HLS stream.
 6. Regenerates runtime files after service restart or server reboot.
 
 The repository intentionally excludes the MP3 collection, generated HLS segments,
 `.env`, databases and virtual environments. Unknown MP3 files are ignored.
+
+Before and after every Radio library replacement, archive the complete MP3 directory,
+copy it off the server, and verify a SHA-256 manifest. Git preserves the curated order,
+display names and runtime code, but is not a backup for the audio bytes.
 
 The stream is a private, IP-restricted personal listening tool. It does not
 autoplay, expose a download feature, provide public indexing, or reproduce full lyrics.

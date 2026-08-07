@@ -64,7 +64,9 @@
         .trim();
 
     const artworkForTrack = (track) => (
-        artworkByTitle[normalizeTrackTitle(track?.title)] || fallbackArtwork
+        artworkByTitle[
+            normalizeTrackTitle(track?.artworkTitle || track?.title)
+        ] || fallbackArtwork
     );
 
     const renderArtwork = (track) => {

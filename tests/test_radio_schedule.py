@@ -11,9 +11,12 @@ def test_playlist_only_includes_curated_yorushika_files(tmp_path):
         path.touch()
 
     assert generate_radio_schedule.ordered_music_files(tmp_path) == [first, second]
-    assert len(generate_radio_schedule.PLAYLIST_ORDER) == 24
+    assert len(generate_radio_schedule.PLAYLIST_ORDER) == 13
     assert set(generate_radio_schedule.PLAYLIST_ORDER) == set(
         generate_radio_schedule.TITLE_OVERRIDES
+    )
+    assert set(generate_radio_schedule.PLAYLIST_ORDER) == set(
+        generate_radio_schedule.ARTWORK_TITLES
     )
 
 
@@ -38,6 +41,7 @@ def test_generated_schedule_is_private(tmp_path, monkeypatch):
     assert schedule["tracks"] == [
         {
             "title": generate_radio_schedule.TITLE_OVERRIDES[track_stem],
+            "artworkTitle": generate_radio_schedule.ARTWORK_TITLES[track_stem],
             "artist": "Yorushika",
             "duration": 180.0,
         }
