@@ -50,5 +50,10 @@ def load_runtime_config() -> dict:
         'SEND_FILE_MAX_AGE_DEFAULT': 86400,
         'SESSION_COOKIE_HTTPONLY': True,
         'SESSION_COOKIE_SAMESITE': 'Lax',
-        'TRUSTED_HOSTS': ['81.68.72.245', 'localhost', '127.0.0.1'],
+        'TRUSTED_HOSTS': [
+            '81.68.72.245',
+            'radio.yoruming.cn',
+            'localhost',
+            '127.0.0.1',
+        ],
     }

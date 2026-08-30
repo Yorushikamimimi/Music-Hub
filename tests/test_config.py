@@ -24,6 +24,7 @@ def test_runtime_config_encodes_database_password_and_hardens_pool(monkeypatch):
     assert config["SESSION_COOKIE_HTTPONLY"] is True
     assert config["SESSION_COOKIE_SAMESITE"] == "Lax"
     assert "81.68.72.245" in config["TRUSTED_HOSTS"]
+    assert "radio.yoruming.cn" in config["TRUSTED_HOSTS"]
 
 
 def test_runtime_config_rejects_missing_required_value(monkeypatch):

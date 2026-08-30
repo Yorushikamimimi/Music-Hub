@@ -82,5 +82,23 @@ def test_preparation_installs_but_does_not_enable_reliability_timers():
     assert "music-hub-health.timer" in preparation
     assert "music-hub-backup.timer" in preparation
     assert "music-hub-failure@.service" in preparation
+    assert "deploy/nginx/musichub-radio.conf" in preparation
+    assert "/etc/nginx/.htpasswd-radio" in preparation
+    assert "deploy/certbot/reload-nginx.sh" in preparation
+    assert "/etc/letsencrypt/renewal-hooks/deploy/reload-nginx" in preparation
+    assert "Preserving existing server-local legacy IP allowlist" in preparation
+    assert 'LEGACY_NGINX_CONF="${LEGACY_NGINX_CONF:-/etc/nginx/conf.d/musichub-ip.conf}"' in preparation
     assert "systemctl enable" not in preparation
     assert "systemctl restart" not in preparation
+
+
+def test_public_legacy_nginx_template_contains_no_owner_source_ip():
+    template = Path("deploy/nginx/musichub-ip.conf").read_text(encoding="utf-8")
+    active_allow_lines = [
+        line.strip()
+        for line in template.splitlines()
+        if line.strip().startswith("allow ")
+    ]
+
+    assert active_allow_lines == ["allow 127.0.0.1;", "allow ::1;"]
+    assert "# allow 203.0.113.10;" in template

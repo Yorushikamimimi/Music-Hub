@@ -2,8 +2,9 @@
 
 ## Current Runtime
 
-- Entry: `http://81.68.72.245/`
-- Access boundary: localhost and Tian's current public IPv4 only
+- Primary entry: `https://radio.yoruming.cn/`
+- Primary access boundary: HTTPS plus HTTP Basic Auth for the complete origin, including `/hls/`
+- Legacy rollback entry: `http://81.68.72.245/`, restricted to the existing Nginx source allowlist
 - Reverse proxy: `Nginx`
 - App server: `Gunicorn + Flask`
 - App service: `musichub.service`
@@ -14,7 +15,14 @@
 - Radio library: `/srv/media/yorushika-radio/music`
 - Service identities: `musichub` and `musichub-radio` (no login shells)
 
-The retired `music.yoruming.cn` DNS and HTTPS entry are not part of the current runtime.
+The retired `music.yoruming.cn` entry is not part of the current runtime. The
+`radio.yoruming.cn` certificate and Nginx server are independent of the main
+`yoruming.cn` website.
+
+The versioned legacy-IP template intentionally contains only localhost plus a
+commented RFC 5737 TEST-NET example. Real owner source IPs belong only in the
+server-local Nginx config and must never be committed. Runtime preparation
+preserves an existing server-local legacy allowlist instead of overwriting it.
 
 ## Persistent Radio Design
 
@@ -22,7 +30,9 @@ The retired `music.yoruming.cn` DNS and HTTPS entry are not part of the current 
 
 1. Creates `/run/yorushika-radio/` through systemd `RuntimeDirectory`.
 2. Runs `scripts/generate_radio_schedule.py`.
-3. Builds a deterministic FFmpeg concat playlist from 13 reviewed 2021 `Live「前世」` files.
+3. Builds a deterministic FFmpeg concat playlist from 57 reviewed files across
+   2021 `Live「前世」`, 2022 `Live「月光」`, 2024 `Live「前世」` and
+   2024 `Live「月と猫のダンス」`.
 4. Probes the real duration of each track and writes `radio-schedule.json`.
 5. Starts an audio-only FFmpeg HLS stream.
 6. Regenerates runtime files after service restart or server reboot.
@@ -34,8 +44,23 @@ Before and after every Radio library replacement, archive the complete MP3 direc
 copy it off the server, and verify a SHA-256 manifest. Git preserves the curated order,
 display names and runtime code, but is not a backup for the audio bytes.
 
-The stream is a private, IP-restricted personal listening tool. It does not
+The stream is a private, login-protected personal listening tool. It does not
 autoplay, expose a download feature, provide public indexing, or reproduce full lyrics.
+
+## Domain Authentication and TLS
+
+- Nginx config: `/etc/nginx/conf.d/musichub-radio.conf`
+- Versioned template: `deploy/nginx/musichub-radio.conf`
+- Password hash: `/etc/nginx/.htpasswd-radio` (`root:www-data`, mode `0640`)
+- Certificate: `/etc/letsencrypt/live/radio.yoruming.cn/`
+- ACME webroot: `/var/www/certbot`
+- Renewal deploy hook: `/etc/letsencrypt/renewal-hooks/deploy/reload-nginx`
+- Pre-auth rollback config: `/var/backups/music-hub/nginx/musichub-radio-pre-auth-20260823T1115CST.conf`
+
+The server stores only a password hash. The current plaintext credential is kept
+in the owner's macOS Keychain under service `radio.yoruming.cn` and account
+`Yorushika`; it must never be added to Git, Vault, `.env`, or operations logs.
+Changing the password requires a separately confirmed credential rotation.
 
 ## Runtime Preparation
 
@@ -64,7 +89,10 @@ systemd-analyze verify deploy/systemd/music-hub-backup.timer
 systemd-analyze verify deploy/systemd/music-hub-failure@.service
 ```
 
-When Tian's public IPv4 changes, update the `allow` line in the Nginx configuration before expecting remote access.
+When Tian's public IPv4 changes, the authenticated HTTPS entry should continue
+to work. Only SSH administration and the legacy IP rollback entry depend on
+source-IP allowlists. Update those server-local rules only after explicit
+approval; do not copy real client IPs back into the public repository template.
 
 ## Service Checks
 
@@ -80,6 +108,10 @@ journalctl -u yorushika-radio.service -n 100 --no-pager
 
 ```bash
 nginx -t
+curl -I http://radio.yoruming.cn/
+curl -I https://radio.yoruming.cn/
+# Expect 401 without credentials; use an interactive prompt or protected local
+# credential source for authenticated checks. Never put the password in docs.
 curl -I -H "Host: 81.68.72.245" http://127.0.0.1/
 curl -I -H "Host: 81.68.72.245" http://127.0.0.1/radio
 curl -I -H "Host: 81.68.72.245" http://127.0.0.1/hls/yorushika.m3u8
@@ -94,6 +126,9 @@ Browser acceptance should additionally prove:
 3. Playback advances with `readyState=4` and no media error.
 4. Mobile layout has no horizontal overflow.
 5. `https://yoruming.cn/` remains healthy because it is a separate project.
+6. The unauthenticated domain returns `401`, a wrong password returns `401`,
+   and authenticated page, static and HLS requests return `200`.
+7. `certbot renew --cert-name radio.yoruming.cn --dry-run --run-deploy-hooks --non-interactive --no-random-sleep-on-renew` succeeds and the versioned hook validates and reloads Nginx.
 
 ## Deployment
 

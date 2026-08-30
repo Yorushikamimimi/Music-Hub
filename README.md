@@ -1,7 +1,7 @@
 # Music Hub
 
 一个仅供本人访问的 `Yorushika` 主题音乐站点，提供作品索引、Song Stories、
-搜索筛选、本地收藏和白名单 Radio。
+搜索筛选、本地收藏和登录保护的 Radio。
 
 ## 项目定位
 - `Web App`：面向个人展示与轻量互动的 Flask 网站。
@@ -9,13 +9,13 @@
 - `MVP`：当前为可运行的最小可交付版本。
   - 中文解释：`MVP` 指保留核心能力、可被真实使用的最小版本。
 
-## 当前状态（2026-07-29）
+## 当前状态（2026-08-23）
 - 目录：以 Yorushika 官方艺人目录中的音乐发行为范围，整理 22 部作品、111 首独立曲目与 124 个曲序位置，保留发行日期、类型、封面、官方来源和复核日期。
 - 页面：首页、作品集、单曲详情、搜索、Song Stories、Radio、策展说明与浏览器本地收藏。
 - 作品页：22 部作品均使用完整策展档案；官方公开信息、本站聆听笔记、个人聆听路径、完整曲序与资料来源分区展示。
 - 影像：24 首已有人工核对的 Bilibili 影像入口；只确认页面可达且标题与曲目相符，不代表官方授权或长期可用。其余曲目只展示官方作品来源。
 - Radio：57 个 Live 分曲文件，覆盖 2021《前世》、2022《月光》、2024《前世》和 2024《月与猫的舞蹈》，按演出与曲序播放，并显示“Live 标识 + 歌名”、当前曲目、近似进度、下一首和 25% 初始音量。
-- 私密边界：禁止搜索引擎收录，Radio 不提供下载入口，只面向 Nginx 白名单。
+- 私密边界：正式入口为 `https://radio.yoruming.cn/`，全站与 HLS 均受 HTTP Basic Auth 保护并禁止搜索引擎收录；旧 IP 白名单入口仅作为回退。
 - 工程：图片和字体已减重；数据库使用可回滚迁移；依赖带哈希锁定；具备集成测试。
 - 数据：曲目与发行作品已拆分，多作品收录的同一首歌只保留一份曲目资料，并按作品分别保存曲序。
 - 运维：Web 与 Radio 使用独立非 root 用户，Unix socket 放在 `/run`。
@@ -67,7 +67,9 @@ RADIO_SERVICE_NAME=yorushika-radio.service \
 - `deploy/systemd/music-hub-health.{service,timer}`
 - `deploy/systemd/music-hub-backup.{service,timer}`
 - `deploy/systemd/music-hub-failure@.service`
+- `deploy/certbot/reload-nginx.sh`
 - `deploy/nginx/musichub-ip.conf`
+- `deploy/nginx/musichub-radio.conf`
 
 音频文件不进入 Git。电台服务从 `/srv/media/yorushika-radio/music` 读取人工
 白名单内的 MP3，并在 `/run/yorushika-radio/` 生成临时 HLS 分片与曲目元数据。

@@ -7,6 +7,7 @@ RADIO_MUSIC_DIR="${RADIO_MUSIC_DIR:-/srv/media/yorushika-radio/music}"
 MYSQL_BACKUP_DIR="${MYSQL_BACKUP_DIR:-/var/backups/music-hub/mysql}"
 RELEASE_BACKUP_DIR="${RELEASE_BACKUP_DIR:-/var/backups/music-hub/releases}"
 MONITOR_STATE_DIR="${MONITOR_STATE_DIR:-/var/lib/music-hub-monitor}"
+LEGACY_NGINX_CONF="${LEGACY_NGINX_CONF:-/etc/nginx/conf.d/musichub-ip.conf}"
 
 if [[ "$(id -u)" -ne 0 ]]; then
   echo "Run this one-time preparation script as root." >&2
@@ -59,8 +60,23 @@ install -m 0644 "${APP_DIR}/deploy/systemd/music-hub-backup.timer" \
   /etc/systemd/system/music-hub-backup.timer
 install -m 0644 "${APP_DIR}/deploy/systemd/music-hub-failure@.service" \
   /etc/systemd/system/music-hub-failure@.service
-install -m 0644 "${APP_DIR}/deploy/nginx/musichub-ip.conf" \
-  /etc/nginx/conf.d/musichub-ip.conf
+install -d -m 0755 /etc/letsencrypt/renewal-hooks/deploy
+install -m 0755 "${APP_DIR}/deploy/certbot/reload-nginx.sh" \
+  /etc/letsencrypt/renewal-hooks/deploy/reload-nginx
+if [[ -e "${LEGACY_NGINX_CONF}" ]]; then
+  echo "Preserving existing server-local legacy IP allowlist: ${LEGACY_NGINX_CONF}"
+else
+  install -m 0644 "${APP_DIR}/deploy/nginx/musichub-ip.conf" \
+    "${LEGACY_NGINX_CONF}"
+fi
+if [[ -r /etc/letsencrypt/live/radio.yoruming.cn/fullchain.pem \
+  && -r /etc/letsencrypt/live/radio.yoruming.cn/privkey.pem \
+  && -r /etc/nginx/.htpasswd-radio ]]; then
+  install -m 0644 "${APP_DIR}/deploy/nginx/musichub-radio.conf" \
+    /etc/nginx/conf.d/musichub-radio.conf
+else
+  echo "Skipping authenticated domain config: certificate or password hash is missing."
+fi
 
 systemctl daemon-reload
 nginx -t

@@ -388,6 +388,7 @@ def test_radio_is_marked_private_and_never_autoplays(client):
     page = client.get("/radio").get_data(as_text=True)
 
     assert "私人聆听入口" in page
+    assert "正式域名使用 HTTPS 登录保护" in page
     assert "autoplay" not in page
     assert 'preload="none"' in page
     assert "初始音量 25%" in page
