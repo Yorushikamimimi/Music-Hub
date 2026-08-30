@@ -52,7 +52,7 @@ def test_reliability_units_have_timers_failure_recording_and_narrow_paths():
 def test_deploy_creates_recovery_points_and_preserves_runtime_data():
     deploy = Path("scripts/deploy_music_hub.sh").read_text(encoding="utf-8")
 
-    assert 'BRANCH="${BRANCH:-codex/yorushika-redesign-prototype}"' in deploy
+    assert 'BRANCH="${BRANCH:-main}"' in deploy
     assert "for attempt in 1 2 3" in deploy
     assert "git -c http.version=HTTP/1.1 clone" in deploy
     assert "Unable to clone ${REPO_URL} after 3 attempts" in deploy

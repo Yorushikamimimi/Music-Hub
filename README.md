@@ -21,6 +21,7 @@
 - 运维：Web 与 Radio 使用独立非 root 用户，Unix socket 放在 `/run`。
 - 可靠性：5 分钟健康检查、每日 MySQL 备份、失败记录、完整发布快照和显式回滚已上线。
 - 视觉：采用“夜鹿集 / YORUSHIKA ARCHIVE”内容型设计，中文说明为主、日文标题为作品标识。
+- 版本库：`main` 是公开、可复现的唯一长期分支；Git 收口不等于服务器部署，线上版本仍以 `deployed-version.json` 为准。
 
 > 2026-07-28 已完成真实备份与隔离恢复演练，并启用健康检查和备份 timer。
 > 当前备份仍与服务器同盘；它能处理误操作和发布回退，不能替代异地灾备。
@@ -47,7 +48,7 @@ chmod +x scripts/deploy_music_hub.sh
 常用参数覆盖（按需）：
 
 ```bash
-BRANCH=codex/yorushika-redesign-prototype \
+BRANCH=main \
 HOST_HEADER=81.68.72.245 \
 SERVICE_NAME=musichub.service \
 RADIO_SERVICE_NAME=yorushika-radio.service \

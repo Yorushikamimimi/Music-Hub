@@ -1,12 +1,20 @@
 # Project Progress
 
-> Updated: 2026-07-29 (Asia/Shanghai)
+> Updated: 2026-08-30 (Asia/Shanghai)
 
 ## Current Stage
-- Stage: `Phase 8 complete release archive production`
-- Meaning: Phase 8 commit `2a3ea91` is the accepted production baseline. The
-  remaining 14 factual release overviews are now complete sourced archives, so all
-  22 releases use the same evidence-bounded editorial model.
+- Stage: `Canonical main repository consolidation complete`
+- Meaning: `main` carries the complete accepted hardening, archive redesign,
+  four-Live Radio and authenticated-domain history. It is the sole long-lived
+  public branch and the default deployment source.
+- Repository content baseline: `96dab70` contains the 2026-08-23 HTTPS / Basic
+  Auth versioned configuration and the sanitized legacy-IP template.
+- Validation: 98 tests passed; Python compile, Flask import, Bash / POSIX shell
+  syntax and Git diff checks passed. Local `nginx -t` was N/A because no Nginx
+  runtime was available, and this Git-only closeout did not connect to production.
+- Production boundary: no deploy, restart, DNS, firewall or server-file change
+  was performed. The exact live version remains owned by the server-side
+  `deployed-version.json` source of truth.
 
 ## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
@@ -200,4 +208,6 @@
 7. Confirmed `https://yoruming.cn/` still served the Personal Knowledge Hub after
    the Music Hub Web restart.
 
-The deployed Phase 8 application commit `2a3ea91` is the production baseline.
+The last repository-recorded deployed application before this closeout is
+`ff9d974`. The 2026-08-30 branch consolidation is Git-only and does not replace
+the server-side `deployed-version.json` as the production source of truth.

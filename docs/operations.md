@@ -132,6 +132,10 @@ Browser acceptance should additionally prove:
 
 ## Deployment
 
+`main` is the canonical public branch and the deployment script defaults to it.
+Selecting another branch is an explicit maintenance override, not the normal
+release path.
+
 `scripts/deploy_music_hub.sh` keeps `.env`, `venv/`, uploads and the current
 avatar; creates a complete pre-deploy code snapshot; installs hash-locked
 dependencies; creates a verified pre-migration database backup; compiles the
