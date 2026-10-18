@@ -1,6 +1,15 @@
 # Project Progress
 
-> Updated: 2026-08-30 (Asia/Shanghai)
+## 当前审查修复（2026-10-19）
+
+- 已核实：GitHub About 的 Website 仍是已停用的 `music.yoruming.cn`；它不是站内 About 模板。已清空 Website，并将描述与 README 明示为“无公开在线演示”，未以私人电台替代公开演示。
+- 许可：有权许可的原创代码补 MIT；`THIRD_PARTY_NOTICES.md` 单列 Outfit 1.100 / OFL 1.1、Bootstrap Icons 1.11.1 / MIT、Bootstrap 5.3.0 / MIT。完整原许可随文件保存；Icons 两份字体与该上游版本逐字节一致，Outfit 内嵌版权与上游 OFL 对应，但生成批次未独立证明。42 份封面与 2 份 SVG 已逐项列出来源证据/未知项；所有封面的再分发许可仍待核，未改删原件，未纳入项目 MIT。
+- 上线：本轮只有 GitHub 元数据、项目文档和三份静态许可文本，没有 UI/业务改动。三份许可已按白名单最小同步至受保护站点，Unix socket 实际 HTTP 200 且 SHA-256 与本地一致；Web 与 Radio 的 PID 均未变，未重启、迁移、读取生产记录或改认证。现有健康 service Result=success；首页/About/Radio/healthz/HLS 及许可文件未认证 HTTPS 均 401。未进行登录后浏览器/完整播放验收，历史验收不升级为本轮实时事实。
+- 版本与恢复：应用 release 仍 `maintenance-20261002T113255Z`；许可增量 `license-notices-20261019`。运行清单由 111 增为 114 项，全部 SHA-256 匹配，整体指纹 `22e161a8c5fa2ba9bcd9836f89357b1e0a30b679f12d224b9bc19822372dcff1`。原版本记录和三文件 payload 保存在 `/var/backups/music-hub/content-releases/license-notices-20261019/`；回滚仅需将三份新增文本保留到备份后移出静态目录并恢复原版本记录，不需改服务/数据库；本轮未演练。
+- 验证与交付：现有项目 .venv 在 `PYTHON_DOTENV_DISABLED=1`、临时 SQLite fixture 下 114 Python tests passed；12 Node frontend tests passed；文档链接、原许可与文件指纹检查通过；上游 OFL 原文的一处行尾空格原样保留，其余暂存文件 diff 检查通过。READY 仅限本轮新增文本和 About 元数据修正；封面授权、历史/远端附件的全面公开审计未完成，不对整个项目素材再分发给 READY。仓库本来已公开，本轮不新增媒体或改写旧 refs。
+- Git 边界与下一步：本轮按明确授权只提交许可文件、第三方说明、README 相关修正与当前进度/运维记录的新节，保留原有 10-02 未提交维护改动。该维护内容已在服务器，但未混入本轮提交，Git HEAD 仍不能替代完整线上清单；后续完整 Git 对齐须另定范围。后续按用户新需求恢复；素材复用或新发布包前先补足授权证据。
+
+> Updated: 2026-10-19 (Asia/Shanghai)
 
 ## Current Stage
 - Stage: `Canonical main repository consolidation complete`

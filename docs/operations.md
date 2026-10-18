@@ -1,5 +1,15 @@
 # Operations Guide
 
+## 2026-10-19 公开入口与静态许可修复
+
+GitHub About Website 已清空，描述注明无公开在线演示；未把私人 `radio.yoruming.cn` 作为公开 Demo。项目原创代码使用 MIT，第三方代码、字体、图像单列 `THIRD_PARTY_NOTICES.md`，封面公开再分发许可仍待核。
+
+本轮仅上线 `static/fonts/OFL-Outfit.txt`、`static/fonts/LICENSE-bootstrap-icons.txt`、`static/css/LICENSE-bootstrap.txt` 三份静态原许可，未改页面、服务配置、认证、依赖、数据库或曲库；不因授权上线就执行无必要重启。部署前原 111 项指纹全匹配，现清单 114 项匹配；原记录与 payload 备份在 `/var/backups/music-hub/content-releases/license-notices-20261019/`，原应用 release 不变，增量 ID 为 `license-notices-20261019`。
+
+实际验证：三份许可经 Unix socket HTTP 获取为 200 且指纹一致；未登录正式域名首页、About、Radio、healthz、HLS 和许可文本均 401，私人功能未被公开。Web/Radio PID 保持 `1681547`/`1681545`，NRestarts 均 0，健康 service Result=success。未读取凭证或生产数据，未做登录后页面/完整播放验收或回滚演练。现有 .venv 的隔离测试为 114 Python 与 12 Node tests passed，不等于私人站点所有流程验收。
+
+版本状态、Git 范围和后续入口唯一见 `docs/progress.md` 顶部；本轮 commit/push 只覆盖审查修复，保留原有可靠性维护改动。
+
 ## Current Runtime
 
 - Primary entry: `https://radio.yoruming.cn/`

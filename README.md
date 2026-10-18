@@ -3,6 +3,9 @@
 一个仅供本人访问的 `Yorushika` 主题音乐站点，提供作品索引、Song Stories、
 搜索筛选、本地收藏和登录保护的 Radio。
 
+**无公开在线演示。** 旧 `music.yoruming.cn` 已停用；私人站点和 HLS 均需登录，
+不能作为陌生访客的公开体验入口。阅读源码可从下方快速开始进入。
+
 ## 项目定位
 - `Web App`：面向个人展示与轻量互动的 Flask 网站。
   - 中文解释：`Web App` 指通过浏览器访问并完成主要交互的应用。
@@ -37,45 +40,19 @@
 详见 [docs/quick-start.md](./docs/quick-start.md)。
 
 ## 服务器更新
-在服务器执行：
 
-```bash
-cd /var/www/My_Homepage
-chmod +x scripts/deploy_music_hub.sh
-./scripts/deploy_music_hub.sh
-```
+现有生产访问方式和发布/回滚入口见 [运行与合规手册](docs/operations.md#current-runtime)。
+服务器运行的是经指纹核对的内容发布，不能用旧 `.git` 标签替代实际部署版本，
+也不要为文档或 GitHub About 元数据更新执行常规拉取、迁移或服务重启。
+本地仍保留 2026-10-02 已上线但未独立提交的维护改动；本轮许可提交不将其混入，
+后续完整源码交付与部署应先核对 `docs/progress.md` 和服务器 `deployed-version.json`。
 
-常用参数覆盖（按需）：
+## 许可与素材
 
-```bash
-BRANCH=main \
-HOST_HEADER=81.68.72.245 \
-SERVICE_NAME=musichub.service \
-RADIO_SERVICE_NAME=yorushika-radio.service \
-./scripts/deploy_music_hub.sh
-```
-
-说明：
-- `BRANCH`：要部署的 Git 分支。
-- `HOST_HEADER`：本机 Nginx 健康检查使用的 Host。
-- `SERVICE_NAME`：systemd 服务名。
-- `RADIO_SERVICE_NAME`：HLS 电台 systemd 服务名。
-
-部署配置位于：
-
-- `deploy/systemd/musichub.service`
-- `deploy/systemd/yorushika-radio.service`
-- `deploy/systemd/music-hub-health.{service,timer}`
-- `deploy/systemd/music-hub-backup.{service,timer}`
-- `deploy/systemd/music-hub-failure@.service`
-- `deploy/certbot/reload-nginx.sh`
-- `deploy/nginx/musichub-ip.conf`
-- `deploy/nginx/musichub-radio.conf`
-
-音频文件不进入 Git。电台服务从 `/srv/media/yorushika-radio/music` 读取人工
-白名单内的 MP3，并在 `/run/yorushika-radio/` 生成临时 HLS 分片与曲目元数据。
-每次替换曲库前后都必须将 MP3 与 SHA-256 清单复制到服务器之外；Git 只负责
-播放顺序、显示名称、服务配置和网页源码，不能替代音频备份。
+维护者有权许可的原创代码使用 [MIT](LICENSE)。字体、Bootstrap、封面和艺人相关
+标识分别遵从 [第三方说明](THIRD_PARTY_NOTICES.md)；已补随字体分发的完整原许可。
+封面可关联作品资料，但图片再分发许可仍待核，不因代码采用 MIT 而获得使用授权。
+项目不随源码提供私人曲库、真实数据库或可公开使用的电台凭证。
 
 ## 文档导航
 - 项目总览：[docs/overview.md](./docs/overview.md)
