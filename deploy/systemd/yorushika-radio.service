@@ -14,8 +14,10 @@ Environment="RADIO_STATION_NAME=Yorushika Radio"
 Environment="RADIO_BUFFER_DELAY_SECONDS=16"
 RuntimeDirectory=yorushika-radio
 RuntimeDirectoryMode=0750
+CacheDirectory=yorushika-radio
+CacheDirectoryMode=0750
 ExecStartPre=/usr/bin/python3 /var/www/My_Homepage/scripts/generate_radio_schedule.py
-ExecStart=/usr/bin/ffmpeg -hide_banner -loglevel warning -re -f concat -safe 0 -i /run/yorushika-radio/playlist.txt -vn -c:a aac -b:a 192k -ar 44100 -ac 2 -f hls -hls_time 4 -hls_list_size 10 -hls_flags delete_segments+independent_segments+omit_endlist+program_date_time -hls_segment_filename /run/yorushika-radio/hls/yorushika-%%08d.ts /run/yorushika-radio/hls/yorushika.m3u8
+ExecStart=/usr/bin/ffmpeg -hide_banner -loglevel warning -stream_loop -1 -re -i /var/cache/yorushika-radio/loop.mka -vn -c:a aac -b:a 192k -ar 44100 -ac 2 -f hls -hls_time 4 -hls_list_size 10 -hls_flags delete_segments+independent_segments+omit_endlist+program_date_time -hls_segment_filename /run/yorushika-radio/hls/yorushika-%%08d.ts /run/yorushika-radio/hls/yorushika.m3u8
 Restart=always
 RestartSec=3
 TimeoutStopSec=15
@@ -35,7 +37,7 @@ ProtectKernelModules=true
 ProtectKernelTunables=true
 ProtectSystem=strict
 ReadOnlyPaths=/srv/media/yorushika-radio/music
-ReadWritePaths=/run/yorushika-radio
+ReadWritePaths=/run/yorushika-radio /var/cache/yorushika-radio
 RestrictAddressFamilies=AF_UNIX
 RestrictSUIDSGID=true
 LockPersonality=true

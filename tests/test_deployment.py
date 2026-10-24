@@ -17,7 +17,10 @@ def test_radio_restarts_after_a_clean_playlist_completion():
 
     assert "Restart=always" in unit
     assert "Restart=on-failure" not in unit
-    assert "-stream_loop" not in unit
+    assert "-stream_loop -1 -re -i /var/cache/yorushika-radio/loop.mka" in unit
+    assert "CacheDirectory=yorushika-radio" in unit
+    assert "CacheDirectoryMode=0750" in unit
+    assert "ReadWritePaths=/run/yorushika-radio /var/cache/yorushika-radio" in unit
     assert "-c:a aac -b:a 192k -ar 44100 -ac 2" in unit
 
 
@@ -53,6 +56,10 @@ def test_deploy_creates_recovery_points_and_preserves_runtime_data():
     deploy = Path("scripts/deploy_music_hub.sh").read_text(encoding="utf-8")
 
     assert 'BRANCH="${BRANCH:-main}"' in deploy
+    assert 'TMP_WORK_DIR=""' in deploy
+    assert 'mktemp -d -- "${TMP_DIR}.XXXXXX"' in deploy
+    assert 'rm -rf -- "${TMP_WORK_DIR}"' in deploy
+    assert 'rm -rf "${TMP_DIR}"' not in deploy
     assert "for attempt in 1 2 3" in deploy
     assert "git -c http.version=HTTP/1.1 clone" in deploy
     assert "Unable to clone ${REPO_URL} after 3 attempts" in deploy
@@ -60,6 +67,8 @@ def test_deploy_creates_recovery_points_and_preserves_runtime_data():
     assert 'systemctl start "${BACKUP_SERVICE_NAME}"' in deploy
     assert "mysql_backup.py\" backup" in deploy
     assert "health_check.py" in deploy
+    assert '"${APP_DIR}/venv/bin/python" -m pip install' in deploy
+    assert '"${APP_DIR}/requirements-tooling.txt"' in deploy
     assert 'HEALTH_CHECK_ATTEMPTS="${HEALTH_CHECK_ATTEMPTS:-6}"' in deploy
     assert 'HEALTH_CHECK_DELAY_SECONDS="${HEALTH_CHECK_DELAY_SECONDS:-3}"' in deploy
     assert "while true; do" in deploy

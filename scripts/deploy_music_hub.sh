@@ -8,6 +8,7 @@ HOST_HEADER="${HOST_HEADER:-81.68.72.245}"
 BRANCH="${BRANCH:-main}"
 REPO_URL="${REPO_URL:-https://github.com/Yorushikamimimi/Music-Hub.git}"
 TMP_DIR="${TMP_DIR:-/tmp/music-hub-release}"
+TMP_WORK_DIR=""
 BACKUP_ROOT="${BACKUP_ROOT:-/var/backups/music-hub}"
 RELEASE_BACKUP_DIR="${RELEASE_BACKUP_DIR:-${BACKUP_ROOT}/releases}"
 MYSQL_BACKUP_DIR="${MYSQL_BACKUP_DIR:-${BACKUP_ROOT}/mysql}"
@@ -43,19 +44,25 @@ need_cmd gzip
 need_cmd python3
 
 cleanup() {
-  rm -rf "${TMP_DIR}"
+  if [[ -n "${TMP_WORK_DIR}" && -d "${TMP_WORK_DIR}" ]]; then
+    rm -rf -- "${TMP_WORK_DIR}"
+  fi
 }
 trap cleanup EXIT
 
 log "Start deploy: repo=${REPO_URL}, branch=${BRANCH}"
+TMP_WORK_DIR="$(mktemp -d -- "${TMP_DIR}.XXXXXX")"
 for attempt in 1 2 3; do
-  rm -rf "${TMP_DIR}"
+  if (( attempt > 1 )); then
+    rm -rf -- "${TMP_WORK_DIR}"
+    TMP_WORK_DIR="$(mktemp -d -- "${TMP_DIR}.XXXXXX")"
+  fi
   log "Clone attempt ${attempt}/3 (HTTP/1.1)"
   if git -c http.version=HTTP/1.1 clone \
     --depth 1 \
     --branch "${BRANCH}" \
     "${REPO_URL}" \
-    "${TMP_DIR}"; then
+    "${TMP_WORK_DIR}"; then
     break
   fi
 
@@ -66,14 +73,14 @@ for attempt in 1 2 3; do
 
   sleep "$((attempt * 3))"
 done
-source_commit="$(git -C "${TMP_DIR}" rev-parse --verify HEAD)"
+source_commit="$(git -C "${TMP_WORK_DIR}" rev-parse --verify HEAD)"
 
 log "Prepare app and backup directories"
 ${SUDO} mkdir -p "${APP_DIR}" "${RELEASE_BACKUP_DIR}" "${MYSQL_BACKUP_DIR}"
 
 if [[ -n "$(${SUDO} find "${APP_DIR}" -mindepth 1 -maxdepth 1 -print -quit)" ]]; then
   log "Create a complete pre-deploy code snapshot"
-  ${SUDO} python3 "${TMP_DIR}/scripts/release_snapshot.py" create \
+  ${SUDO} python3 "${TMP_WORK_DIR}/scripts/release_snapshot.py" create \
     --app-dir "${APP_DIR}" \
     --backup-dir "${RELEASE_BACKUP_DIR}" \
     --keep "${RELEASE_KEEP}" \
@@ -88,7 +95,7 @@ ${SUDO} rsync -a --delete \
   --exclude "${KEEP_ENV_FILE}" \
   --exclude "static/uploads/" \
   --exclude "current_avatar.txt" \
-  "${TMP_DIR}/" "${APP_DIR}/"
+  "${TMP_WORK_DIR}/" "${APP_DIR}/"
 
 if [[ ! -x "${APP_DIR}/venv/bin/pip" ]]; then
   log "Create venv because ${APP_DIR}/venv not found"
@@ -96,6 +103,9 @@ if [[ ! -x "${APP_DIR}/venv/bin/pip" ]]; then
 fi
 
 log "Install dependencies"
+${SUDO} "${APP_DIR}/venv/bin/python" -m pip install \
+  --require-hashes \
+  -r "${APP_DIR}/requirements-tooling.txt"
 ${SUDO} "${APP_DIR}/venv/bin/pip" install \
   --require-hashes \
   -r "${APP_DIR}/requirements.txt"

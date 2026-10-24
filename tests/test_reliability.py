@@ -5,10 +5,41 @@ import pathlib
 import subprocess
 import sys
 import tarfile
+import datetime as dt
 
 import pytest
 
 from scripts import health_check, mysql_backup, release_snapshot
+
+
+HEALTHY_TS_SEGMENT = (b"\x47" + bytes(187)) * 2
+
+
+@pytest.mark.parametrize(
+    ("timestamp", "expected_offset"),
+    [
+        ("2026-10-02T19:43:35.278+0800", dt.timedelta(hours=8)),
+        ("2026-10-02T19:43:35.278+08:00", dt.timedelta(hours=8)),
+        ("2026-10-02T11:43:35.278Z", dt.timedelta(0)),
+    ],
+)
+def test_parse_ffmpeg_program_datetime_offsets(timestamp, expected_offset):
+    parsed = health_check.parse_program_datetime(timestamp)
+
+    assert parsed.utcoffset() == expected_offset
+
+
+@pytest.mark.parametrize(
+    "timestamp",
+    [
+        "2026-10-02T19:43:35.278+2460",
+        "2026-10-02T19:43:35.278+0800junk",
+        "not-a-timestamp+0800",
+    ],
+)
+def test_parse_program_datetime_rejects_invalid_values(timestamp):
+    with pytest.raises(ValueError):
+        health_check.parse_program_datetime(timestamp)
 
 
 def test_health_check_covers_web_database_and_radio(monkeypatch):
@@ -16,7 +47,12 @@ def test_health_check_covers_web_database_and_radio(monkeypatch):
 
     responses = {
         "/healthz": b'{"status":"ok"}',
-        "/hls/yorushika.m3u8": b"#EXTM3U\nsegment-0001.ts\n",
+        "/hls/yorushika.m3u8": (
+            "#EXTM3U\n#EXT-X-PROGRAM-DATE-TIME:"
+            + dt.datetime.now(dt.timezone.utc).isoformat()
+            + "\nyorushika-00000001.ts\n"
+        ).encode(),
+        "/hls/yorushika-00000001.ts": HEALTHY_TS_SEGMENT,
         "/hls/radio-schedule.json": b'{"private":true,"tracks":[{"title":"Elma"}]}',
     }
     monkeypatch.setattr(
@@ -35,6 +71,138 @@ def test_health_check_covers_web_database_and_radio(monkeypatch):
     assert result["failures"] == []
     assert result["checks"]["http:/healthz"] == "ok"
     assert result["checks"]["http:/hls/yorushika.m3u8"] == "ok"
+    assert result["attempts"] == 1
+
+
+def test_health_check_retries_startup_failures_with_a_bounded_attempt_count(
+    monkeypatch,
+):
+    monkeypatch.setattr(health_check, "service_is_active", lambda _service: None)
+    fetch_count = 0
+
+    def fake_fetch(_base_url, _host_header, path):
+        nonlocal fetch_count
+        if path == "/hls/yorushika.m3u8":
+            fetch_count += 1
+            if fetch_count == 1:
+                raise OSError("playlist is not ready")
+            return (
+                "#EXTM3U\n#EXT-X-PROGRAM-DATE-TIME:"
+                + dt.datetime.now(dt.timezone.utc).isoformat()
+                + "\nyorushika-00000001.ts\n"
+            ).encode()
+        if path == "/hls/yorushika-00000001.ts":
+            return HEALTHY_TS_SEGMENT
+        return {
+            "/healthz": b'{"status":"ok"}',
+            "/hls/radio-schedule.json": b'{"private":true,"tracks":[{"title":"Elma"}]}',
+        }[path]
+
+    monkeypatch.setattr(health_check, "fetch", fake_fetch)
+    monkeypatch.setattr(health_check.time, "sleep", lambda _seconds: None)
+
+    result = health_check.run_checks(
+        "http://127.0.0.1",
+        "81.68.72.245",
+        ("yorushika-radio.service",),
+        attempts=2,
+        retry_delay_seconds=0,
+    )
+
+    assert result["status"] == "ok"
+    assert result["attempts"] == 2
+    assert fetch_count == 2
+
+
+def test_health_check_fails_when_the_latest_hls_segment_is_stale(monkeypatch):
+    monkeypatch.setattr(health_check, "service_is_active", lambda _service: None)
+    stale_date = dt.datetime.now(dt.timezone.utc) - dt.timedelta(seconds=90)
+    responses = {
+        "/healthz": b'{"status":"ok"}',
+        "/hls/yorushika.m3u8": (
+            "#EXTM3U\n#EXT-X-PROGRAM-DATE-TIME:"
+            + stale_date.isoformat()
+            + "\nyorushika-00000001.ts\n"
+        ).encode(),
+        "/hls/radio-schedule.json": b'{"private":true,"tracks":[{"title":"Elma"}]}',
+    }
+    monkeypatch.setattr(
+        health_check,
+        "fetch",
+        lambda _base_url, _host_header, path: responses[path],
+    )
+
+    result = health_check.run_checks(
+        "http://127.0.0.1",
+        "81.68.72.245",
+        ("yorushika-radio.service",),
+        attempts=1,
+    )
+
+    assert result["status"] == "failed"
+    assert any("latest HLS segment is stale" in failure for failure in result["failures"])
+
+
+def test_health_check_fails_when_latest_hls_segment_is_missing(monkeypatch):
+    monkeypatch.setattr(health_check, "service_is_active", lambda _service: None)
+    responses = {
+        "/healthz": b'{"status":"ok"}',
+        "/hls/yorushika.m3u8": (
+            "#EXTM3U\n#EXT-X-PROGRAM-DATE-TIME:"
+            + dt.datetime.now(dt.timezone.utc).isoformat()
+            + "\nyorushika-00000001.ts\n"
+        ).encode(),
+        "/hls/radio-schedule.json": b'{"private":true,"tracks":[{"title":"Elma"}]}',
+    }
+
+    def fake_fetch(_base_url, _host_header, path):
+        if path == "/hls/yorushika-00000001.ts":
+            raise OSError("segment returned HTTP 404")
+        return responses[path]
+
+    monkeypatch.setattr(health_check, "fetch", fake_fetch)
+
+    result = health_check.run_checks(
+        "http://127.0.0.1",
+        "81.68.72.245",
+        ("yorushika-radio.service",),
+        attempts=1,
+    )
+
+    assert result["status"] == "failed"
+    assert any("HLS segment" in failure and "404" in failure for failure in result["failures"])
+
+
+def test_health_check_rejects_segment_urls_and_path_traversal(monkeypatch):
+    monkeypatch.setattr(health_check, "service_is_active", lambda _service: None)
+    responses = {
+        "/healthz": b'{"status":"ok"}',
+        "/hls/yorushika.m3u8": (
+            "#EXTM3U\n#EXT-X-PROGRAM-DATE-TIME:"
+            + dt.datetime.now(dt.timezone.utc).isoformat()
+            + "\n../private.ts\n"
+        ).encode(),
+        "/hls/radio-schedule.json": b'{"private":true,"tracks":[{"title":"Elma"}]}',
+    }
+    segment_requests = []
+
+    def fake_fetch(_base_url, _host_header, path):
+        if path.startswith("/hls/") and path.endswith(".ts"):
+            segment_requests.append(path)
+        return responses[path]
+
+    monkeypatch.setattr(health_check, "fetch", fake_fetch)
+
+    result = health_check.run_checks(
+        "http://127.0.0.1",
+        "81.68.72.245",
+        ("yorushika-radio.service",),
+        attempts=1,
+    )
+
+    assert result["status"] == "failed"
+    assert any("unsafe HLS segment path" in failure for failure in result["failures"])
+    assert segment_requests == []
 
 
 def test_mysql_retention_only_deletes_managed_backup_names(tmp_path):
