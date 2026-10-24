@@ -1,0 +1,3 @@
+# Keep installation tools patched separately from application dependencies.
+pip==26.2.1
+setuptools==84.0.0
