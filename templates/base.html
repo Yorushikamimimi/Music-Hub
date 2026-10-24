@@ -13,10 +13,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/yorushika-archive.css') }}">
-    <script src="{{ url_for('static', filename='site.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='favorites.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='about.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='radio.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='site.js', v=static_js_version) }}" defer></script>
+    <script src="{{ url_for('static', filename='favorites.js', v=static_js_version) }}" defer></script>
+    <script src="{{ url_for('static', filename='about.js', v=static_js_version) }}" defer></script>
+    <script src="{{ url_for('static', filename='radio.js', v=static_js_version) }}" defer></script>
 </head>
 
 <body{% if global_radio_stream_url %} class="has-global-radio"{% endif %}>

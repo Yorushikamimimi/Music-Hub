@@ -4,20 +4,39 @@
  */
 
 const FAV_KEY = 'yorushika_favorites';
+let favoritesReadWarningShown = false;
+let favoritesReadFailed = false;
 
 /** 读取所有收藏（返回对象数组） */
 function getFavorites() {
+    favoritesReadFailed = false;
     try {
-        const value = JSON.parse(localStorage.getItem(FAV_KEY));
+        const storedValue = localStorage.getItem(FAV_KEY);
+        const value = JSON.parse(storedValue);
+        if (storedValue !== null && !Array.isArray(value)) {
+            throw new Error('Stored favorites are not a list');
+        }
         return Array.isArray(value) ? value : [];
-    } catch {
+    } catch (error) {
+        favoritesReadFailed = true;
+        console.warn('Favorites could not be read:', error);
+        if (!favoritesReadWarningShown) {
+            favoritesReadWarningShown = true;
+            showToast('浏览器未能读取已有收藏，收藏列表可能不完整。');
+        }
         return [];
     }
 }
 
 /** 保存收藏列表 */
 function saveFavorites(favs) {
-    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+    try {
+        localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+        return true;
+    } catch (error) {
+        console.warn('Favorites could not be saved:', error);
+        return false;
+    }
 }
 
 /** 是否已收藏（按 id 或 link 判断） */
@@ -28,13 +47,14 @@ function isFavorited(songId) {
 /** 切换收藏状态，返回最新状态 true / false */
 function toggleFavorite(song) {
     let favs = getFavorites();
+    if (favoritesReadFailed) return null;
     const idx = favs.findIndex(s => s.id === song.id);
     if (idx === -1) {
         favs.push(song);
     } else {
         favs.splice(idx, 1);
     }
-    saveFavorites(favs);
+    if (!saveFavorites(favs)) return null;
     return idx === -1; // true = 刚被收藏
 }
 
@@ -62,6 +82,10 @@ function initFavButtons() {
                 year:   btn.dataset.songYear,
             };
             const added = toggleFavorite(song);
+            if (added === null) {
+                showToast('浏览器无法读取或保存收藏，请检查存储设置或空间。');
+                return;
+            }
             if (added) {
                 btn.classList.add('favorited');
                 icon.classList.replace('bi-heart', 'bi-heart-fill');

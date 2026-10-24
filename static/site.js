@@ -17,7 +17,12 @@
         );
     };
 
-    const savedTheme = localStorage.getItem('theme');
+    let savedTheme = null;
+    try {
+        savedTheme = localStorage.getItem('theme');
+    } catch (error) {
+        console.warn('Theme preference unavailable:', error);
+    }
     const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
     root.setAttribute('data-theme', initialTheme);
     updateThemeControl(initialTheme);
@@ -27,7 +32,11 @@
             ? 'dark'
             : 'light';
         root.setAttribute('data-theme', nextTheme);
-        localStorage.setItem('theme', nextTheme);
+        try {
+            localStorage.setItem('theme', nextTheme);
+        } catch (error) {
+            console.warn('Theme preference could not be saved:', error);
+        }
         updateThemeControl(nextTheme);
     });
 

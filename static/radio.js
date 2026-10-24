@@ -26,6 +26,32 @@
     let scheduleUnavailable = false;
     let serverClockOffset = 0;
     let renderedTrackKey = '';
+    let scheduleRetryTimer = null;
+    let scheduleRetryAttempt = 0;
+    let scheduleRequestInFlight = false;
+    let playbackRequested = false;
+    let playbackRetryTimer = null;
+    let playbackRetryAttempt = 0;
+
+    const MAX_PLAYBACK_RETRIES = 5;
+    const MAX_SCHEDULE_RETRY_DELAY_MS = 60000;
+
+    const safeStorageGet = (key) => {
+        try {
+            return localStorage.getItem(key);
+        } catch (error) {
+            console.warn('Radio preference unavailable:', error);
+            return null;
+        }
+    };
+
+    const safeStorageSet = (key, value) => {
+        try {
+            localStorage.setItem(key, value);
+        } catch (error) {
+            console.warn('Radio preference could not be saved:', error);
+        }
+    };
 
     try {
         artworkByTitle = JSON.parse(
@@ -228,6 +254,7 @@
 
     const updatePlaybackControls = () => {
         const isPlaying = !audio.paused && !audio.ended;
+        const isRecoveryPending = playbackRequested && !isPlaying;
         dock.classList.toggle('is-playing', isPlaying);
         const page = pageControls();
         page.cover?.classList.toggle('is-playing', isPlaying);
@@ -236,14 +263,21 @@
         const updateToggle = (button) => {
             if (!button) return;
             const icon = button.querySelector('i');
-            icon?.classList.toggle('bi-play-fill', !isPlaying);
-            icon?.classList.toggle('bi-pause-fill', isPlaying);
+            const offersPause = isPlaying || isRecoveryPending;
+            icon?.classList.toggle('bi-play-fill', !offersPause);
+            icon?.classList.toggle('bi-pause-fill', offersPause);
             button.setAttribute(
                 'aria-label',
-                isPlaying ? '暂停夜鹿电台' : '播放夜鹿电台'
+                isPlaying
+                    ? '暂停夜鹿电台'
+                    : isRecoveryPending ? '取消夜鹿电台重连' : '播放夜鹿电台'
             );
             const label = button.querySelector('span');
-            if (label) label.textContent = isPlaying ? '暂停播放' : '开始收听';
+            if (label) {
+                label.textContent = isPlaying
+                    ? '暂停播放'
+                    : isRecoveryPending ? '取消重连' : '开始收听';
+            }
         };
         updateToggle(dockToggle);
         updateToggle(page.toggle);
@@ -266,17 +300,67 @@
         });
     };
 
+    const playAudio = async ({retry = false} = {}) => {
+        if (!playbackRequested || (!retry && !audio.paused)) return;
+        if (playbackRetryTimer !== null) {
+            window.clearTimeout(playbackRetryTimer);
+            playbackRetryTimer = null;
+        }
+        setPlaybackMessage(retry ? '电台连接中断，正在尝试恢复…' : '正在连接夜鹿电台…');
+        try {
+            if (retry) audio.load?.();
+            await audio.play();
+            if (!playbackRequested) audio.pause();
+        } catch (error) {
+            if (!playbackRequested) return;
+            updatePlaybackControls();
+            setPlaybackMessage('音频暂时无法播放，正在尝试恢复…');
+            console.warn('Radio playback did not start:', error);
+            schedulePlaybackRetry();
+        }
+    };
+
+    const schedulePlaybackRetry = () => {
+        if (!playbackRequested || playbackRetryTimer !== null) return;
+        if (playbackRetryAttempt >= MAX_PLAYBACK_RETRIES) {
+            playbackRequested = false;
+            updatePlaybackControls();
+            setPlaybackMessage('电台暂时无法恢复，请点击播放重试。');
+            return;
+        }
+        const delay = Math.min(1000 * (2 ** playbackRetryAttempt), 16000);
+        playbackRetryAttempt += 1;
+        playbackRetryTimer = window.setTimeout(() => {
+            playbackRetryTimer = null;
+            playAudio({retry: true});
+        }, delay);
+    };
+
+    const stopPlaybackRetries = () => {
+        if (playbackRetryTimer !== null) {
+            window.clearTimeout(playbackRetryTimer);
+            playbackRetryTimer = null;
+        }
+        playbackRetryAttempt = 0;
+    };
+
     const togglePlayback = async () => {
-        if (audio.paused) {
-            setPlaybackMessage('正在连接夜鹿电台…');
-            try {
-                await audio.play();
-            } catch (error) {
-                setPlaybackMessage('播放未能开始，请稍后再试。');
-                console.warn('Radio playback did not start:', error);
-            }
-        } else {
+        if (playbackRequested && audio.paused) {
+            playbackRequested = false;
+            stopPlaybackRetries();
             audio.pause();
+            updatePlaybackControls();
+            setPlaybackMessage('准备好后，点击“开始收听”。');
+        } else if (audio.paused) {
+            playbackRequested = true;
+            playbackRetryAttempt = 0;
+            updatePlaybackControls();
+            await playAudio();
+        } else {
+            playbackRequested = false;
+            stopPlaybackRetries();
+            audio.pause();
+            updatePlaybackControls();
         }
     };
 
@@ -313,14 +397,60 @@
         );
     };
 
+    const validSchedule = (value) => (
+        value
+        && typeof value === 'object'
+        && typeof value.startedAt === 'number'
+        && Number.isFinite(value.startedAt)
+        && value.startedAt >= 0
+        && Array.isArray(value.tracks)
+        && value.tracks.length > 0
+        && value.tracks.every((track) => (
+            track
+            && typeof track === 'object'
+            && typeof track.duration === 'number'
+            && Number.isFinite(track.duration)
+            && track.duration > 0
+            && (typeof track.title === 'string' || typeof track.artworkTitle === 'string')
+        ))
+        && (
+            value.bufferDelaySeconds === undefined
+            || Number.isFinite(Number(value.bufferDelaySeconds))
+        )
+    );
+
+    const scheduleRetryDelay = () => Math.min(
+        5000 * (2 ** Math.min(scheduleRetryAttempt, 4)),
+        MAX_SCHEDULE_RETRY_DELAY_MS
+    );
+
+    const scheduleScheduleRetry = () => {
+        if (scheduleRetryTimer !== null) return;
+        const delay = scheduleRetryDelay();
+        scheduleRetryAttempt += 1;
+        scheduleRetryTimer = window.setTimeout(() => {
+            scheduleRetryTimer = null;
+            loadSchedule();
+        }, delay);
+    };
+
     const loadSchedule = async () => {
+        if (scheduleRequestInFlight) return;
+        scheduleRequestInFlight = true;
+        let controller = null;
+        let timeoutId = null;
         try {
+            controller = new AbortController();
+            timeoutId = window.setTimeout(() => controller.abort(), 10000);
             const scheduleUrl = new URL(
                 dock.dataset.radioSchedule,
                 window.location.origin
             );
             scheduleUrl.searchParams.set('v', String(Date.now()));
-            const response = await fetch(scheduleUrl, {cache: 'no-store'});
+            const response = await fetch(scheduleUrl, {
+                cache: 'no-store',
+                signal: controller.signal,
+            });
             if (!response.ok) {
                 throw new Error(
                     `Schedule request failed with ${response.status}`
@@ -334,17 +464,30 @@
                 ) / 1000;
             }
 
-            schedule = await response.json();
+            const nextSchedule = await response.json();
+            if (!validSchedule(nextSchedule)) {
+                throw new Error('Radio schedule payload is invalid');
+            }
+            schedule = nextSchedule;
+            scheduleUnavailable = false;
+            scheduleRetryAttempt = 0;
             renderSchedule();
-            window.setInterval(renderSchedule, 1000);
+            if (scheduleRetryTimer !== null) {
+                window.clearTimeout(scheduleRetryTimer);
+                scheduleRetryTimer = null;
+            }
         } catch (error) {
             scheduleUnavailable = true;
             renderUnavailableSchedule();
+            scheduleScheduleRetry();
             console.warn('Radio schedule unavailable:', error);
+        } finally {
+            if (timeoutId !== null) window.clearTimeout(timeoutId);
+            scheduleRequestInFlight = false;
         }
     };
 
-    const savedVolumeSetting = localStorage.getItem('radio-volume');
+    const savedVolumeSetting = safeStorageGet('radio-volume');
     const savedVolume = Number(savedVolumeSetting);
     audio.volume = savedVolumeSetting !== null
         && Number.isFinite(savedVolume)
@@ -363,6 +506,12 @@
     });
 
     audio.addEventListener('play', () => {
+        if (!playbackRequested) {
+            audio.pause();
+            updatePlaybackControls();
+            setPlaybackMessage('准备好后，点击“开始收听”。');
+            return;
+        }
         updatePlaybackControls();
         setPlaybackMessage('夜鹿电台正在播放。');
     });
@@ -381,22 +530,45 @@
         setPlaybackMessage('正在缓冲直播音频…');
     });
     audio.addEventListener('playing', () => {
+        if (!playbackRequested) {
+            audio.pause();
+            updatePlaybackControls();
+            setPlaybackMessage('准备好后，点击“开始收听”。');
+            return;
+        }
         updatePlaybackControls();
         setPlaybackMessage('夜鹿电台正在播放。');
     });
     audio.addEventListener('volumechange', () => {
-        localStorage.setItem('radio-volume', String(audio.volume));
+        safeStorageSet('radio-volume', String(audio.volume));
         updateVolumeControls();
     });
     audio.addEventListener('error', () => {
         updatePlaybackControls();
-        setPlaybackMessage('音频暂时无法播放，请稍后再试。');
+        if (playbackRequested) {
+            setPlaybackMessage('音频连接中断，正在尝试恢复…');
+            schedulePlaybackRetry();
+        } else {
+            setPlaybackMessage('音频暂时无法播放，请稍后再试。');
+        }
+    });
+    audio.addEventListener('playing', () => {
+        if (!playbackRequested) return;
+        playbackRetryAttempt = 0;
+        stopPlaybackRetries();
     });
 
     if ('mediaSession' in navigator) {
         try {
-            navigator.mediaSession.setActionHandler('play', () => audio.play());
-            navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+            navigator.mediaSession.setActionHandler('play', () => {
+                playbackRequested = true;
+                playAudio();
+            });
+            navigator.mediaSession.setActionHandler('pause', () => {
+                playbackRequested = false;
+                stopPlaybackRetries();
+                audio.pause();
+            });
         } catch (error) {
             console.warn('Media Session controls unavailable:', error);
         }
@@ -407,4 +579,6 @@
     updatePlaybackControls();
     updateVolumeControls();
     loadSchedule();
+    window.setInterval(renderSchedule, 1000);
+    window.setInterval(loadSchedule, 60000);
 })();

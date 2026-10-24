@@ -89,7 +89,13 @@ const initAboutWishlist = () => {
         clearButton.dataset.wishlistBound = 'true';
         clearButton.addEventListener('click', () => {
             if (window.confirm('确认清空全部收藏吗？')) {
-                localStorage.removeItem(FAV_KEY);
+                try {
+                    localStorage.removeItem(FAV_KEY);
+                } catch (error) {
+                    console.warn('Favorites could not be cleared:', error);
+                    showToast('浏览器未能清空收藏，请检查存储设置。');
+                    return;
+                }
                 window.renderWishlist();
                 showToast('收藏已清空。');
             }

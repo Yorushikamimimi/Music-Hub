@@ -1,6 +1,8 @@
 """Flask application factory for Music Hub."""
 
+import hashlib
 import os
+from pathlib import Path
 
 from flask import Flask, jsonify, request, url_for
 from flask_migrate import Migrate
@@ -17,6 +19,10 @@ migrate = Migrate()
 
 def create_app(test_config=None):
     app = Flask(__name__)
+    script_digest = hashlib.sha256()
+    for filename in ("site.js", "favorites.js", "about.js", "radio.js"):
+        script_digest.update((Path(app.static_folder) / filename).read_bytes())
+    app.jinja_env.globals["static_js_version"] = script_digest.hexdigest()[:16]
     app.config.update(
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",

@@ -40,6 +40,20 @@ def test_primary_routes_are_available(client, path):
     assert response.status_code == 200
 
 
+def test_scripts_use_content_version_to_avoid_stale_browser_cache(client):
+    import hashlib
+    from pathlib import Path
+
+    digest = hashlib.sha256()
+    names = ("site.js", "favorites.js", "about.js", "radio.js")
+    for name in names:
+        digest.update((Path("static") / name).read_bytes())
+    version = digest.hexdigest()[:16]
+    page = client.get("/").get_data(as_text=True)
+    for name in names:
+        assert f'/static/{name}?v={version}' in page
+
+
 def test_search_matches_japanese_title_and_real_album(client):
     response = client.get("/search", query_string={"q": "春泥棒"})
     page = response.get_data(as_text=True)

@@ -1,7 +1,15 @@
 # Project Progress
 
+## 2026-10-24 本地复验与 Git 交付
+
+- 按用户授权保存此前已上线但未纳入 Git 的可靠性维护，以及已确认的审查验收记录；依赖、服务端／部署、前端／交付文档按文件分批。
+- 本轮隔离复跑：禁用 dotenv、临时 SQLite fixture，114 项 Python 测试通过；12 项 Node 前端测试通过；部署脚本语法和相关 diff 检查通过；现有 uv 环境 28 个包依赖兼容检查通过。没有安装依赖、读取生产数据库或凭证，也没有重新部署、重启或操作真实收藏。
+- 公开增量只含源码、哈希锁文件、测试与文字文档；去除新增公开文本中的本机备份路径，完整原记录保留在仓库外。没有新增媒体、截图、运行数据或发布包；既有第三方素材授权、全部历史及远端附件仍未全面复核。
+- Git 当前提交与远端状态以实际历史／回读为准。10-02 与 10-19 的浏览器、服务器及备份检查属于历史证据；完整长轮次、跨浏览器、实体手机和整机灾备边界仍保留，本轮没有重跑这些验收。
+
 ## 当前审查修复（2026-10-19）
 
+- 本人验收：2026-10-19 Tian 已在“人生俯瞰模式”明确确认本次 GitHub 审查修复验收通过；本条为主控回传的本人确认。只对本轮入口、许可说明及静态许可上线收口，不扩大为全链路、全部素材版权或全历史审计通过。该验收记录当时仅留本地；现纳入 2026-10-24 Git 交付，本轮未新增部署。
 - 已核实：GitHub About 的 Website 仍是已停用的 `music.yoruming.cn`；它不是站内 About 模板。已清空 Website，并将描述与 README 明示为“无公开在线演示”，未以私人电台替代公开演示。
 - 许可：有权许可的原创代码补 MIT；`THIRD_PARTY_NOTICES.md` 单列 Outfit 1.100 / OFL 1.1、Bootstrap Icons 1.11.1 / MIT、Bootstrap 5.3.0 / MIT。完整原许可随文件保存；Icons 两份字体与该上游版本逐字节一致，Outfit 内嵌版权与上游 OFL 对应，但生成批次未独立证明。42 份封面与 2 份 SVG 已逐项列出来源证据/未知项；所有封面的再分发许可仍待核，未改删原件，未纳入项目 MIT。
 - 上线：本轮只有 GitHub 元数据、项目文档和三份静态许可文本，没有 UI/业务改动。三份许可已按白名单最小同步至受保护站点，Unix socket 实际 HTTP 200 且 SHA-256 与本地一致；Web 与 Radio 的 PID 均未变，未重启、迁移、读取生产记录或改认证。现有健康 service Result=success；首页/About/Radio/healthz/HLS 及许可文件未认证 HTTPS 均 401。未进行登录后浏览器/完整播放验收，历史验收不升级为本轮实时事实。
@@ -9,21 +17,29 @@
 - 验证与交付：现有项目 .venv 在 `PYTHON_DOTENV_DISABLED=1`、临时 SQLite fixture 下 114 Python tests passed；12 Node frontend tests passed；文档链接、原许可与文件指纹检查通过；上游 OFL 原文的一处行尾空格原样保留，其余暂存文件 diff 检查通过。READY 仅限本轮新增文本和 About 元数据修正；封面授权、历史/远端附件的全面公开审计未完成，不对整个项目素材再分发给 READY。仓库本来已公开，本轮不新增媒体或改写旧 refs。
 - Git 边界与下一步：本轮按明确授权只提交许可文件、第三方说明、README 相关修正与当前进度/运维记录的新节，保留原有 10-02 未提交维护改动。该维护内容已在服务器，但未混入本轮提交，Git HEAD 仍不能替代完整线上清单；后续完整 Git 对齐须另定范围。后续按用户新需求恢复；素材复用或新发布包前先补足授权证据。
 
-> Updated: 2026-10-19 (Asia/Shanghai)
+> Updated: 2026-10-24 (Asia/Shanghai)
+
+## Latest Maintenance Release
+
+- 2026-10-02 19:49 CST：可靠性维护已部署，release `maintenance-20261002T113255Z`；详情见 [发布与验收记录](./operations.md#2026-10-02-可靠性维护发布)。
+- 完成：无损播放缓存与无限循环、前端有上限重连/时间表刷新、浏览器存储异常降级、部署临时目录保护、分片健康检查、干净哈希锁定依赖与 111 项运行文件指纹核验。
+- 验证：114 Python tests + 12 Node tests；服务器 Python 3.10 隔离页面检查、正式 HLS 解码与健康检查通过。Chrome 实际播放、跨页、短暂缺失流后自动恢复、正常收藏增删、深浅主题和 390 px Radio/About 无溢出通过。
+- 备份：发布前 MySQL 副本已复制到 Mac、SHA-256 一致、隔离恢复检查通过；自动异机备份和故障通知另定。原始曲库、生产数据库内容、认证、Nginx 与防火墙未修改。
+- 边界：2026-10-24 已获本次 Git 交付授权；完整 57 首长轮次、跨浏览器和整机灾备尚未证明；线上影像“已核对”数字由非空链接数生成，与历史 24 条核验记录需专项对齐。
 
 ## Current Stage
-- Stage: `Canonical main repository consolidation complete`
-- Meaning: `main` carries the complete accepted hardening, archive redesign,
-  four-Live Radio and authenticated-domain history. It is the sole long-lived
-  public branch and the default deployment source.
+- Stage: `Reliability maintenance deployed; Git delivery authorized`
+- Meaning: production runs the verified working-tree content release. `main`
+  remains the sole long-lived branch. This delivery saves the maintenance in Git;
+  verify remote state before any future deployment, which requires separate authority.
 - Repository content baseline: `96dab70` contains the 2026-08-23 HTTPS / Basic
   Auth versioned configuration and the sanitized legacy-IP template.
-- Validation: 98 tests passed; Python compile, Flask import, Bash / POSIX shell
-  syntax and Git diff checks passed. Local `nginx -t` was N/A because no Nginx
-  runtime was available, and this Git-only closeout did not connect to production.
-- Production boundary: no deploy, restart, DNS, firewall or server-file change
-  was performed. The exact live version remains owned by the server-side
-  `deployed-version.json` source of truth.
+- Validation: 114 Python tests, 12 frontend tests, Shell syntax, Git diff,
+  production Nginx/unit checks, HLS decoding and logged-in Chrome acceptance passed.
+- Production boundary: code, runtime dependencies and Radio unit deployed;
+  no production catalog/migration, credentials, firewall, DNS or active Nginx change.
+  Exact runtime evidence is the 111-file manifest in `deployed-version.json`,
+  not the server's stale `.git` or a base-commit label.
 
 ## Phase 2 Production Baseline
 1. Replaced the generic Music Hub presentation with the reviewed
