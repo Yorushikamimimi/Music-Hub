@@ -1,5 +1,20 @@
 # Project Progress
 
+## 2026-11-08 静态版已上线 radio.yoruming.cn（无密码）
+
+- 2026-11-08｜Claude 桌面版 Code／控制台负责人｜本人定：静态版不要密码、下掉查询、去掉电台页。
+- 新增 `scripts/export_static.py`：用真实模板导出 140 页（`build/static-site/`，不进 git）；`STATIC_SITE` 开关隐藏搜索、年份筛选、聆听手记搜索、电台与播放条；不导出工房联动。nginx 草稿 `deploy/nginx/yeluji-static.conf`（无密码、只 GET/HEAD、仍禁收录）。
+- `static/site.js`：没手动选时 19:00–6:00 自动深色，手动选择只管到下次日夜交替。本机登录项已重启生效。测试 126 passed；本机 61796 预览了首页、作品集、歌曲、发行页，图片全部加载。
+- 本人定保留封面并授权部署：文件在服务器 `/srv/sites/yeluji-static/releases/20261108-1841`（`current` 软链接指向它），nginx 换成 `conf.d/yeluji-static.conf`；公网 140 页 200、`/search` `/radio` 404、POST 405、安全头与禁收录在，ego 实测图片全部加载、站内跳转正常。
+- 回滚：`/srv/sites/yeluji-static/backups/20261108/musichub-radio.conf` 放回 `conf.d`、删掉 `yeluji-static.conf`，`nginx -t` 后 reload（旧配置指向的应用进程已停，回滚后只会回到 502／密码页）。更新内容：本机重跑导出、打包上传新发布目录、改 `current` 软链接。
+- **未证明**：手机实机、长期访问量；封面公开再分发的许可仍待核（本人知情后选择保留）。
+
+## 2026-11-08 安全审查（本机预览）
+
+- 2026-11-08｜Claude 桌面版 Code／控制台负责人｜本人要求审查四个本机服务与网页。发现本机预览不校验 Host：伪造 Host 也能读到工房画面，相当于绕开了工房自己的本机限制（DNS rebinding）。
+- 修复：`routes/local_studio.py` 加只认本机地址的检查；`scripts/local_preview.py` 设 `TRUSTED_HOSTS`。新增用例，测试 125 passed；重启登录项后伪造 Host 返回 400，正常访问 200。
+- **未证明**：真实 DNS rebinding 攻击没有演练，只用伪造 Host 头模拟。
+
 ## 2026-11-08 下线服务器、本机改版已验收并提交
 
 2026-11-08｜Claude 桌面版 Code／控制台负责人（11-08 起统一负责本仓库）｜本人要求先下线、本机改版，后续再考虑上服务器，并去掉验收要输密码的麻烦。
