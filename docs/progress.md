@@ -6,7 +6,7 @@
 - 下线：服务器 `systemctl disable --now musichub.service yorushika-radio.service music-hub-health.timer`；nginx、Basic Auth、证书、数据库、音频、备份全部保留，`music-hub-backup.timer` 仍在跑。恢复＝`systemctl enable --now` 这三项。
 - 新单曲《雲を抜け風下へ私だけ》（10-14，detail/80）已入目录，封面经本人同意下载，THIRD_PARTY_NOTICES 已补一行（再分发许可待核）。
 - 改版（按 qiye `previews/yeluji-v1` 方向）：`static/motion.js`＋`yorushika-archive.css` 末尾一节（首屏错落浮现、漂浮光斑、今日卡片跟手倾斜、卡片滚动浮现）；首页新发行条与「新」标（`is_new_release`，30 天）；歌曲页「我在视觉工房留下的画面」（仅配置 `STUDIO_URL` 时出现，`routes/local_studio.py` 读工房收藏、按歌名全等匹配、缓存 60 秒）；`/songs/by-title` 供控制台跳转。
-- 本机预览：`.venv/bin/python scripts/local_preview.py` → http://127.0.0.1:61705 （临时 SQLite、无密码，工房在 8765 时自动接上）；目前 30 首歌能配到工房帧。测试 122 passed（新增 `tests/test_local_studio.py`）。
+- 本机预览：http://127.0.0.1:61705 已由 qiye 登录项 `cn.yoruming.qiye.yeluji` 常驻（跑的就是 `scripts/local_preview.py`；临时 SQLite、无密码、每次启动重建，工房在 8765 时自动接上；日志 `~/Library/Logs/qiye/yeluji.log`）。改了模板或 JS 后要重启它才生效：`launchctl kickstart -k gui/$(id -u)/cn.yoruming.qiye.yeluji`；目前 30 首歌能配到工房帧。测试 122 passed（新增 `tests/test_local_studio.py`）。
 - 本人验收中发现：点「工房画面」后画面块消失。原因是站内换页（site.js 抓取后替换正文、改锚点也会触发）后 motion.js 没重跑；已改为随 `music-hub:page-load` 重跑、按钮直接滚动不改网址，ego 实测站内点进、点按钮、后退再前进三条路径都正常。
 - 本人追加：列表里标出有工房画面的歌。新增 `/local/studio/songs`（各歌帧数），首页精选、作品集、专辑页两处曲目、发行总览、搜索结果的歌名旁显示深色「工房 N」小标，仅本机出现；测试 124 passed。
 - 本人验收：11-08 本人在本机预览确认「验收通过」（首页动效、新发行、歌曲页工房画面、列表「工房 N」、控制台两去处）。
