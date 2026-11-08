@@ -99,7 +99,7 @@
                             {% if song.link %}target="_blank" rel="noopener noreferrer" aria-label="在 B 站打开 {{ song.title_ja }} 影像"{% endif %}
                         >
                             <span>{{ "%02d"|format(song.track_number) }}</span>
-                            <strong>{{ song.title_ja }}</strong>
+                            <strong>{{ song.title_ja }}{% if studio_enabled %}<span class="studio-tag" data-studio-slug="{{ song.slug }}" hidden></span>{% endif %}</strong>
                             <small>{{ song.title_en or "官方曲序收录" }}</small>
                             <i class="bi {% if song.link %}bi-play-circle{% else %}bi-arrow-up-right{% endif %}" aria-hidden="true"></i>
                         </a>

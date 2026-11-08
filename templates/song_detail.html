@@ -74,9 +74,27 @@
                 >
                     <i class="bi bi-heart" aria-hidden="true"></i> 收藏
                 </button>
+                {% if studio_enabled %}
+                <a class="archive-button archive-button-secondary studio-jump" href="#studio" hidden>
+                    <i class="bi bi-images" aria-hidden="true"></i> <span>工房画面</span>
+                </a>
+                {% endif %}
             </div>
         </div>
     </article>
+
+    {% if studio_enabled %}
+    <section class="studio-frames" id="studio" data-studio-frames="{{ url_for('local_studio.frames', slug=song.slug) }}" aria-labelledby="studio-title" hidden>
+        <div class="studio-frames-head">
+            <h2 id="studio-title">我在视觉工房留下的画面</h2>
+            <span class="studio-count"></span>
+        </div>
+        <p class="studio-lyric" aria-live="polite"></p>
+        <div class="studio-strip"></div>
+        <p class="studio-frames-foot">悬停看那一帧配的歌词，点开在视觉工房里打开。只在本机显示，画面不离开这台电脑。</p>
+        <p class="studio-offline">视觉工房现在没开，打开后刷新这页就能看到收藏的画面。</p>
+    </section>
+    {% endif %}
 
     <section class="song-note-grid" aria-labelledby="note-title">
         <div class="song-note-main">

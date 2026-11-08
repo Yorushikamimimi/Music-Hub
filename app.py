@@ -1,5 +1,6 @@
 """Flask application factory for Music Hub."""
 
+import datetime
 import hashlib
 import os
 from pathlib import Path
@@ -12,15 +13,26 @@ from commands import register_commands
 from catalog_data import CATALOG_TRACKS
 from config import load_runtime_config
 from models import db
+from routes.local_studio import local_studio_bp
 from routes.main import main_bp
 
 migrate = Migrate()
+
+NEW_RELEASE_DAYS = 30
+
+
+def is_new_release(release_date, today=None):
+    """A release counts as new for 30 days after it comes out."""
+    if release_date is None:
+        return False
+    today = today or datetime.date.today()
+    return 0 <= (today - release_date).days <= NEW_RELEASE_DAYS
 
 
 def create_app(test_config=None):
     app = Flask(__name__)
     script_digest = hashlib.sha256()
-    for filename in ("site.js", "favorites.js", "about.js", "radio.js"):
+    for filename in ("site.js", "favorites.js", "about.js", "radio.js", "motion.js"):
         script_digest.update((Path(app.static_folder) / filename).read_bytes())
     app.jinja_env.globals["static_js_version"] = script_digest.hexdigest()[:16]
     app.config.update(
@@ -46,6 +58,9 @@ def create_app(test_config=None):
     db.init_app(app)
     migrate.init_app(app, db)
     app.register_blueprint(main_bp)
+    app.register_blueprint(local_studio_bp)
+    app.jinja_env.globals["is_new_release"] = is_new_release
+    app.jinja_env.globals["studio_enabled"] = bool(app.config.get("STUDIO_URL"))
     register_commands(app)
 
     @app.context_processor

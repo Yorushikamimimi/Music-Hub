@@ -74,7 +74,7 @@
             <li>
                 <a class="release-track-main" href="{{ url_for('main.song_detail', slug=song.slug, release=release.slug) }}">
                     <span>{{ "%02d"|format(song.track_number) }}</span>
-                    <strong>{{ song.title_ja }}</strong>
+                    <strong>{{ song.title_ja }}{% if studio_enabled %}<span class="studio-tag" data-studio-slug="{{ song.slug }}" hidden></span>{% endif %}</strong>
                     <small>{{ song.title_en or "本站曲目资料" }}</small>
                     <i class="bi bi-arrow-right" aria-hidden="true"></i>
                 </a>

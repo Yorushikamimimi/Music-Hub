@@ -45,7 +45,7 @@ def test_scripts_use_content_version_to_avoid_stale_browser_cache(client):
     from pathlib import Path
 
     digest = hashlib.sha256()
-    names = ("site.js", "favorites.js", "about.js", "radio.js")
+    names = ("site.js", "favorites.js", "about.js", "radio.js", "motion.js")
     for name in names:
         digest.update((Path("static") / name).read_bytes())
     version = digest.hexdigest()[:16]
@@ -85,8 +85,8 @@ def test_discography_groups_tracks_and_supports_filters(client):
     page = client.get("/discography").get_data(as_text=True)
 
     assert "作品集" in page
-    assert "124 个已核对曲序位置" in page
-    assert "22 个作品集合" in page
+    assert "125 个已核对曲序位置" in page
+    assert "23 个作品集合" in page
     assert "二人称" in page
     assert "22 首完整曲序" in page
     assert "盗作" in page
@@ -378,14 +378,14 @@ def test_about_explains_archive_identity_scope_and_boundaries(client):
 
     assert "关于夜鹿集" in page
     assert "它不是一份热度榜" in page
-    assert "22 <span>部</span>" in page
-    assert "111 <span>首</span>" in page
-    assert "124 <span>条</span>" in page
+    assert "23 <span>部</span>" in page
+    assert "112 <span>首</span>" in page
+    assert "125 <span>条</span>" in page
     assert "111 <span>首</span>" in page
     assert "独立曲目" in page
     assert "曲序位置" in page
     assert "Yorushika 官方艺人目录中的音乐发行" in page
-    assert "已核对 22 部作品" in page
+    assert "已核对 23 部作品" in page
     assert "不含 Live 影像制品、书简型小说" in page
     assert "不代表官方授权或长期可用" in page
     assert "当前只收录已经逐项核对的八部作品" not in page

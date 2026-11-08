@@ -541,6 +541,16 @@ LEGACY_RELEASES = (
 
 NEW_RELEASES = (
     {
+        "slug": "kumo-wo-nuke",
+        "title": "雲を抜け風下へ私だけ",
+        "release_type": "Digital Single",
+        "release_date": date(2026, 10, 14),
+        "cover_path": "release_kumo_wo_nuke.webp",
+        "source_url": "https://yorushika.com/discography/artist/2/detail/80/",
+        "source_checked_at": date(2026, 11, 8),
+        "tracks": (("kumo-wo-nuke", "雲を抜け風下へ私だけ"),),
+    },
+    {
         "slug": "nininsyou",
         "title": "二人称",
         "release_type": "Digital Album",
@@ -762,7 +772,9 @@ def _build_catalog_tracks():
                         "当前仅记录官方收录信息，不转载完整歌词。"
                     ),
                     "source_url": primary_release["source_url"],
-                    "source_checked_at": CATALOG_REVIEWED_ON,
+                    "source_checked_at": primary_release.get(
+                        "source_checked_at", CATALOG_REVIEWED_ON
+                    ),
                     "mv_url": BILIBILI_VIDEO_LINKS.get(slug),
                 }
             )

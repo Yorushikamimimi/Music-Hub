@@ -263,6 +263,7 @@ def index():
         total_song_count=len(songs),
         listening_paths=listening_paths,
         album_spotlights=album_spotlights,
+        latest_release=releases[0] if releases else None,
     )
 
 

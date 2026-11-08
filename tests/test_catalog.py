@@ -26,8 +26,8 @@ def test_catalog_contains_curated_official_records(app):
     with app.app_context():
         songs = MusicYorushika.query.order_by(MusicYorushika.display_order).all()
 
-        assert len(songs) == 111
-        assert [song.display_order for song in songs] == list(range(1, 112))
+        assert len(songs) == 112
+        assert [song.display_order for song in songs] == list(range(1, 113))
         assert all(song.cover_path.endswith(".webp") for song in songs)
         assert all(
             (Path(app.root_path) / "static" / "images" / song.cover_path).is_file()
@@ -52,22 +52,22 @@ def test_catalog_sync_is_idempotent(app):
         result = sync_catalog()
         second_count = db.session.query(MusicYorushika).count()
 
-        assert first_count == second_count == 111
+        assert first_count == second_count == 112
         assert result == {
             "created": 0,
-            "updated": 111,
-            "total": 111,
+            "updated": 112,
+            "total": 112,
             "releases_created": 0,
-            "releases_updated": 22,
-            "releases_total": 22,
-            "placements_total": 124,
+            "releases_updated": 23,
+            "releases_total": 23,
+            "placements_total": 125,
         }
 
 
 def test_release_track_order_matches_curated_official_catalog():
-    assert len(CATALOG_TRACKS) == 111
-    assert len(CATALOG_RELEASES) == 22
-    assert len(CATALOG_RELEASE_TRACKS) == 124
+    assert len(CATALOG_TRACKS) == 112
+    assert len(CATALOG_RELEASES) == 23
+    assert len(CATALOG_RELEASE_TRACKS) == 125
     assert sum(bool(track["mv_url"]) for track in CATALOG_TRACKS) == 111
     assert len(PENDING_REVIEW_BILIBILI_VIDEO_CANDIDATES) == 23
     assert len(PENDING_REVIEW_BILIBILI_ALBUM_TRACK_CANDIDATES) == 64
@@ -157,7 +157,8 @@ def test_release_dates_and_sources_follow_official_release_pages():
     assert releases["盗作"]["source_url"].endswith("/discography/detail/15/")
     assert all("/discography/" in release["source_url"] for release in CATALOG_RELEASES)
     assert all(
-        track["source_checked_at"].isoformat() == "2026-07-29"
+        track["source_checked_at"].isoformat()
+        == ("2026-11-08" if track["slug"] == "kumo-wo-nuke" else "2026-07-29")
         for track in CATALOG_TRACKS
     )
     assert CATALOG_REVIEWED_ON.isoformat() == "2026-07-29"
@@ -175,6 +176,7 @@ def test_catalog_matches_reviewed_official_artist_release_scope():
         )
         for release in CATALOG_RELEASES
     ] == [
+        ("雲を抜け風下へ私だけ", "2026-10-14", "https://yorushika.com/discography/artist/2/detail/80/"),
         ("あぶく", "2026-04-22", "https://yorushika.com/discography/artist/2/detail/76/"),
         ("二人称", "2026-03-04", "https://yorushika.com/discography/artist/2/detail/75/"),
         ("茜", "2026-02-04", "https://yorushika.com/discography/artist/2/detail/74/"),
@@ -233,9 +235,9 @@ def test_sync_never_reuses_a_curated_row_only_because_cover_matches(
 
         result = sync_catalog()
 
-        assert result["created"] == 110
+        assert result["created"] == 111
         assert result["updated"] == 1
-        assert result["total"] == 111
+        assert result["total"] == 112
         assert {
             song.slug for song in MusicYorushika.query.order_by(MusicYorushika.id)
         } == {track["slug"] for track in CATALOG_TRACKS}

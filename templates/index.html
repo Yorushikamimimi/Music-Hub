@@ -20,6 +20,17 @@
                     进入私人电台
                 </a>
             </div>
+            {% if latest_release and is_new_release(latest_release.release_date) %}
+            <a class="release-new-strip" href="{{ url_for('main.release_detail', slug=latest_release.slug) }}">
+                <span class="release-new-dot" aria-hidden="true"></span>
+                <img src="{{ url_for('static', filename='images/' + latest_release.cover_path) }}" alt="" width="52" height="52" decoding="async">
+                <span class="release-new-copy">
+                    <strong>{{ latest_release.title }}</strong>
+                    <small>新发行 · {{ latest_release.release_type }} · {{ latest_release.release_date.strftime('%Y.%m.%d') }}</small>
+                </span>
+                <span class="release-new-go">去看看 <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+            </a>
+            {% endif %}
         </div>
 
         {% if daily_song %}
@@ -101,7 +112,9 @@
                     >
                 </a>
                 <div class="featured-track-meta">
+                    {% if is_new_release(song.release_date) %}<span class="archive-new-badge">新</span>{% endif %}
                     <span>{{ song.release_year }}</span>
+                    {% if studio_enabled %}<span class="studio-tag studio-tag-chip" data-studio-slug="{{ song.slug }}" hidden></span>{% endif %}
                     <span>{{ song.release_type }}</span>
                 </div>
                 <h3>

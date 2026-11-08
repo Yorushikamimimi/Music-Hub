@@ -139,7 +139,9 @@ def sync_catalog(commit: bool = True) -> dict:
         release.release_date = release_data["release_date"]
         release.cover_path = release_data["cover_path"]
         release.source_url = _clean_external_url(release_data["source_url"])
-        release.source_checked_at = CATALOG_REVIEWED_ON
+        release.source_checked_at = release_data.get(
+            "source_checked_at", CATALOG_REVIEWED_ON
+        )
         release.display_order = display_order
         release.is_featured = True
         releases_by_slug[release.slug] = release

@@ -1,5 +1,7 @@
 """Source-backed release stories kept separate from database catalog facts."""
 
+from datetime import date
+
 from catalog_data import CATALOG_REVIEWED_ON
 
 
@@ -793,6 +795,42 @@ RELEASE_STORIES = {
                 "url": "https://sp.universal-music.co.jp/yorushika/nininshou/",
             },
         ),
+    },
+    "kumo-wo-nuke": {
+        **_single_release_story(
+            album_title="雲を抜け風下へ私だけ",
+            title_en="",
+            track_slug="kumo-wo-nuke",
+            official_summary=(
+                "《雲を抜け風下へ私だけ》于 2026 年 10 月 14 日以 Digital Single 发行，"
+                "是电视动画《薬屋のひとりごと》第 3 期第 1 クール的片头主题曲。"
+            ),
+            official_facts=(
+                "2026 年 10 月 14 日以 Digital Single 形式发行。",
+                "Yorushika 官方公告确认，本曲是电视动画"
+                "《薬屋のひとりごと》第 3 期第 1 クール的片头主题曲。",
+                "官方发行页只列出同名单曲一首。",
+            ),
+            editorial_note=(
+                "本页目前只记录公开发行信息与主题曲关系；"
+                "个人聆听笔记待补，不先替听感下结论。"
+            ),
+            chapter_title="新发行",
+            chapter_description=(
+                "这一页只收录一首作品；点击曲名可继续查看发行资料。"
+            ),
+            official_release_url=(
+                "https://yorushika.com/discography/artist/2/detail/80/"
+            ),
+            context_sources=(
+                {
+                    "label": "Yorushika 新曲配信公告",
+                    "url": "https://yorushika.com/news/detail/11837",
+                },
+            ),
+            secondary_source_label="新曲配信公告",
+        ),
+        "source_checked_at": date(2026, 11, 8),
     },
     "abuku": _single_release_story(
         album_title="あぶく",

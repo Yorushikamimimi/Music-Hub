@@ -55,6 +55,7 @@ Outfit 的 OFL 文本取自上游提交 `902773808eb372f70fb34e8946dd1ffe604efc7
 | `release_haru.webp` | [晴る 官方资料页](https://yorushika.com/discography/detail/37/)；源码关联 | 图像获取链与公开再分发许可待核 |
 | `release_hebi.webp` | [へび 官方资料页](https://yorushika.com/discography/artist/2/detail/61/)；源码关联 | 图像获取链与公开再分发许可待核 |
 | `release_kaseijin.webp` | [火星人 官方资料页](https://yorushika.com/discography/artist/2/detail/63/)；源码关联 | 图像获取链与公开再分发许可待核 |
+| `release_kumo_wo_nuke.webp` | [雲を抜け風下へ私だけ 官方资料页](https://yorushika.com/discography/artist/2/detail/80/)；2026-11-08 经本人同意取自该页封面原图，转 900×900 WebP | 公开再分发许可待核 |
 | `release_makeinu.webp` | [負け犬にアンコールはいらない 官方资料页](https://yorushika.com/discography/detail/7/)；源码关联 | 图像获取链与公开再分发许可待核 |
 | `release_natsukusa.webp` | [夏草が邪魔をする 官方资料页](https://yorushika.com/discography/detail/8/)；源码关联 | 图像获取链与公开再分发许可待核 |
 | `release_nininsyou.webp` | [二人称 官方资料页](https://yorushika.com/discography/artist/2/detail/75/)；源码关联 | 图像获取链与公开再分发许可待核 |

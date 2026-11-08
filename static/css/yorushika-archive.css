@@ -2459,3 +2459,372 @@ body.is-page-loading #main-content {
         animation: none;
     }
 }
+
+/* ---- 2026-11 本机改版：动效、新发行、工房画面 ---- */
+@keyframes archive-rise {
+    from { opacity: 0; translate: 0 22px; filter: blur(6px); }
+    to { opacity: 1; translate: 0 0; filter: none; }
+}
+
+@keyframes archive-drift {
+    50% { transform: translate(60px, 40px) scale(1.1); }
+}
+
+@keyframes archive-ping {
+    70% { box-shadow: 0 0 0 10px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+@keyframes archive-char {
+    from { opacity: 0; translate: 0 6px; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+.archive-hero {
+    position: relative;
+    isolation: isolate;
+}
+
+.archive-hero::before,
+.archive-hero::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.32;
+    pointer-events: none;
+}
+
+.archive-hero::before {
+    top: -60px;
+    left: -140px;
+    background: #c9d3f0;
+    animation: archive-drift 18s ease-in-out infinite;
+}
+
+.archive-hero::after {
+    top: 80px;
+    right: -120px;
+    background: #f1d2d8;
+    animation: archive-drift 22s ease-in-out infinite reverse;
+}
+
+[data-theme="dark"] .archive-hero::before,
+[data-theme="dark"] .archive-hero::after {
+    opacity: 0.12;
+}
+
+.archive-hero-copy > *,
+.archive-hero .daily-listening-card {
+    animation: archive-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.archive-hero-copy > :nth-child(2) { animation-delay: 0.12s; }
+.archive-hero-copy > :nth-child(3) { animation-delay: 0.3s; }
+.archive-hero-copy > :nth-child(4) { animation-delay: 0.45s; }
+.archive-hero-copy > :nth-child(5) { animation-delay: 0.65s; }
+.archive-hero .daily-listening-card { animation-delay: 0.35s; }
+
+.archive-hero > .daily-listening-card {
+    transition: transform 0.25s ease-out, box-shadow 0.3s ease;
+    will-change: transform;
+}
+
+.archive-hero:has(.daily-listening-card) {
+    perspective: 1200px;
+}
+
+.motion-ready .featured-track-card,
+.motion-ready .listening-path-card,
+.motion-ready .album-thread-row {
+    opacity: 0;
+    translate: 0 26px;
+    transition:
+        opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--reveal-i, 0) * 70ms),
+        translate 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--reveal-i, 0) * 70ms),
+        transform 260ms ease,
+        border-color 260ms ease,
+        background-color 260ms ease;
+}
+
+.motion-ready .is-seen {
+    opacity: 1;
+    translate: 0 0;
+}
+
+.featured-track-cover {
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.45s ease;
+}
+
+.featured-track-card:hover .featured-track-cover {
+    transform: translateY(-6px);
+    box-shadow: 0 26px 40px -24px rgba(31, 38, 56, 0.5);
+}
+
+/* 新发行条与「新」标 */
+.release-new-strip {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 30rem;
+    margin: 2rem 0 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--archive-line);
+    border-radius: var(--archive-radius-md);
+    background: var(--archive-surface);
+    color: inherit;
+    text-decoration: none;
+}
+
+.release-new-strip:hover {
+    border-color: var(--archive-rose);
+    color: inherit;
+}
+
+.release-new-strip img {
+    width: 52px;
+    height: 52px;
+    flex: none;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.release-new-dot {
+    width: 9px;
+    height: 9px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--archive-rose);
+    box-shadow: 0 0 0 0 var(--archive-rose-soft);
+    animation: archive-ping 2s infinite;
+}
+
+.release-new-copy {
+    min-width: 0;
+}
+
+.release-new-copy strong {
+    display: block;
+    overflow: hidden;
+    font-size: 1rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.release-new-copy small {
+    color: var(--archive-muted);
+}
+
+.release-new-go {
+    margin-left: auto;
+    color: var(--archive-blue-deep);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.archive-new-badge,
+.featured-track-meta .archive-new-badge {
+    border-color: var(--archive-rose);
+    background: var(--archive-rose);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* 列表里的「工房 N」小标（仅本机，有工房收藏的歌才出现） */
+@keyframes studio-tag-in {
+    from { opacity: 0; transform: scale(0.8); }
+}
+
+.studio-tag {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.45rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    background: #151823;
+    color: #f2f4fa;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    vertical-align: 0.15em;
+    white-space: nowrap;
+    animation: studio-tag-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.studio-tag[hidden] {
+    display: none;
+}
+
+.featured-track-meta .studio-tag-chip {
+    margin-left: 0;
+    border-color: #151823;
+    background: #151823;
+    color: #f2f4fa;
+}
+
+[data-theme="dark"] .studio-tag,
+[data-theme="dark"] .featured-track-meta .studio-tag-chip {
+    border-color: #f2f4fa;
+    background: #f2f4fa;
+    color: #151823;
+}
+
+/* 歌曲页：视觉工房里收藏的画面（仅本机） */
+.studio-jump[hidden] {
+    display: none;
+}
+
+.studio-frames {
+    margin-top: 2rem;
+    scroll-margin-top: 96px;
+    padding: 1.5rem;
+    overflow: hidden;
+    border-radius: var(--archive-radius-lg);
+    background: #151823;
+    color: #f2f4fa;
+}
+
+.studio-frames-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.studio-frames-head h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.studio-frames-head span,
+.studio-frames-foot,
+.studio-offline {
+    color: #9aa0b5;
+    font-size: 0.8rem;
+}
+
+.studio-lyric {
+    min-height: 2.4em;
+    margin: 1rem 0 0.9rem;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+    font-style: italic;
+    line-height: 1.6;
+}
+
+.studio-lyric.is-meta {
+    color: #9aa0b5;
+    font-size: 1rem;
+    font-style: normal;
+}
+
+.studio-lyric span {
+    display: inline-block;
+    white-space: pre;
+    animation: archive-char 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.studio-strip {
+    display: flex;
+    gap: 0.75rem;
+    padding-bottom: 0.4rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+.studio-strip a {
+    position: relative;
+    flex: none;
+    width: 220px;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #222737;
+    scroll-snap-align: start;
+    animation: archive-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--reveal-i, 0) * 60ms);
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.studio-strip a:hover,
+.studio-strip a:focus-visible {
+    transform: scale(1.04);
+}
+
+.studio-strip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.studio-strip span {
+    position: absolute;
+    left: 8px;
+    bottom: 6px;
+    padding: 0 6px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-size: 0.72rem;
+}
+
+.studio-frames-foot {
+    margin: 0.75rem 0 0;
+}
+
+.studio-offline {
+    display: none;
+    margin: 0.75rem 0 0;
+}
+
+.studio-frames.is-offline .studio-offline {
+    display: block;
+}
+
+.studio-frames.is-offline .studio-lyric,
+.studio-frames.is-offline .studio-strip,
+.studio-frames.is-offline .studio-frames-foot {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    .archive-hero::before,
+    .archive-hero::after {
+        width: 260px;
+        height: 260px;
+    }
+
+    .release-new-go {
+        display: none;
+    }
+
+    .studio-strip a {
+        width: 180px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .archive-hero::before,
+    .archive-hero::after,
+    .archive-hero-copy > *,
+    .archive-hero .daily-listening-card,
+    .release-new-dot,
+    .studio-strip a,
+    .studio-lyric span {
+        animation: none;
+    }
+
+    .motion-ready .featured-track-card,
+    .motion-ready .listening-path-card,
+    .motion-ready .album-thread-row {
+        opacity: 1;
+        translate: 0 0;
+        transition: none;
+    }
+}
