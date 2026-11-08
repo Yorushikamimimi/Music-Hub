@@ -29,6 +29,8 @@ def main():
             "SECRET_KEY": "local-preview-only",
             "SQLALCHEMY_DATABASE_URI": f"sqlite:///{workdir / 'preview.sqlite3'}",
             "STUDIO_URL": os.getenv("STUDIO_URL", "http://127.0.0.1:8765"),
+            # Only answer to this machine's own addresses (blocks DNS rebinding).
+            "TRUSTED_HOSTS": ["127.0.0.1", "localhost"],
         }
     )
     with app.app_context():

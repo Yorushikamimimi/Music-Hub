@@ -13,12 +13,15 @@ import time
 import unicodedata
 import urllib.error
 import urllib.request
+from urllib.parse import urlsplit
 
 from flask import Blueprint, Response, abort, current_app, jsonify, redirect, request, url_for
 
 from models import MusicYorushika
 
 local_studio_bp = Blueprint("local_studio", __name__)
+
+_LOCAL_HOSTS = {"127.0.0.1", "localhost", "::1"}
 
 _MEDIA_ID = re.compile(r"^[0-9a-f]{16,64}$")
 _TIMEOUT = 8
@@ -31,6 +34,21 @@ def _studio_url():
     if not url:
         abort(404)
     return url
+
+
+@local_studio_bp.before_request
+def _local_only():
+    """Answer only requests addressed to this machine.
+
+    Without this, a web page using DNS rebinding could read the studio's
+    frames through here, getting around the studio's own Host check.
+    """
+    try:
+        hostname = urlsplit("//" + request.host).hostname
+    except ValueError:
+        hostname = None
+    if hostname not in _LOCAL_HOSTS:
+        abort(403)
 
 
 def normalize_title(value):

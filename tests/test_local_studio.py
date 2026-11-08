@@ -159,3 +159,9 @@ def test_songs_endpoint_counts_frames_per_song(studio_client, monkeypatch):
 def test_list_tags_are_absent_without_studio(client):
     assert client.get("/local/studio/songs").status_code == 404
     assert b"data-studio-slug" not in client.get("/discography").data
+
+
+def test_studio_routes_refuse_foreign_host(studio_client):
+    for path in ("/local/studio/songs", f"/local/studio/media/{MEDIA}", "/local/studio/frames/haru-dorobou"):
+        assert studio_client.get(path, headers={"Host": "evil.example"}).status_code == 403
+        assert studio_client.get(path, headers={"Host": "evil.example:61705"}).status_code == 403
