@@ -8,11 +8,13 @@
                 <h1 class="fw-bold mb-1">Song Stories</h1>
                 <p class="text-muted mb-0">有来源的作品资料与个人整理，不转载完整歌词</p>
             </div>
+            {% if not static_site %}
             <form action="{{ url_for('main.lyrics') }}" method="GET" class="d-flex gap-2">
                 <label class="visually-hidden" for="story-query">搜索歌曲或专辑</label>
                 <input id="story-query" type="text" class="form-control" name="q" placeholder="Song / Album" value="{{ keyword }}">
                 <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i>Search</button>
             </form>
+            {% endif %}
         </div>
     </div>
 

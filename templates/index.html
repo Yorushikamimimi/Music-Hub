@@ -16,9 +16,15 @@
                 <a class="archive-button archive-button-primary" href="{{ url_for('main.discography') }}">
                     浏览作品集 <i class="bi bi-arrow-right" aria-hidden="true"></i>
                 </a>
+                {% if static_site %}
+                <a class="archive-button archive-button-secondary" href="{{ url_for('main.lyrics') }}">
+                    阅读聆听手记
+                </a>
+                {% else %}
                 <a class="archive-button archive-button-secondary" href="{{ url_for('main.radio') }}">
                     进入私人电台
                 </a>
+                {% endif %}
             </div>
             {% if latest_release and is_new_release(latest_release.release_date) %}
             <a class="release-new-strip" href="{{ url_for('main.release_detail', slug=latest_release.slug) }}">
@@ -148,7 +154,7 @@
             {% else %}
             <a
                 class="album-thread-row"
-                href="{{ url_for('main.discography', year=album.release_year) }}#{{ album.title|replace(' ', '-') }}"
+                href="{{ url_for('main.discography') if static_site else url_for('main.discography', year=album.release_year) }}#{{ album.title|replace(' ', '-') }}"
             >
             {% endif %}
                 <span class="album-thread-year">{{ album.release_year }}</span>

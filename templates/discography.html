@@ -17,6 +17,7 @@
         </p>
     </header>
 
+    {% if not static_site %}
     <form class="discography-filter" action="{{ url_for('main.discography') }}" method="get">
         <div>
             <label for="discography-year">发行年份</label>
@@ -41,6 +42,7 @@
         <a class="archive-button archive-button-secondary" href="{{ url_for('main.discography') }}">重置</a>
         {% endif %}
     </form>
+    {% endif %}
 
     <div class="discography-summary" aria-live="polite">
         <span>当前显示 {{ albums|length }} 个作品集合</span>

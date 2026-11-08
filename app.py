@@ -61,6 +61,8 @@ def create_app(test_config=None):
     app.register_blueprint(local_studio_bp)
     app.jinja_env.globals["is_new_release"] = is_new_release
     app.jinja_env.globals["studio_enabled"] = bool(app.config.get("STUDIO_URL"))
+    # Static export (scripts/export_static.py): no search, filters or radio.
+    app.jinja_env.globals["static_site"] = bool(app.config.get("STATIC_SITE"))
     register_commands(app)
 
     @app.context_processor
