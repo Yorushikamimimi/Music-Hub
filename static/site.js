@@ -17,27 +17,44 @@
         );
     };
 
-    let savedTheme = null;
-    try {
-        savedTheme = localStorage.getItem('theme');
-    } catch (error) {
-        console.warn('Theme preference unavailable:', error);
-    }
-    const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
-    root.setAttribute('data-theme', initialTheme);
-    updateThemeControl(initialTheme);
+    // Dark from 19:00 to 6:00 unless the reader picked a theme; a manual pick
+    // lasts only until the next day/night switch, then the clock takes over.
+    const period = (now = new Date()) => {
+        const h = now.getHours();
+        const day = new Date(now);
+        if (h < 6) day.setDate(day.getDate() - 1);
+        const key = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
+        return { key: `${key}-${h >= 6 && h < 19 ? 'day' : 'night'}`, theme: h >= 6 && h < 19 ? 'light' : 'dark' };
+    };
+    const readPick = () => {
+        try {
+            const pick = JSON.parse(localStorage.getItem('theme-pick') || 'null');
+            return pick && pick.period === period().key ? pick.theme : null;
+        } catch (error) {
+            return null;
+        }
+    };
+    const applyTheme = (theme) => {
+        root.setAttribute('data-theme', theme);
+        updateThemeControl(theme);
+    };
+    applyTheme(readPick() || period().theme);
+    setInterval(() => {
+        const theme = readPick() || period().theme;
+        if (root.getAttribute('data-theme') !== theme) applyTheme(theme);
+    }, 60_000);
 
     themeToggle?.addEventListener('click', () => {
         const nextTheme = root.getAttribute('data-theme') === 'light'
             ? 'dark'
             : 'light';
-        root.setAttribute('data-theme', nextTheme);
+        applyTheme(nextTheme);
         try {
-            localStorage.setItem('theme', nextTheme);
+            localStorage.setItem('theme-pick', JSON.stringify({ theme: nextTheme, period: period().key }));
+            localStorage.removeItem('theme');
         } catch (error) {
             console.warn('Theme preference could not be saved:', error);
         }
-        updateThemeControl(nextTheme);
     });
 
     const setNavigationOpen = (isOpen) => {
